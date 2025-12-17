@@ -3,7 +3,8 @@ import { Building2, Users, MapPin, Award, Youtube, Instagram, Facebook, Twitter,
 
 export const metadata = {
   title: 'About Us - TheAkristalGroup',
-  description: 'Learn about TheAkristalGroup, your trusted real estate marketplace in Rwanda',
+  description:
+    'Learn about Akristal Group Limited, a multifaceted leader in real estate, construction, home automation, financing, design, events, transport and consulting services.',
 }
 
 export default function AboutPage() {
@@ -14,7 +15,7 @@ export default function AboutPage() {
           About Akristal Group Limited
         </h1>
         <p className="mt-4 text-lg text-gray-600 dark:text-gray-400">
-          Your trusted partner in real estate
+          A multifaceted leader in real estate and lifestyle services
         </p>
       </div>
 
@@ -25,16 +26,92 @@ export default function AboutPage() {
               Who We Are
             </h2>
             <p className="mb-4 text-gray-600 dark:text-gray-400">
-              TheAkristalGroup is a leading real estate marketplace in Rwanda, dedicated to
-              connecting buyers, sellers, and agents in a trusted and transparent environment. We
-              specialize in residential, commercial, land, and rental properties across the
-              country.
+              The Akristal Group Limited is a multifaceted leader in the real estate and lifestyle
+              sectors. We specialize in comprehensive services including Real Estate Development,
+              Construction, and cutting-edge Home Automation solutions that elevate modern living.
             </p>
             <p className="text-gray-600 dark:text-gray-400">
-              Our mission is to make real estate transactions seamless, secure, and accessible to
-              everyone. We provide a comprehensive platform that empowers property seekers and
-              owners to find their perfect match.
+              Our offerings extend to Local &amp; International Commercial and Residential
+              Properties, flexible Lease/Rentals and in-house Financing. Beyond real estate, we
+              provide Outsourcing Management, Interior &amp; Exterior Decorations, Architectural
+              Design, Event Planning, Micro Pawn/Loan activities, Transport/Car Hire services, and
+              Consulting Services for Manufacturing Companies, and we are proud owners of F.Y.L.
+              Company (Fund Your Lifestyle).
             </p>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardContent className="pt-6">
+            <h2 className="mb-4 text-2xl font-semibold text-gray-900 dark:text-white">
+              Our Services
+            </h2>
+            <p className="mb-4 text-gray-600 dark:text-gray-400">
+              We offer a comprehensive portfolio of services across real estate, lifestyle, and
+              support sectors:
+            </p>
+            <ul className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-gray-600 dark:text-gray-400">
+              <li className="flex items-start">
+                <span className="mr-2 text-blue-600 dark:text-blue-400">•</span>
+                <span>Real Estate Development</span>
+              </li>
+              <li className="flex items-start">
+                <span className="mr-2 text-blue-600 dark:text-blue-400">•</span>
+                <span>Construction</span>
+              </li>
+              <li className="flex items-start">
+                <span className="mr-2 text-blue-600 dark:text-blue-400">•</span>
+                <span>Home Automation</span>
+              </li>
+              <li className="flex items-start">
+                <span className="mr-2 text-blue-600 dark:text-blue-400">•</span>
+                <span>Local &amp; International Commercial Properties</span>
+              </li>
+              <li className="flex items-start">
+                <span className="mr-2 text-blue-600 dark:text-blue-400">•</span>
+                <span>Local &amp; International Residential Properties</span>
+              </li>
+              <li className="flex items-start">
+                <span className="mr-2 text-blue-600 dark:text-blue-400">•</span>
+                <span>Lease &amp; Rental Services</span>
+              </li>
+              <li className="flex items-start">
+                <span className="mr-2 text-blue-600 dark:text-blue-400">•</span>
+                <span>In-house Financing</span>
+              </li>
+              <li className="flex items-start">
+                <span className="mr-2 text-blue-600 dark:text-blue-400">•</span>
+                <span>Outsourcing Management</span>
+              </li>
+              <li className="flex items-start">
+                <span className="mr-2 text-blue-600 dark:text-blue-400">•</span>
+                <span>Interior &amp; Exterior Decorations</span>
+              </li>
+              <li className="flex items-start">
+                <span className="mr-2 text-blue-600 dark:text-blue-400">•</span>
+                <span>Architectural Design</span>
+              </li>
+              <li className="flex items-start">
+                <span className="mr-2 text-blue-600 dark:text-blue-400">•</span>
+                <span>Event Planning</span>
+              </li>
+              <li className="flex items-start">
+                <span className="mr-2 text-blue-600 dark:text-blue-400">•</span>
+                <span>Micro Pawn/Loan Activities</span>
+              </li>
+              <li className="flex items-start">
+                <span className="mr-2 text-blue-600 dark:text-blue-400">•</span>
+                <span>Transport &amp; Car Hire Services</span>
+              </li>
+              <li className="flex items-start">
+                <span className="mr-2 text-blue-600 dark:text-blue-400">•</span>
+                <span>Consulting Services for Manufacturing Companies</span>
+              </li>
+              <li className="flex items-start">
+                <span className="mr-2 text-blue-600 dark:text-blue-400">•</span>
+                <span>F.Y.L. Company (Fund Your Lifestyle)</span>
+              </li>
+            </ul>
           </CardContent>
         </Card>
 

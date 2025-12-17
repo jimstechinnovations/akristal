@@ -172,8 +172,12 @@ export default async function HomePage() {
                 <Building2 className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 h-8 w-8 sm:h-12 sm:w-12 text-white opacity-50" />
               </div>
               <CardContent className="p-3 sm:p-4">
-                <h3 className="font-semibold text-[#0d233e] dark:text-white mb-1 text-sm sm:text-base">Real Estate Development</h3>
-                <p className="text-xs sm:text-sm text-gray-600 dark:text-gray-400">From concept to completion</p>
+                <h3 className="font-semibold text-[#0d233e] dark:text-white mb-1 text-sm sm:text-base">
+                  Real Estate Development &amp; Construction
+                </h3>
+                <p className="text-xs sm:text-sm text-gray-600 dark:text-gray-400">
+                  End-to-end development and construction for residential and commercial projects.
+                </p>
               </CardContent>
             </Card>
             <Card className="overflow-hidden shadow-sm hover:shadow-md transition-all bg-white dark:bg-[#1e293b]">
@@ -181,8 +185,13 @@ export default async function HomePage() {
                 <Briefcase className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 h-8 w-8 sm:h-12 sm:w-12 text-white opacity-50" />
               </div>
               <CardContent className="p-3 sm:p-4">
-                <h3 className="font-semibold text-[#0d233e] dark:text-white mb-1 text-sm sm:text-base">Property Management</h3>
-                <p className="text-xs sm:text-sm text-gray-600 dark:text-gray-400">Comprehensive solutions</p>
+                <h3 className="font-semibold text-[#0d233e] dark:text-white mb-1 text-sm sm:text-base">
+                  Properties, Lease &amp; Rentals
+                </h3>
+                <p className="text-xs sm:text-sm text-gray-600 dark:text-gray-400">
+                  Local &amp; international commercial and residential properties with flexible lease,
+                  rental and in-house financing.
+                </p>
               </CardContent>
             </Card>
             <Card className="overflow-hidden shadow-sm hover:shadow-md transition-all bg-white dark:bg-[#1e293b]">
@@ -190,8 +199,13 @@ export default async function HomePage() {
                 <Home className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 h-8 w-8 sm:h-12 sm:w-12 text-white opacity-50" />
               </div>
               <CardContent className="p-3 sm:p-4">
-                <h3 className="font-semibold text-[#0d233e] dark:text-white mb-1 text-sm sm:text-base">Home Automation</h3>
-                <p className="text-xs sm:text-sm text-gray-600 dark:text-gray-400">Smart home technology</p>
+                <h3 className="font-semibold text-[#0d233e] dark:text-white mb-1 text-sm sm:text-base">
+                  Home Automation &amp; Lifestyle
+                </h3>
+                <p className="text-xs sm:text-sm text-gray-600 dark:text-gray-400">
+                  Smart home automation and lifestyle solutions powered by F.Y.L. (Fund Your
+                  Lifestyle).
+                </p>
               </CardContent>
             </Card>
             <Card className="overflow-hidden shadow-sm hover:shadow-md transition-all bg-white dark:bg-[#1e293b]">
@@ -199,8 +213,14 @@ export default async function HomePage() {
                 <TrendingUp className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 h-8 w-8 sm:h-12 sm:w-12 text-white opacity-50" />
               </div>
               <CardContent className="p-3 sm:p-4">
-                <h3 className="font-semibold text-[#0d233e] dark:text-white mb-1 text-sm sm:text-base">Interior Design</h3>
-                <p className="text-xs sm:text-sm text-gray-600 dark:text-gray-400">Create stunning spaces</p>
+                <h3 className="font-semibold text-[#0d233e] dark:text-white mb-1 text-sm sm:text-base">
+                  Design, Events &amp; Support Services
+                </h3>
+                <p className="text-xs sm:text-sm text-gray-600 dark:text-gray-400">
+                  Interior &amp; exterior decorations, architectural design, event planning,
+                  outsourcing, micro pawn/loan, transport &amp; car hire, and consulting for
+                  manufacturing companies.
+                </p>
               </CardContent>
             </Card>
           </div>

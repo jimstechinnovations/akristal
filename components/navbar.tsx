@@ -217,10 +217,13 @@ export function Navbar() {
         <div className="flex h-16 items-center justify-between">
           <div className="flex items-center">
             <Link href="/" className="flex flex-col items-start">
-              <span className="text-xl font-bold text-blue-600 dark:text-blue-400">
+              <span className="hidden sm:block text-xl font-bold text-blue-600 dark:text-blue-400">
                 TheAkristalGroup
               </span>
-              <span className="text-xs font-medium text-gray-600 dark:text-gray-400 -mt-1">
+              <span className="sm:hidden text-lg font-bold text-blue-600 dark:text-blue-400">
+                TAG
+              </span>
+              <span className="hidden sm:block text-xs font-medium text-gray-600 dark:text-gray-400 -mt-1">
                 REDEFINING REAL ESTATE
               </span>
             </Link>
@@ -374,7 +377,7 @@ export function Navbar() {
                         className="fixed inset-0 z-10" 
                         onClick={() => setProfileDropdownOpen(false)}
                       />
-                      <div className="absolute right-0 mt-2 w-64 rounded-md bg-white shadow-lg ring-1 ring-black ring-opacity-5 dark:bg-gray-800 dark:ring-gray-700 z-20">
+                      <div className="fixed left-1/2 top-16 -translate-x-1/2 w-64 max-w-[90vw] lg:absolute lg:top-auto lg:left-auto lg:right-0 lg:translate-x-0 lg:max-w-none mt-2 rounded-md bg-white shadow-lg ring-1 ring-black ring-opacity-5 dark:bg-gray-800 dark:ring-gray-700 z-20">
                         <div className="py-2">
                           {/* User Info */}
                           <div className="px-4 py-3 border-b border-gray-200 dark:border-gray-700">
