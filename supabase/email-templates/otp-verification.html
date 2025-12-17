@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Verify Your Email - Akristal Group Limited</title>
+</head>
+<body style="margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif; background-color: #f3f4f6;">
+  <table role="presentation" style="width: 100%; border-collapse: collapse; background-color: #f3f4f6; padding: 20px 0;">
+    <tr>
+      <td align="center">
+        <table role="presentation" style="width: 100%; max-width: 600px; border-collapse: collapse; background-color: #ffffff; border-radius: 8px; box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); overflow: hidden;">
+          
+          <!-- Header with Branding -->
+          <tr>
+            <td style="background: linear-gradient(135deg, #2563eb 0%, #1e40af 100%); padding: 32px 24px; text-align: center;">
+              <h1 style="margin: 0; color: #ffffff; font-size: 28px; font-weight: 700; letter-spacing: -0.5px;">
+                Akristal Group Limited
+              </h1>
+              <p style="margin: 8px 0 0 0; color: #e0e7ff; font-size: 14px; font-weight: 400;">
+                Real Estate Marketplace
+              </p>
+            </td>
+          </tr>
+
+          <!-- Main Content -->
+          <tr>
+            <td style="padding: 40px 32px;">
+              
+              <!-- Greeting -->
+              <h2 style="margin: 0 0 16px 0; color: #111827; font-size: 24px; font-weight: 600; line-height: 1.3;">
+                Verify Your Email Address
+              </h2>
+              
+              <p style="margin: 0 0 24px 0; color: #4b5563; font-size: 16px; line-height: 1.6;">
+                Thank you for signing up with Akristal Group Limited! To complete your registration and secure your account, please verify your email address using the verification code below.
+              </p>
+
+              <!-- OTP Code Box -->
+              <table role="presentation" style="width: 100%; border-collapse: collapse; margin: 32px 0;">
+                <tr>
+                  <td align="center" style="padding: 0;">
+                    <div style="background: linear-gradient(135deg, #eff6ff 0%, #dbeafe 100%); border: 2px dashed #3b82f6; border-radius: 12px; padding: 32px 24px; margin: 24px 0;">
+                      <p style="margin: 0 0 12px 0; color: #1e40af; font-size: 14px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px;">
+                        Your Verification Code
+                      </p>
+                      <h1 style="margin: 0; color: #1e40af; font-size: 42px; font-weight: 700; letter-spacing: 8px; font-family: 'Courier New', monospace; text-align: center;">
+                        {{ .Token }}
+                      </h1>
+                    </div>
+                  </td>
+                </tr>
+              </table>
+
+              <!-- Instructions -->
+              <div style="background-color: #f9fafb; border-left: 4px solid #3b82f6; padding: 16px 20px; margin: 24px 0; border-radius: 4px;">
+                <p style="margin: 0 0 8px 0; color: #374151; font-size: 14px; font-weight: 600;">
+                  ⏱️ Important Information:
+                </p>
+                <ul style="margin: 0; padding-left: 20px; color: #4b5563; font-size: 14px; line-height: 1.8;">
+                  <li>This code will expire in <strong>10 minutes</strong></li>
+                  <li>Enter this code on the verification page to complete your registration</li>
+                  <li>Do not share this code with anyone</li>
+                  <li>If you didn't request this code, please ignore this email</li>
+                </ul>
+              </div>
+
+              <!-- Security Notice -->
+              <div style="margin: 32px 0 0 0; padding: 16px; background-color: #fef3c7; border-radius: 6px; border: 1px solid #fcd34d;">
+                <p style="margin: 0; color: #92400e; font-size: 13px; line-height: 1.6;">
+                  <strong>🔒 Security Tip:</strong> Akristal Group Limited will never ask for your verification code via phone or email. Keep your account secure by never sharing your codes.
+                </p>
+              </div>
+
+            </td>
+          </tr>
+
+          <!-- Footer -->
+          <tr>
+            <td style="background-color: #f9fafb; padding: 32px 24px; text-align: center; border-top: 1px solid #e5e7eb;">
+              
+              <!-- Company Info -->
+              <p style="margin: 0 0 16px 0; color: #6b7280; font-size: 14px; line-height: 1.6;">
+                <strong style="color: #111827;">Akristal Group Limited</strong><br>
+                KK 15 Rd, Kigali, Rwanda<br>
+                Email: <a href="mailto:theakristalgroup@gmail.com" style="color: #2563eb; text-decoration: none;">theakristalgroup@gmail.com</a><br>
+                Phone: <a href="tel:0791900316" style="color: #2563eb; text-decoration: none;">0791900316</a>
+              </p>
+
+              <!-- Help Link -->
+              <p style="margin: 16px 0 0 0;">
+                <a href="{{ .SiteURL }}/support" style="color: #2563eb; text-decoration: none; font-size: 14px; font-weight: 500;">
+                  Need Help? Contact Support
+                </a>
+              </p>
+
+              <!-- Copyright -->
+              <p style="margin: 24px 0 0 0; color: #9ca3af; font-size: 12px; line-height: 1.5;">
+                © {{ .Year }} Akristal Group Limited. All rights reserved.<br>
+                This is an automated email, please do not reply.
+              </p>
+
+            </td>
+          </tr>
+
+        </table>
+      </td>
+    </tr>
+  </table>
+</body>
+</html>
+

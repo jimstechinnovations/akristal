@@ -1,0 +1,225 @@
+import { createClient } from '@/lib/supabase/server'
+import { requireAdmin } from '@/lib/auth'
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import { Button } from '@/components/ui/button'
+import { Badge } from '@/components/ui/badge'
+import { CheckCircle, XCircle, Clock, FileText } from 'lucide-react'
+import type { Database } from '@/types/database'
+
+type PaymentRow = Database['public']['Tables']['payments']['Row']
+type ProfileLite = Pick<Database['public']['Tables']['profiles']['Row'], 'full_name' | 'email'>
+type PropertyLite = Pick<Database['public']['Tables']['properties']['Row'], 'title'>
+type PaymentWithJoins = PaymentRow & { profiles: ProfileLite | null; properties: PropertyLite | null }
+
+export default async function AdminPaymentsPage() {
+  await requireAdmin()
+  const supabase = await createClient()
+
+  const { data: payments, error } = await supabase
+    .from('payments')
+    .select('*, profiles(full_name, email), properties(title)')
+    .order('created_at', { ascending: false })
+    .limit(50)
+
+  const getStatusIcon = (status: PaymentRow['payment_status']) => {
+    switch (status) {
+      case 'completed':
+        return <CheckCircle className="h-5 w-5 text-green-600 dark:text-green-400" />
+      case 'failed':
+        return <XCircle className="h-5 w-5 text-red-600 dark:text-red-400" />
+      default:
+        return <Clock className="h-5 w-5 text-yellow-600 dark:text-yellow-400" />
+    }
+  }
+
+  const getStatusColor = (status: PaymentRow['payment_status']) => {
+    switch (status) {
+      case 'completed':
+        return 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200'
+      case 'failed':
+        return 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200'
+      case 'processing':
+        return 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200'
+      default:
+        return 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200'
+    }
+  }
+
+  // Calculate totals
+  const typedPayments = (payments as PaymentWithJoins[]) || []
+
+  const totalRevenue = typedPayments.reduce((sum, p) => {
+    return sum + (p.payment_status === 'completed' ? p.amount : 0)
+  }, 0)
+
+  const pendingCount = typedPayments.filter((p) => p.payment_status === 'pending').length
+
+  return (
+    <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
+      <div className="mb-8">
+        <h1 className="text-3xl font-bold text-gray-900 dark:text-white">Payment Management</h1>
+        <p className="mt-2 text-gray-600 dark:text-gray-400">
+          Review and manage all payment transactions
+        </p>
+      </div>
+
+      {/* Stats */}
+      <div className="mb-8 grid grid-cols-1 gap-4 sm:grid-cols-3">
+        <Card>
+          <CardHeader>
+            <CardTitle className="text-sm font-medium text-gray-600 dark:text-gray-400">
+              Total Revenue
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold">
+              {new Intl.NumberFormat('en-RW', {
+                style: 'currency',
+                currency: 'RWF',
+                minimumFractionDigits: 0,
+              }).format(totalRevenue)}
+            </div>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader>
+            <CardTitle className="text-sm font-medium text-gray-600 dark:text-gray-400">
+              Total Payments
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold">{typedPayments.length}</div>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader>
+            <CardTitle className="text-sm font-medium text-gray-600 dark:text-gray-400">
+              Pending Review
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold">{pendingCount}</div>
+          </CardContent>
+        </Card>
+      </div>
+
+      {error ? (
+        <Card>
+          <CardContent className="pt-6">
+            <p className="text-red-600 dark:text-red-400">
+              Error loading payments: {error.message}
+            </p>
+          </CardContent>
+        </Card>
+      ) : typedPayments.length > 0 ? (
+        <div className="space-y-4">
+          {typedPayments.map((payment) => (
+            <Card key={payment.id}>
+              <CardContent className="pt-6">
+                <div className="flex items-start justify-between">
+                  <div className="flex-1">
+                    <div className="flex items-center space-x-3">
+                      {getStatusIcon(payment.payment_status)}
+                      <div>
+                        <h3 className="font-semibold text-gray-900 dark:text-white">
+                          {payment.description || 'Payment'}
+                        </h3>
+                        <p className="text-sm text-gray-600 dark:text-gray-400">
+                          User: {payment.profiles?.full_name || payment.profiles?.email}
+                        </p>
+                        {payment.properties && (
+                          <p className="text-sm text-gray-600 dark:text-gray-400">
+                            Property: {payment.properties.title}
+                          </p>
+                        )}
+                        <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">
+                          {new Date(payment.created_at).toLocaleDateString()}
+                        </p>
+                      </div>
+                    </div>
+                    <div className="mt-4 flex flex-wrap gap-4 text-sm">
+                      <div>
+                        <span className="text-gray-600 dark:text-gray-400">Amount: </span>
+                        <span className="font-semibold text-gray-900 dark:text-white">
+                          {new Intl.NumberFormat('en-RW', {
+                            style: 'currency',
+                            currency: payment.currency || 'RWF',
+                            minimumFractionDigits: 0,
+                          }).format(payment.amount)}
+                        </span>
+                      </div>
+                      <div>
+                        <span className="text-gray-600 dark:text-gray-400">Method: </span>
+                        <span className="font-semibold text-gray-900 dark:text-white">
+                          {payment.payment_method.replace('_', ' ')}
+                        </span>
+                      </div>
+                      {payment.bank_name && (
+                        <div>
+                          <span className="text-gray-600 dark:text-gray-400">Bank: </span>
+                          <span className="font-semibold text-gray-900 dark:text-white">
+                            {payment.bank_name}
+                          </span>
+                        </div>
+                      )}
+                      {payment.account_number && (
+                        <div>
+                          <span className="text-gray-600 dark:text-gray-400">Account: </span>
+                          <span className="font-semibold text-gray-900 dark:text-white">
+                            {payment.account_number}
+                          </span>
+                        </div>
+                      )}
+                    </div>
+                    {payment.notes && (
+                      <p className="mt-2 text-sm text-gray-600 dark:text-gray-400">
+                        Notes: {payment.notes}
+                      </p>
+                    )}
+                  </div>
+                  <div className="ml-4 flex flex-col items-end space-y-2">
+                    <Badge className={getStatusColor(payment.payment_status)}>
+                      {payment.payment_status}
+                    </Badge>
+                    {payment.bank_statement_url && (
+                      <a
+                        href={payment.bank_statement_url}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="flex items-center text-sm text-blue-600 hover:underline dark:text-blue-400"
+                      >
+                        <FileText className="mr-1 h-4 w-4" />
+                        View Statement
+                      </a>
+                    )}
+                    <div className="flex space-x-2">
+                      {payment.payment_status === 'pending' && (
+                        <>
+                          <Button size="sm" variant="outline">
+                            Approve
+                          </Button>
+                          <Button size="sm" variant="outline">
+                            Reject
+                          </Button>
+                        </>
+                      )}
+                    </div>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          ))}
+        </div>
+      ) : (
+        <Card>
+          <CardContent className="pt-6 text-center">
+            <p className="text-gray-600 dark:text-gray-400">No payments found.</p>
+          </CardContent>
+        </Card>
+      )}
+    </div>
+  )
+}
+
