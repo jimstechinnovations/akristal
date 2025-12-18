@@ -171,3 +171,41 @@ export async function updateCategory(categoryId: string, formData: FormData) {
   return { success: true }
 }
 
+export async function createCategory(formData: FormData) {
+  await requireAdmin()
+  const supabase = await createClient()
+
+  const insert: Database['public']['Tables']['categories']['Insert'] = {
+    name: formData.get('name')?.toString() || '',
+    slug: formData.get('slug')?.toString() || '',
+    description: formData.get('description')?.toString() || null,
+    icon: formData.get('icon')?.toString() || null,
+    color: formData.get('color')?.toString() || null,
+    display_order: formData.get('display_order')
+      ? parseInt(formData.get('display_order')!.toString(), 10)
+      : 0,
+    is_active: formData.get('is_active') === 'true',
+  }
+
+  type CategoriesInsertQuery = {
+    insert: (
+      values: Database['public']['Tables']['categories']['Insert']
+    ) => Promise<{ error: { message: string } | null }>
+  }
+  type CategoriesInsertClient = {
+    from: (table: 'categories') => CategoriesInsertQuery
+  }
+
+  const { error } = await (supabase as unknown as CategoriesInsertClient)
+    .from('categories')
+    .insert(insert)
+
+  if (error) {
+    return { error: error.message }
+  }
+
+  revalidatePath('/admin/categories')
+  return { success: true }
+}
+
+

@@ -235,9 +235,9 @@ export function Navbar() {
               <Image
                 src="/Akristal-svg.svg"
                 alt="TheAkristalGroup logo"
-                width={32}
-                height={32}
-                className="h-8 w-8 sm:h-9 sm:w-9"
+                width={40}
+                height={40}
+                className="h-[2.88rem] w-[2.88rem] sm:h-[2.475rem] sm:w-[2.475rem]"
                 priority
               />
               <div className="hidden sm:flex flex-col items-start">

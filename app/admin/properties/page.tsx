@@ -86,7 +86,7 @@ export default async function AdminPropertiesPage() {
               <div key={property.id} className="bg-white dark:bg-[#1e293b] rounded-lg overflow-hidden shadow-sm">
                 <PropertyCard property={property} />
                 <div className="p-3 sm:p-4 pt-0 flex gap-2">
-                  <Link href={`/seller/properties/${property.id}/edit`} className="flex-1">
+                  <Link href={`/admin/properties/${property.id}/edit`} className="flex-1">
                     <Button variant="outline" size="sm" className="w-full">
                       Edit
                     </Button>
