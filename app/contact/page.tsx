@@ -76,12 +76,55 @@ export default function ContactPage() {
                   </div>
                   <div>
                     <h3 className="font-semibold text-gray-900 dark:text-white">Phone</h3>
-                    <a
-                      href="tel:+250791900316"
-                      className="mt-1 text-sm text-blue-600 hover:underline dark:text-blue-400"
-                    >
-                      +250791900316
-                    </a>
+                    <div className="mt-1 space-y-1 text-sm">
+                      <div>
+                        <span className="font-semibold text-gray-900 dark:text-white">Primary:</span>{' '}
+                        <a
+                          href="tel:+250791900316"
+                          className="text-blue-600 hover:underline dark:text-blue-400"
+                        >
+                          +250791900316
+                        </a>
+                      </div>
+                      <div>
+                        <span className="font-semibold text-gray-900 dark:text-white">West Africa:</span>{' '}
+                        <a
+                          href="tel:+2348132383836"
+                          className="text-blue-600 hover:underline dark:text-blue-400"
+                        >
+                          +2348132383836
+                        </a>
+                      </div>
+                      <div>
+                        <span className="font-semibold text-gray-900 dark:text-white">East Africa:</span>{' '}
+                        <a
+                          href="tel:+250788357819"
+                          className="text-blue-600 hover:underline dark:text-blue-400"
+                        >
+                          +250788357819
+                        </a>
+                      </div>
+                      <div>
+                        <span className="font-semibold text-gray-900 dark:text-white">WhatsApp:</span>{' '}
+                        <a
+                          href="https://wa.me/250734994909"
+                          className="text-blue-600 hover:underline dark:text-blue-400"
+                          target="_blank"
+                          rel="noopener noreferrer"
+                        >
+                          +250734994909
+                        </a>
+                      </div>
+                      <div>
+                        <span className="font-semibold text-gray-900 dark:text-white">South Africa:</span>{' '}
+                        <a
+                          href="tel:+27676846945"
+                          className="text-blue-600 hover:underline dark:text-blue-400"
+                        >
+                          +27 67 684 6945
+                        </a>
+                      </div>
+                    </div>
                   </div>
                 </div>
               </CardContent>

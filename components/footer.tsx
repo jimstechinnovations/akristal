@@ -119,11 +119,50 @@ export function Footer() {
                 </a>
               </li>
               <li>
+                <span className="font-semibold text-gray-900 dark:text-gray-100">Primary:</span>{' '}
                 <a
                   href="tel:+250791900316"
                   className="hover:text-blue-600 dark:hover:text-blue-400 transition-colors"
                 >
                   +250791900316
+                </a>
+              </li>
+              <li>
+                <span className="font-semibold text-gray-900 dark:text-gray-100">West Africa:</span>{' '}
+                <a
+                  href="tel:+2348132383836"
+                  className="hover:text-blue-600 dark:hover:text-blue-400 transition-colors"
+                >
+                  +2348132383836
+                </a>
+              </li>
+              <li>
+                <span className="font-semibold text-gray-900 dark:text-gray-100">East Africa:</span>{' '}
+                <a
+                  href="tel:+250788357819"
+                  className="hover:text-blue-600 dark:hover:text-blue-400 transition-colors"
+                >
+                  +250788357819
+                </a>
+              </li>
+              <li>
+                <span className="font-semibold text-gray-900 dark:text-gray-100">WhatsApp:</span>{' '}
+                <a
+                  href="https://wa.me/250734994909"
+                  className="hover:text-blue-600 dark:hover:text-blue-400 transition-colors"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  +250734994909
+                </a>
+              </li>
+              <li>
+                <span className="font-semibold text-gray-900 dark:text-gray-100">South Africa:</span>{' '}
+                <a
+                  href="tel:+27676846945"
+                  className="hover:text-blue-600 dark:hover:text-blue-400 transition-colors"
+                >
+                  +27 67 684 6945
                 </a>
               </li>
               <li>KK 15 Rd, Kigali, Rwanda</li>

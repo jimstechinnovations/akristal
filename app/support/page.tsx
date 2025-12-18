@@ -47,7 +47,7 @@ const faqs = [
   {
     question: 'What should I do if I encounter a problem?',
     answer:
-      'Contact our support team via email at info@akristal.com or call us at +250791900316. We aim to respond within 24 hours.',
+      'Contact our support team via email at info@akristal.com or call us on any of these numbers: Primary: +250791900316, West Africa: +2348132383836, East Africa: +250788357819, WhatsApp: +250734994909, South Africa: +27 67 684 6945. We aim to respond within 24 hours.',
   },
 ]
 

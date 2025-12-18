@@ -23,7 +23,6 @@ export default async function ConversationPage({
   type MessageWithProfile = MessageRow & {
     profiles: Pick<ProfileRow, 'full_name' | 'avatar_url'> | null
   }
-
   // Get conversation
   const { data: conversation } = await supabase
     .from('conversations')
