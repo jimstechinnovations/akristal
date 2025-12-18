@@ -1,4 +1,5 @@
 import nodemailer from 'nodemailer'
+import { formatCurrency } from './utils'
 
 const transporter = nodemailer.createTransport({
   host: process.env.SMTP_HOST || 'smtp.zoho.com',
@@ -20,7 +21,7 @@ export interface EmailOptions {
 export async function sendEmail(options: EmailOptions) {
   try {
     const info = await transporter.sendMail({
-      from: `"Akristal Group Limited" <${process.env.BUSINESS_EMAIL || 'theakristalgroup@gmail.com'}>`,
+      from: `"Akristal Group Limited" <${process.env.BUSINESS_EMAIL || 'info@akristal.com'}>`,
       to: options.to,
       subject: options.subject,
       text: options.text,
@@ -43,7 +44,7 @@ export async function sendWelcomeEmail(email: string, name: string) {
         <p>Hello ${name},</p>
         <p>Thank you for joining our real estate marketplace. We're excited to have you on board!</p>
         <p>You can now browse properties, save favorites, and connect with sellers and agents.</p>
-        <p>If you have any questions, feel free to contact us at theakristalgroup@gmail.com or call us at 0791900316.</p>
+        <p>If you have any questions, feel free to contact us at info@akristal.com or call us at +250791900316.</p>
         <p>Best regards,<br>Akristal Group Limited</p>
       </div>
     `,
@@ -66,7 +67,7 @@ export async function sendListingApprovalEmail(
         <p>Hello ${name},</p>
         <p>Your property listing "${propertyTitle}" has been ${approved ? 'approved and is now live on our platform' : 'rejected'}.</p>
         ${!approved && reason ? `<p><strong>Reason:</strong> ${reason}</p>` : ''}
-        <p>If you have any questions, please contact us at theakristalgroup@gmail.com.</p>
+        <p>If you have any questions, please contact us at info@akristal.com.</p>
         <p>Best regards,<br>Akristal Group Limited</p>
       </div>
     `,
@@ -110,10 +111,10 @@ export async function sendPaymentConfirmationEmail(
       <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
         <h1 style="color: #2563eb;">Payment Confirmation</h1>
         <p>Hello ${name},</p>
-        <p>We have received your payment of ${new Intl.NumberFormat('en-RW', { style: 'currency', currency }).format(amount)}.</p>
+        <p>We have received your payment of ${formatCurrency(amount, currency)}.</p>
         ${propertyTitle ? `<p><strong>Property:</strong> ${propertyTitle}</p>` : ''}
         <p>Your payment is being processed and you will receive an update once it's completed.</p>
-        <p>If you have any questions, please contact us at theakristalgroup@gmail.com.</p>
+        <p>If you have any questions, please contact us at info@akristal.com.</p>
         <p>Best regards,<br>Akristal Group Limited</p>
       </div>
     `,

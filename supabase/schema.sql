@@ -95,7 +95,7 @@ CREATE TABLE IF NOT EXISTS public.properties (
   city TEXT NOT NULL,
   district TEXT,
   province TEXT,
-  country TEXT DEFAULT 'Rwanda',
+  country TEXT,
   latitude DECIMAL(10, 8),
   longitude DECIMAL(11, 8),
   location_point GEOGRAPHY(POINT, 4326), -- For spatial queries
@@ -642,4 +642,3 @@ INSERT INTO public.categories (name, slug, description, display_order, is_active
   ('Land', 'land', 'Vacant land and plots', 3, true),
   ('Rental', 'rental', 'Properties available for rent', 4, true)
 ON CONFLICT (slug) DO NOTHING;
-

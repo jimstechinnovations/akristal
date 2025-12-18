@@ -21,8 +21,8 @@ Akristal Group Limited will never ask for your verification code via phone or em
 ---
 Akristal Group Limited
 KK 15 Rd, Kigali, Rwanda
-Email: theakristalgroup@gmail.com
-Phone: 0791900316
+Email: info@akristal.com
+Phone: +250791900316
 
 Need Help? Contact Support: {{ .SiteURL }}/support
 

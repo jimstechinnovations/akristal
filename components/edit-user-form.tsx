@@ -103,7 +103,7 @@ export function EditUserForm({ user }: { user: Profile }) {
               type="tel"
               value={formData.phone}
               onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
-              placeholder="0791900316"
+              placeholder="+250791900316"
             />
           </div>
 

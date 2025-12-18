@@ -29,6 +29,7 @@ function NewPaymentPageInner() {
 
   const [formData, setFormData] = useState({
     amount: '',
+    currency: 'USD',
     description: '',
     bankName: '',
     accountNumber: '',
@@ -90,7 +91,7 @@ function NewPaymentPageInner() {
         user_id: user.id,
         property_id: propertyId || null,
         amount: parseFloat(formData.amount),
-        currency: 'RWF',
+        currency: formData.currency,
         payment_method: 'bank_transfer' as PaymentMethod,
         payment_status: 'pending' as PaymentStatus,
         bank_name: formData.bankName,
@@ -152,20 +153,42 @@ function NewPaymentPageInner() {
         </CardHeader>
         <CardContent>
           <form onSubmit={handleSubmit} className="space-y-4">
-            <div>
-              <label htmlFor="amount" className="block text-sm font-medium mb-1 text-gray-900 dark:text-white">
-                Amount (RWF) *
-              </label>
-              <Input
-                id="amount"
-                type="number"
-                step="0.01"
-                min="0"
-                placeholder="0.00"
-                value={formData.amount}
-                onChange={(e) => setFormData({ ...formData, amount: e.target.value })}
-                required
-              />
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div>
+                <label htmlFor="amount" className="block text-sm font-medium mb-1 text-gray-900 dark:text-white">
+                  Amount *
+                </label>
+                <Input
+                  id="amount"
+                  type="number"
+                  step="0.01"
+                  min="0"
+                  placeholder="0.00"
+                  value={formData.amount}
+                  onChange={(e) => setFormData({ ...formData, amount: e.target.value })}
+                  required
+                />
+              </div>
+              <div>
+                <label htmlFor="currency" className="block text-sm font-medium mb-1 text-gray-900 dark:text-white">
+                  Currency *
+                </label>
+                <select
+                  id="currency"
+                  className="flex h-10 w-full rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm text-gray-900 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-100"
+                  value={formData.currency}
+                  onChange={(e) => setFormData({ ...formData, currency: e.target.value })}
+                  required
+                >
+                  <option value="USD">USD - US Dollar</option>
+                  <option value="EUR">EUR - Euro</option>
+                  <option value="GBP">GBP - British Pound</option>
+                  <option value="RWF">RWF - Rwandan Franc</option>
+                  <option value="NGN">NGN - Nigerian Naira</option>
+                  <option value="KES">KES - Kenyan Shilling</option>
+                  <option value="ZAR">ZAR - South African Rand</option>
+                </select>
+              </div>
             </div>
 
             <div>

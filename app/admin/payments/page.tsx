@@ -4,6 +4,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { CheckCircle, XCircle, Clock, FileText } from 'lucide-react'
+import { formatCurrency } from '@/lib/utils'
 import type { Database } from '@/types/database'
 
 type PaymentRow = Database['public']['Tables']['payments']['Row']
@@ -73,11 +74,7 @@ export default async function AdminPaymentsPage() {
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">
-              {new Intl.NumberFormat('en-RW', {
-                style: 'currency',
-                currency: 'RWF',
-                minimumFractionDigits: 0,
-              }).format(totalRevenue)}
+              {formatCurrency(totalRevenue)}
             </div>
           </CardContent>
         </Card>
@@ -143,11 +140,7 @@ export default async function AdminPaymentsPage() {
                       <div>
                         <span className="text-gray-600 dark:text-gray-400">Amount: </span>
                         <span className="font-semibold text-gray-900 dark:text-white">
-                          {new Intl.NumberFormat('en-RW', {
-                            style: 'currency',
-                            currency: payment.currency || 'RWF',
-                            minimumFractionDigits: 0,
-                          }).format(payment.amount)}
+                          {formatCurrency(payment.amount, payment.currency || undefined)}
                         </span>
                       </div>
                       <div>

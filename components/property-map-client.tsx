@@ -56,8 +56,8 @@ function FitBounds({ properties }: { properties: Property[] }) {
       )
       map.fitBounds(bounds, { padding: [50, 50] })
     } else {
-      // Default to Kigali, Rwanda if no properties
-      map.setView([-1.9441, 30.0619], 12)
+      // Default to a central map view if no properties
+      map.setView([-1.9441, 30.0619], 2)
     }
   }, [map, validProperties])
 
@@ -65,7 +65,7 @@ function FitBounds({ properties }: { properties: Property[] }) {
 }
 
 export function PropertyMapClient({ properties, onLocationSelect, selectedLocation }: PropertyMapProps) {
-  const [mapCenter, setMapCenter] = useState<[number, number]>([-1.9441, 30.0619]) // Kigali, Rwanda
+  const [mapCenter, setMapCenter] = useState<[number, number]>([0, 20]) // Default global view
   const [searchRadius, setSearchRadius] = useState(5) // km
   const [showLocationPicker, setShowLocationPicker] = useState(false)
 
@@ -118,6 +118,7 @@ export function PropertyMapClient({ properties, onLocationSelect, selectedLocati
       <CardContent className="p-0">
         <div className="relative h-[600px] w-full">
           <MapContainer
+            key={JSON.stringify(validProperties.map((p) => p.id))}
             center={mapCenter}
             zoom={12}
             style={{ height: '100%', width: '100%', zIndex: 0 }}

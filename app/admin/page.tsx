@@ -4,6 +4,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import Link from 'next/link'
 import { Button } from '@/components/ui/button'
 import { Users, FileText, DollarSign, TrendingUp } from 'lucide-react'
+import { formatCurrency } from '@/lib/utils'
 import type { Database } from '@/types/database'
 
 type PaymentRow = Database['public']['Tables']['payments']['Row']
@@ -95,11 +96,7 @@ export default async function AdminDashboard() {
           </CardHeader>
           <CardContent>
             <div className="text-lg sm:text-2xl font-bold text-[#0d233e] dark:text-white">
-              {new Intl.NumberFormat('en-RW', {
-                style: 'currency',
-                currency: 'RWF',
-                minimumFractionDigits: 0,
-              }).format(totalRevenue)}
+              {formatCurrency(totalRevenue)}
             </div>
           </CardContent>
         </Card>

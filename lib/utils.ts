@@ -6,7 +6,7 @@ export function cn(...inputs: ClassValue[]) {
 }
 
 export function formatCurrency(amount: number, currency: string = 'RWF'): string {
-  return new Intl.NumberFormat('en-RW', {
+  return new Intl.NumberFormat('en', {
     style: 'currency',
     currency: currency,
     minimumFractionDigits: 0,
@@ -44,5 +44,3 @@ export function getErrorMessage(error: unknown): string {
   }
   return 'An unexpected error occurred'
 }
-
-

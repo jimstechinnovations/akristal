@@ -14,6 +14,8 @@ export async function createProperty(formData: FormData) {
     const user = await requireRole(['seller', 'agent', 'admin'])
     const supabase = await createClient()
 
+    const isAdmin = user.profile.role === 'admin'
+
     const propertyData: PropertyInsert = {
       seller_id: user.id,
       title: formData.get('title') as string,
@@ -39,8 +41,10 @@ export async function createProperty(formData: FormData) {
       year_built: formData.get('year_built')
         ? parseInt(formData.get('year_built') as string)
         : null,
-      listing_status: 'pending_approval',
       status: 'available',
+      listing_status: isAdmin ? 'approved' : 'pending_approval',
+      approved_at: isAdmin ? new Date().toISOString() : null,
+      approved_by: isAdmin ? user.id : null,
     }
 
     type PropertiesInsertClient = {

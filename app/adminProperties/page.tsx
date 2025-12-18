@@ -7,6 +7,12 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { Map, List } from 'lucide-react'
 import type { Database } from '@/types/database'
 
+export const metadata = {
+  title: 'Admin Properties - TheAkristalGroup',
+  description:
+    'Browse properties listed and managed directly by Akristal Group Limited (admin properties).',
+}
+
 type Property = Database['public']['Tables']['properties']['Row']
 
 type SearchParams = Record<string, string | undefined> & {
@@ -23,21 +29,22 @@ type SearchParams = Record<string, string | undefined> & {
   view?: string
 }
 
-export default async function PropertiesPage({
+export default async function AdminPropertiesBrowsePage({
   searchParams,
 }: {
   searchParams: Promise<SearchParams>
 }) {
   const supabase = await createClient()
-  
+
   // Next.js 16: searchParams is a Promise
   const params = await searchParams
 
   let query = supabase
     .from('properties')
-    .select('*')
+    .select('*, profiles:seller_id(role)')
     .eq('listing_status', 'approved')
     .eq('status', 'available')
+    .eq('profiles.role', 'admin')
 
   // Apply filters
   if (params?.type) {
@@ -64,44 +71,16 @@ export default async function PropertiesPage({
     )
   }
 
-  // Location-based filtering (radius search)
   const { data: initialData, error } = await query.order('created_at', { ascending: false })
-  let data = initialData as Property[] | null
-  
-  if (params?.lat && params?.lng && params?.radius) {
-    const lat = parseFloat(params.lat)
-    const lng = parseFloat(params.lng)
-    const radiusKm = parseFloat(params.radius)
-    
-    // Filter properties by distance
-    if (data) {
-      data = data.filter((property) => {
-        if (!property.latitude || !property.longitude) return false
-        
-        // Haversine formula for distance calculation
-        const R = 6371 // Earth's radius in km
-        const dLat = ((property.latitude - lat) * Math.PI) / 180
-        const dLon = ((property.longitude - lng) * Math.PI) / 180
-        const a =
-          Math.sin(dLat / 2) * Math.sin(dLat / 2) +
-          Math.cos((lat * Math.PI) / 180) *
-            Math.cos((property.latitude * Math.PI) / 180) *
-            Math.sin(dLon / 2) *
-            Math.sin(dLon / 2)
-        const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a))
-        const distance = R * c
-        
-        return distance <= radiusKm
-      })
-    }
-  }
+  const data = initialData as Property[] | null
 
-  // Get unique cities for filter
+  // Get unique cities for filter (only from admin-owned properties)
   const { data: citiesData } = await supabase
     .from('properties')
-    .select('city')
+    .select('city, profiles:seller_id(role)')
     .eq('listing_status', 'approved')
     .eq('status', 'available')
+    .eq('profiles.role', 'admin')
 
   const cities = citiesData as Array<Pick<Property, 'city'>> | null
   const uniqueCities = Array.from(new Set(cities?.map((c) => c.city) || [])).sort()
@@ -111,10 +90,10 @@ export default async function PropertiesPage({
       <div className="bg-white dark:bg-gray-800 shadow-sm">
         <div className="mx-auto max-w-7xl px-4 py-6 sm:px-6 lg:px-8">
           <h1 className="text-2xl font-bold text-[#0d233e] dark:text-white">
-            Browse Properties
+            Admin Properties
           </h1>
           <p className="mt-1 text-sm text-gray-600 dark:text-gray-400">
-            Find your perfect property across Africa and worldwide
+            Properties listed and managed directly by Akristal Group Limited (admin listings only).
           </p>
         </div>
       </div>
@@ -123,10 +102,7 @@ export default async function PropertiesPage({
         {/* Mobile: Filters as Drawer/Modal, Desktop: Sidebar */}
         <div className="mb-4 lg:hidden">
           <Suspense fallback={<div className="h-20 bg-white dark:bg-gray-800 rounded-lg animate-pulse" />}>
-            <PropertySearch 
-              cities={uniqueCities} 
-              searchParams={params}
-            />
+            <PropertySearch cities={uniqueCities} searchParams={params} />
           </Suspense>
         </div>
 
@@ -134,10 +110,7 @@ export default async function PropertiesPage({
           {/* Desktop Sidebar */}
           <aside className="hidden lg:block lg:col-span-1">
             <Suspense fallback={<div className="h-96 bg-white dark:bg-gray-800 rounded-lg animate-pulse" />}>
-              <PropertySearch 
-                cities={uniqueCities} 
-                searchParams={params}
-              />
+              <PropertySearch cities={uniqueCities} searchParams={params} />
             </Suspense>
           </aside>
 
@@ -161,7 +134,7 @@ export default async function PropertiesPage({
                   </span>
                 )}
               </div>
-              
+
               <TabsContent value="list" className="mt-0">
                 {error ? (
                   <div className="rounded-lg bg-red-50 dark:bg-red-900/20 p-4 text-red-800 dark:text-red-200">
@@ -176,12 +149,12 @@ export default async function PropertiesPage({
                 ) : (
                   <div className="rounded-lg bg-white dark:bg-gray-800 p-8 text-center shadow-sm">
                     <p className="text-gray-600 dark:text-gray-400">
-                      No properties found matching your criteria.
+                      No admin properties found matching your criteria.
                     </p>
                   </div>
                 )}
               </TabsContent>
-              
+
               <TabsContent value="map" className="mt-0">
                 {error ? (
                   <div className="rounded-lg bg-red-50 dark:bg-red-900/20 p-4 text-red-800 dark:text-red-200">
@@ -205,7 +178,7 @@ export default async function PropertiesPage({
                 ) : (
                   <div className="rounded-lg bg-white dark:bg-gray-800 p-8 text-center shadow-sm">
                     <p className="text-gray-600 dark:text-gray-400">
-                      No properties found matching your criteria.
+                      No admin properties found matching your criteria.
                     </p>
                   </div>
                 )}

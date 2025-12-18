@@ -23,12 +23,28 @@ type PropertyFormState = {
   city: string
   district: string
   province: string
+  country: string
+  latitude: string
+  longitude: string
   price: string
+  currency: string
   size_sqm: string
   bedrooms: string
   bathrooms: string
   parking_spaces: string
   year_built: string
+  amenities: string
+  features: string
+  document_urls: string
+  video_urls: string
+}
+
+function parseList(value: string): string[] {
+  if (!value.trim()) return []
+  return value
+    .split(/[,\n]/)
+    .map((item) => item.trim())
+    .filter(Boolean)
 }
 
 export function PropertyForm({ property }: { property?: PropertyRow }) {
@@ -42,17 +58,27 @@ export function PropertyForm({ property }: { property?: PropertyRow }) {
     city: property?.city || '',
     district: property?.district || '',
     province: property?.province || '',
+    country: property?.country || '',
+    latitude: property?.latitude != null ? String(property.latitude) : '',
+    longitude: property?.longitude != null ? String(property.longitude) : '',
     price: property ? String(property.price) : '',
+    currency: property?.currency || 'RWF',
     size_sqm: property?.size_sqm != null ? String(property.size_sqm) : '',
     bedrooms: property?.bedrooms != null ? String(property.bedrooms) : '',
     bathrooms: property?.bathrooms != null ? String(property.bathrooms) : '',
     parking_spaces: property?.parking_spaces != null ? String(property.parking_spaces) : '',
     year_built: property?.year_built != null ? String(property.year_built) : '',
+    amenities: Array.isArray(property?.amenities)
+      ? (property!.amenities as string[]).join(', ')
+      : '',
+    features: Array.isArray(property?.features)
+      ? (property!.features as string[]).join(', ')
+      : '',
+    document_urls: property?.document_urls?.join('\n') || '',
+    video_urls: property?.video_urls?.join('\n') || '',
   })
   const [images, setImages] = useState<File[]>([])
-  const [imagePreviews, setImagePreviews] = useState<string[]>(
-    property?.image_urls || []
-  )
+  const [imagePreviews, setImagePreviews] = useState<string[]>(property?.image_urls || [])
   const supabase = createClient()
 
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -87,6 +113,18 @@ export function PropertyForm({ property }: { property?: PropertyRow }) {
         return
       }
 
+      // Fetch profile to determine role (seller / agent / admin)
+      const { data: profile } = await supabase
+        .from('profiles')
+        .select('role')
+        .eq('id', user.id)
+        .single()
+
+      const profileRole =
+        (profile as Pick<Database['public']['Tables']['profiles']['Row'], 'role'> | null)?.role ||
+        'buyer'
+      const isAdmin = profileRole === 'admin'
+
       // Upload images
       const imageUrls: string[] = []
       for (const image of images) {
@@ -99,9 +137,22 @@ export function PropertyForm({ property }: { property?: PropertyRow }) {
         }
       }
 
-      const allImageUrls = [...imagePreviews.filter((url) => !url.startsWith('data:')), ...imageUrls]
+      const allImageUrls = [
+        ...imagePreviews.filter((url) => !url.startsWith('data:')),
+        ...imageUrls,
+      ]
+
+      // Shared parsed fields
+      const latitude = formData.latitude ? parseFloat(formData.latitude) : null
+      const longitude = formData.longitude ? parseFloat(formData.longitude) : null
+      const amenities = parseList(formData.amenities)
+      const features = parseList(formData.features)
+      const documentUrls = parseList(formData.document_urls)
+      const videoUrls = parseList(formData.video_urls)
 
       if (property) {
+        // For updates, don't change listing status here.
+        // Admin approval/rejection is managed via dedicated admin actions.
         const updateData: PropertyUpdate = {
           seller_id: user.id,
           title: formData.title,
@@ -111,7 +162,11 @@ export function PropertyForm({ property }: { property?: PropertyRow }) {
           city: formData.city,
           district: formData.district || null,
           province: formData.province || null,
+          country: formData.country || undefined,
+          latitude,
+          longitude,
           price: parseFloat(formData.price),
+          currency: formData.currency || 'RWF',
           size_sqm: formData.size_sqm ? parseFloat(formData.size_sqm) : null,
           bedrooms: formData.bedrooms ? parseInt(formData.bedrooms) : null,
           bathrooms: formData.bathrooms ? parseInt(formData.bathrooms) : null,
@@ -119,8 +174,10 @@ export function PropertyForm({ property }: { property?: PropertyRow }) {
           year_built: formData.year_built ? parseInt(formData.year_built) : null,
           cover_image_url: allImageUrls[0] || null,
           image_urls: allImageUrls,
-          listing_status: 'pending_approval',
-          status: 'available',
+          amenities,
+          features,
+          document_urls: documentUrls,
+          video_urls: videoUrls,
         }
         const { error } = await (supabase as any)
           .from('properties')
@@ -139,7 +196,11 @@ export function PropertyForm({ property }: { property?: PropertyRow }) {
           city: formData.city,
           district: formData.district || null,
           province: formData.province || null,
+          country: formData.country || undefined,
+          latitude,
+          longitude,
           price: parseFloat(formData.price),
+          currency: formData.currency || 'RWF',
           size_sqm: formData.size_sqm ? parseFloat(formData.size_sqm) : null,
           bedrooms: formData.bedrooms ? parseInt(formData.bedrooms) : null,
           bathrooms: formData.bathrooms ? parseInt(formData.bathrooms) : null,
@@ -147,17 +208,33 @@ export function PropertyForm({ property }: { property?: PropertyRow }) {
           year_built: formData.year_built ? parseInt(formData.year_built) : null,
           cover_image_url: allImageUrls[0] || null,
           image_urls: allImageUrls,
-          listing_status: 'pending_approval',
+          amenities,
+          features,
+          document_urls: documentUrls,
+          video_urls: videoUrls,
           status: 'available',
+          // Admin listings are auto-approved, others go to pending_approval
+          listing_status: isAdmin ? 'approved' : 'pending_approval',
+          approved_at: isAdmin ? new Date().toISOString() : null,
+          approved_by: isAdmin ? user.id : null,
         }
 
         const { error } = await (supabase as any).from('properties').insert(insertData)
 
         if (error) throw error
-        toast.success('Property created successfully! Awaiting admin approval.')
+        toast.success(
+          isAdmin
+            ? 'Property created and automatically approved as an admin listing.'
+            : 'Property created successfully! Awaiting admin approval.'
+        )
       }
 
-      router.push('/seller/dashboard')
+      // Redirect based on role
+      if (isAdmin) {
+        router.push('/admin/properties')
+      } else {
+        router.push('/seller/dashboard')
+      }
     } catch (error: unknown) {
       toast.error(getErrorMessage(error) || 'Failed to save property')
     } finally {
@@ -205,9 +282,9 @@ export function PropertyForm({ property }: { property?: PropertyRow }) {
             </select>
           </div>
 
-          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+          <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
             <div>
-              <label className="block text-sm font-medium mb-1 text-gray-900 dark:text-white">Price (RWF) *</label>
+              <label className="block text-sm font-medium mb-1 text-gray-900 dark:text-white">Price *</label>
               <Input
                 type="number"
                 step="0.01"
@@ -215,6 +292,23 @@ export function PropertyForm({ property }: { property?: PropertyRow }) {
                 onChange={(e) => setFormData({ ...formData, price: e.target.value })}
                 required
               />
+            </div>
+            <div>
+              <label className="block text-sm font-medium mb-1 text-gray-900 dark:text-white">Currency *</label>
+              <select
+                className="flex h-10 w-full rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm text-gray-900 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-100"
+                value={formData.currency}
+                onChange={(e) => setFormData({ ...formData, currency: e.target.value })}
+                required
+              >
+                <option value="RWF">RWF - Rwandan Franc</option>
+                <option value="USD">USD - US Dollar</option>
+                <option value="EUR">EUR - Euro</option>
+                <option value="GBP">GBP - British Pound</option>
+                <option value="NGN">NGN - Nigerian Naira</option>
+                <option value="KES">KES - Kenyan Shilling</option>
+                <option value="ZAR">ZAR - South African Rand</option>
+              </select>
             </div>
             <div>
               <label className="block text-sm font-medium mb-1 text-gray-900 dark:text-white">Size (m²)</label>
@@ -236,7 +330,7 @@ export function PropertyForm({ property }: { property?: PropertyRow }) {
             />
           </div>
 
-          <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
+          <div className="grid grid-cols-1 gap-4 sm:grid-cols-4">
             <div>
               <label className="block text-sm font-medium mb-1 text-gray-900 dark:text-white">City *</label>
               <Input
@@ -253,10 +347,38 @@ export function PropertyForm({ property }: { property?: PropertyRow }) {
               />
             </div>
             <div>
-              <label className="block text-sm font-medium mb-1 text-gray-900 dark:text-white">Province</label>
+              <label className="block text-sm font-medium mb-1 text-gray-900 dark:text-white">Province / State</label>
               <Input
                 value={formData.province}
                 onChange={(e) => setFormData({ ...formData, province: e.target.value })}
+              />
+            </div>
+            <div>
+              <label className="block text-sm font-medium mb-1 text-gray-900 dark:text-white">Country</label>
+              <Input
+                value={formData.country}
+                onChange={(e) => setFormData({ ...formData, country: e.target.value })}
+              />
+            </div>
+          </div>
+
+          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+            <div>
+              <label className="block text-sm font-medium mb-1 text-gray-900 dark:text-white">Latitude</label>
+              <Input
+                type="number"
+                step="0.00000001"
+                value={formData.latitude}
+                onChange={(e) => setFormData({ ...formData, latitude: e.target.value })}
+              />
+            </div>
+            <div>
+              <label className="block text-sm font-medium mb-1 text-gray-900 dark:text-white">Longitude</label>
+              <Input
+                type="number"
+                step="0.00000001"
+                value={formData.longitude}
+                onChange={(e) => setFormData({ ...formData, longitude: e.target.value })}
               />
             </div>
           </div>
@@ -308,6 +430,54 @@ export function PropertyForm({ property }: { property?: PropertyRow }) {
           </div>
 
           <div>
+            <label className="block text-sm font-medium mb-1 text-gray-900 dark:text-white">
+              Amenities (comma or line separated)
+            </label>
+            <textarea
+              className="flex min-h-[80px] w-full rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm text-gray-900 placeholder:text-gray-500 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-100 dark:placeholder:text-gray-400"
+              value={formData.amenities}
+              onChange={(e) => setFormData({ ...formData, amenities: e.target.value })}
+              placeholder="Pool, Gym, Security, Parking"
+            />
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium mb-1 text-gray-900 dark:text-white">
+              Features (comma or line separated)
+            </label>
+            <textarea
+              className="flex min-h-[80px] w-full rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm text-gray-900 placeholder:text-gray-500 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-100 dark:placeholder:text-gray-400"
+              value={formData.features}
+              onChange={(e) => setFormData({ ...formData, features: e.target.value })}
+              placeholder="Furnished, Gated Community, Sea View"
+            />
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium mb-1 text-gray-900 dark:text-white">
+              Document URLs (optional, one per line)
+            </label>
+            <textarea
+              className="flex min-h-[80px] w-full rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm text-gray-900 placeholder:text-gray-500 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-100 dark:placeholder:text-gray-400"
+              value={formData.document_urls}
+              onChange={(e) => setFormData({ ...formData, document_urls: e.target.value })}
+              placeholder="https://example.com/doc1.pdf\nhttps://example.com/doc2.pdf"
+            />
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium mb-1 text-gray-900 dark:text-white">
+              Video URLs (optional, one per line)
+            </label>
+            <textarea
+              className="flex min-h-[80px] w-full rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm text-gray-900 placeholder:text-gray-500 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-100 dark:placeholder:text-gray-400"
+              value={formData.video_urls}
+              onChange={(e) => setFormData({ ...formData, video_urls: e.target.value })}
+              placeholder="https://youtube.com/....\nhttps://vimeo.com/..."
+            />
+          </div>
+
+          <div>
             <label className="block text-sm font-medium mb-1 text-gray-900 dark:text-white">Images</label>
             <input
               type="file"
@@ -355,5 +525,3 @@ export function PropertyForm({ property }: { property?: PropertyRow }) {
     </form>
   )
 }
-
-

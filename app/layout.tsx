@@ -14,7 +14,7 @@ const inter = Inter({
 
 export const metadata: Metadata = {
   title: "TheAkristalGroup - REDEFINING REAL ESTATE",
-  description: "Find your dream property in Rwanda. Browse residential, commercial, land, and rental properties.",
+  description: "Find your dream property. Browse residential, commercial, land, and rental properties across Africa and worldwide.",
   icons: {
     icon: [
       { url: '/Akristal-svg.svg', type: 'image/svg+xml' },

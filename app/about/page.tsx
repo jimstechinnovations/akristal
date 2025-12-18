@@ -126,7 +126,7 @@ export default function AboutPage() {
               </h3>
               <p className="text-gray-600 dark:text-gray-400">
                 Browse thousands of verified properties including homes, commercial spaces, land,
-                and rental units across Rwanda.
+                and rental units across major cities and regions.
               </p>
             </CardContent>
           </Card>
@@ -155,8 +155,7 @@ export default function AboutPage() {
                 Prime Locations
               </h3>
               <p className="text-gray-600 dark:text-gray-400">
-                Properties in the best neighborhoods and prime locations throughout Rwanda, from
-                Kigali to all districts.
+                Properties in the best neighborhoods and prime locations across Africa and beyond.
               </p>
             </CardContent>
           </Card>
@@ -220,19 +219,19 @@ export default function AboutPage() {
               <p>
                 <strong>Email:</strong>{' '}
                 <a
-                  href="mailto:theakristalgroup@gmail.com"
+                  href="mailto:info@akristal.com"
                   className="text-blue-600 hover:underline dark:text-blue-400"
                 >
-                  theakristalgroup@gmail.com
+                  info@akristal.com
                 </a>
               </p>
               <p>
                 <strong>Phone:</strong>{' '}
                 <a
-                  href="tel:0791900316"
+                  href="tel:+250791900316"
                   className="text-blue-600 hover:underline dark:text-blue-400"
                 >
-                  0791900316
+                  +250791900316
                 </a>
               </p>
               <p>

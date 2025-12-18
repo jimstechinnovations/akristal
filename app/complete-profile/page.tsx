@@ -143,7 +143,7 @@ export default function CompleteProfilePage() {
               <Input
                 id="phone"
                 type="tel"
-                placeholder="0791900316"
+                placeholder="+250791900316"
                 value={formData.phone}
                 onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
               />

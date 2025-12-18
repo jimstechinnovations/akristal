@@ -47,7 +47,7 @@ const faqs = [
   {
     question: 'What should I do if I encounter a problem?',
     answer:
-      'Contact our support team via email at theakristalgroup@gmail.com or call us at 0791900316. We aim to respond within 24 hours.',
+      'Contact our support team via email at info@akristal.com or call us at +250791900316. We aim to respond within 24 hours.',
   },
 ]
 
@@ -90,8 +90,8 @@ export default function SupportPage() {
             <p className="mb-4 text-sm text-gray-600 dark:text-gray-400">
               Send us an email and we'll respond within 24 hours.
             </p>
-            <a href="mailto:theakristalgroup@gmail.com">
-              <Button variant="outline">theakristalgroup@gmail.com</Button>
+            <a href="mailto:info@akristal.com">
+              <Button variant="outline">info@akristal.com</Button>
             </a>
           </CardContent>
         </Card>

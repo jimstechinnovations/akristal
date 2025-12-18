@@ -5,10 +5,11 @@ import { Card, CardContent } from '@/components/ui/card'
 import { Search, Home, Key, Building2, Car, Heart, MapPin, TrendingUp, Store, Briefcase } from 'lucide-react'
 import Image from 'next/image'
 import type { Database } from '@/types/database'
+import { formatCurrency } from '@/lib/utils'
 
 type FeaturedProperty = Pick<
   Database['public']['Tables']['properties']['Row'],
-  'id' | 'title' | 'price' | 'cover_image_url' | 'city' | 'address' | 'property_type'
+  'id' | 'title' | 'price' | 'currency' | 'cover_image_url' | 'city' | 'address' | 'property_type'
 >
 
 export default async function HomePage() {
@@ -17,7 +18,7 @@ export default async function HomePage() {
   // Fetch featured properties
   const { data } = await supabase
     .from('properties')
-    .select('id, title, price, cover_image_url, city, address, property_type')
+    .select('id, title, price, currency, cover_image_url, city, address, property_type')
     .eq('listing_status', 'approved')
     .eq('status', 'available')
     .order('created_at', { ascending: false })
@@ -143,11 +144,7 @@ export default async function HomePage() {
                       <span className="truncate">{property.address}, {property.city}</span>
                     </p>
                     <p className="text-base sm:text-lg font-semibold text-[#c89b3c]">
-                      {new Intl.NumberFormat('en-RW', {
-                        style: 'currency',
-                        currency: 'RWF',
-                        minimumFractionDigits: 0,
-                      }).format(property.price)}
+                      {formatCurrency(property.price, property.currency || undefined)}
                     </p>
                   </div>
                 </Link>
@@ -158,7 +155,7 @@ export default async function HomePage() {
       )}
 
       {/* Our Services */}
-      <section className="px-4 py-4 sm:py-6">
+      <section id="services" className="px-4 py-4 sm:py-6">
         <div className="mx-auto max-w-7xl">
           <div className="flex justify-between items-center mb-3 sm:mb-4">
             <h2 className="text-lg sm:text-xl font-bold text-[#0d233e] dark:text-white">Our Services</h2>

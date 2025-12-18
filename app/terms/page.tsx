@@ -205,10 +205,10 @@ export default function TermsPage() {
               </p>
               <div className="text-gray-600 dark:text-gray-400">
                 <p>
-                  <strong>Email:</strong> theakristalgroup@gmail.com
+                  <strong>Email:</strong> info@akristal.com
                 </p>
                 <p>
-                  <strong>Phone:</strong> 0791900316
+                  <strong>Phone:</strong> +250791900316
                 </p>
                 <p>
                   <strong>Address:</strong> KK 15 Rd, Kigali, Rwanda

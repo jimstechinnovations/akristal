@@ -14,14 +14,16 @@ type PropertyWithSeller = PropertyRow & { profiles: SellerProfile | SellerProfil
 export default async function PropertyPage({
   params,
 }: {
-  params: { id: string }
+  params: Promise<{ id: string }>
 }) {
+  const resolvedParams = await params
+  const id = resolvedParams.id
   const supabase = await createClient()
 
   const { data, error } = await supabase
     .from('properties')
     .select('*, profiles:seller_id(full_name, email, phone)')
-    .eq('id', params.id)
+    .eq('id', id)
     .single()
   const property = data as PropertyWithSeller | null
 
@@ -33,7 +35,7 @@ export default async function PropertyPage({
   await (supabase as any)
     .from('properties')
     .update({ views_count: (property.views_count || 0) + 1 })
-    .eq('id', params.id)
+    .eq('id', id)
 
   const seller = Array.isArray(property.profiles) ? property.profiles[0] : property.profiles
 

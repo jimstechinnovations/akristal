@@ -58,10 +58,10 @@ export default function ContactPage() {
                   <div>
                     <h3 className="font-semibold text-gray-900 dark:text-white">Email</h3>
                     <a
-                      href="mailto:theakristalgroup@gmail.com"
+                      href="mailto:info@akristal.com"
                       className="mt-1 text-sm text-blue-600 hover:underline dark:text-blue-400"
                     >
-                      theakristalgroup@gmail.com
+                      info@akristal.com
                     </a>
                   </div>
                 </div>
@@ -77,10 +77,10 @@ export default function ContactPage() {
                   <div>
                     <h3 className="font-semibold text-gray-900 dark:text-white">Phone</h3>
                     <a
-                      href="tel:0791900316"
+                      href="tel:+250791900316"
                       className="mt-1 text-sm text-blue-600 hover:underline dark:text-blue-400"
                     >
-                      0791900316
+                      +250791900316
                     </a>
                   </div>
                 </div>
@@ -221,7 +221,7 @@ export default function ContactPage() {
                   <Input
                     id="phone"
                     type="tel"
-                    placeholder="0791900316"
+                  placeholder="+250791900316"
                     value={formData.phone}
                     onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
                   />

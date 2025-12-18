@@ -23,6 +23,7 @@ import {
   Tags,
   Users,
   CreditCard,
+  Briefcase,
   LogOut,
   LogIn,
   UserPlus,
@@ -47,6 +48,7 @@ export function Navbar() {
   const [user, setUser] = useState<AuthUser | null>(null)
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
   const [mounted, setMounted] = useState(false)
+  const [propertiesDropdownOpen, setPropertiesDropdownOpen] = useState(false)
   const [listingDropdownOpen, setListingDropdownOpen] = useState(false)
   const [adminDropdownOpen, setAdminDropdownOpen] = useState(false)
   const [profileDropdownOpen, setProfileDropdownOpen] = useState(false)
@@ -114,14 +116,14 @@ export function Navbar() {
   }
 
   const navLinks: NavLink[] = []
-  
+
   // Only show Home for non-authenticated users
   if (!user) {
     navLinks.push({ href: '/', label: 'Home', icon: Home })
   }
-  
-  // Properties is always available
-  navLinks.push({ href: '/properties', label: 'Properties', icon: Search })
+
+  // Dedicated Services page
+  navLinks.push({ href: '/services', label: 'Services', icon: Briefcase })
 
   if (user) {
     if (role === 'buyer') {
@@ -182,6 +184,18 @@ export function Navbar() {
   const adminLinks = getAdminLinks()
   const hasAdminDropdown = adminLinks.length > 0
 
+  // Properties dropdown links (role-aware)
+  const propertiesLinks: NavLink[] =
+    role === 'admin'
+      ? [
+          { href: '/properties', label: 'General', icon: Search },
+          { href: '/admin/properties', label: 'Own', icon: List },
+        ]
+      : [
+          { href: '/properties', label: 'General', icon: Search },
+          { href: '/adminProperties', label: 'Admin', icon: List },
+        ]
+
   const isLinkActive = (href: string) => {
     if (href === '/') return pathname === '/'
     return pathname === href || pathname.startsWith(href + '/')
@@ -228,6 +242,7 @@ export function Navbar() {
               </span>
             </Link>
             <div className="hidden md:ml-10 md:flex md:space-x-4 md:items-center">
+              {/* Main nav links (excluding Properties, which has its own dropdown) */}
               {navLinks.map((link) => {
                 const Icon = link.icon
                 return (
@@ -245,27 +260,82 @@ export function Navbar() {
                   </Link>
                 )
               })}
-              
+
+              {/* Properties Dropdown (General vs Admin/Own) */}
+              <div className="relative">
+                <button
+                  onClick={() => setPropertiesDropdownOpen(!propertiesDropdownOpen)}
+                  className={`flex items-center space-x-1 rounded-md px-3 py-2 text-sm font-medium transition-colors ${
+                    propertiesLinks.some((link) => isLinkActive(link.href))
+                      ? 'bg-blue-100 text-blue-700 dark:bg-blue-900 dark:text-blue-300'
+                      : 'text-gray-700 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-800'
+                  }`}
+                >
+                  <Search className="h-4 w-4" />
+                  <span>Properties</span>
+                  <ChevronDown
+                    className={`h-4 w-4 transition-transform ${
+                      propertiesDropdownOpen ? 'rotate-180' : ''
+                    }`}
+                  />
+                </button>
+
+                {propertiesDropdownOpen && (
+                  <>
+                    <div
+                      className="fixed inset-0 z-10"
+                      onClick={() => setPropertiesDropdownOpen(false)}
+                    />
+                    <div className="absolute left-0 mt-1 w-48 rounded-md bg-white shadow-lg ring-1 ring-black ring-opacity-5 dark:bg-gray-800 dark:ring-gray-700 z-20">
+                      <div className="py-1">
+                        {propertiesLinks.map((link) => {
+                          const Icon = link.icon
+                          return (
+                            <Link
+                              key={link.href}
+                              href={link.href}
+                              onClick={() => setPropertiesDropdownOpen(false)}
+                              className={`flex items-center space-x-2 px-4 py-2 text-sm transition-colors ${
+                                isLinkActive(link.href)
+                                  ? 'bg-blue-50 text-blue-700 dark:bg-blue-900 dark:text-blue-300'
+                                  : 'text-gray-700 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-700'
+                              }`}
+                            >
+                              <Icon className="h-4 w-4" />
+                              <span>{link.label}</span>
+                            </Link>
+                          )
+                        })}
+                      </div>
+                    </div>
+                  </>
+                )}
+              </div>
+
               {/* Listing Dropdown for Seller/Agent */}
               {hasListingDropdown && (
                 <div className="relative">
                   <button
                     onClick={() => setListingDropdownOpen(!listingDropdownOpen)}
                     className={`flex items-center space-x-1 rounded-md px-3 py-2 text-sm font-medium transition-colors ${
-                      listingLinks.some(link => isLinkActive(link.href))
+                      listingLinks.some((link) => isLinkActive(link.href))
                         ? 'bg-blue-100 text-blue-700 dark:bg-blue-900 dark:text-blue-300'
                         : 'text-gray-700 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-800'
                     }`}
                   >
                     <List className="h-4 w-4" />
                     <span>Listing</span>
-                    <ChevronDown className={`h-4 w-4 transition-transform ${listingDropdownOpen ? 'rotate-180' : ''}`} />
+                    <ChevronDown
+                      className={`h-4 w-4 transition-transform ${
+                        listingDropdownOpen ? 'rotate-180' : ''
+                      }`}
+                    />
                   </button>
-                  
+
                   {listingDropdownOpen && (
                     <>
-                      <div 
-                        className="fixed inset-0 z-10" 
+                      <div
+                        className="fixed inset-0 z-10"
                         onClick={() => setListingDropdownOpen(false)}
                       />
                       <div className="absolute left-0 mt-1 w-48 rounded-md bg-white shadow-lg ring-1 ring-black ring-opacity-5 dark:bg-gray-800 dark:ring-gray-700 z-20">
@@ -301,20 +371,24 @@ export function Navbar() {
                   <button
                     onClick={() => setAdminDropdownOpen(!adminDropdownOpen)}
                     className={`flex items-center space-x-1 rounded-md px-3 py-2 text-sm font-medium transition-colors ${
-                      adminLinks.some(link => isLinkActive(link.href))
+                      adminLinks.some((link) => isLinkActive(link.href))
                         ? 'bg-blue-100 text-blue-700 dark:bg-blue-900 dark:text-blue-300'
                         : 'text-gray-700 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-800'
                     }`}
                   >
                     <Users className="h-4 w-4" />
                     <span>Manage</span>
-                    <ChevronDown className={`h-4 w-4 transition-transform ${adminDropdownOpen ? 'rotate-180' : ''}`} />
+                    <ChevronDown
+                      className={`h-4 w-4 transition-transform ${
+                        adminDropdownOpen ? 'rotate-180' : ''
+                      }`}
+                    />
                   </button>
-                  
+
                   {adminDropdownOpen && (
                     <>
-                      <div 
-                        className="fixed inset-0 z-10" 
+                      <div
+                        className="fixed inset-0 z-10"
                         onClick={() => setAdminDropdownOpen(false)}
                       />
                       <div className="absolute left-0 mt-1 w-48 rounded-md bg-white shadow-lg ring-1 ring-black ring-opacity-5 dark:bg-gray-800 dark:ring-gray-700 z-20">
@@ -370,11 +444,11 @@ export function Navbar() {
                   >
                     {getUserInitial()}
                   </button>
-                  
+
                   {profileDropdownOpen && (
                     <>
-                      <div 
-                        className="fixed inset-0 z-10" 
+                      <div
+                        className="fixed inset-0 z-10"
                         onClick={() => setProfileDropdownOpen(false)}
                       />
                       <div className="fixed left-1/2 top-16 -translate-x-1/2 w-64 max-w-[90vw] lg:absolute lg:top-auto lg:left-auto lg:right-0 lg:translate-x-0 lg:max-w-none mt-2 rounded-md bg-white shadow-lg ring-1 ring-black ring-opacity-5 dark:bg-gray-800 dark:ring-gray-700 z-20">
@@ -398,7 +472,7 @@ export function Navbar() {
                               </div>
                             </div>
                           </div>
-                          
+
                           {/* Menu Items */}
                           <Link
                             href={getDashboardLink(role)}
@@ -408,7 +482,7 @@ export function Navbar() {
                             <LayoutDashboard className="h-4 w-4" />
                             <span>{getDashboardLabel(role)}</span>
                           </Link>
-                          
+
                           <Link
                             href="/profile"
                             onClick={() => setProfileDropdownOpen(false)}
@@ -417,7 +491,7 @@ export function Navbar() {
                             <User className="h-4 w-4" />
                             <span>View Profile</span>
                           </Link>
-                          
+
                           <Link
                             href="/settings"
                             onClick={() => setProfileDropdownOpen(false)}
@@ -426,9 +500,9 @@ export function Navbar() {
                             <Settings className="h-4 w-4" />
                             <span>Settings</span>
                           </Link>
-                          
+
                           <div className="border-t border-gray-200 dark:border-gray-700 my-1" />
-                          
+
                           <button
                             onClick={() => {
                               setProfileDropdownOpen(false)
@@ -456,7 +530,9 @@ export function Navbar() {
                   </Button>
                 </Link>
                 <Link href="/register">
-                  <Button size="sm" className="hidden sm:flex">Sign Up</Button>
+                  <Button size="sm" className="hidden sm:flex">
+                    Sign Up
+                  </Button>
                   <Button size="sm" className="sm:hidden" aria-label="Sign up">
                     <UserPlus className="h-4 w-4" />
                   </Button>
@@ -468,11 +544,7 @@ export function Navbar() {
               className="md:hidden rounded-md p-2 text-gray-700 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-800"
               onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
             >
-              {mobileMenuOpen ? (
-                <X className="h-5 w-5" />
-              ) : (
-                <Menu className="h-5 w-5" />
-              )}
+              {mobileMenuOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
             </button>
           </div>
         </div>
@@ -499,14 +571,61 @@ export function Navbar() {
                 </Link>
               )
             })}
-            
+
+            {/* Mobile Properties Dropdown */}
+            <div>
+              <button
+                onClick={() => setPropertiesDropdownOpen(!propertiesDropdownOpen)}
+                className={`flex items-center justify-between w-full rounded-md px-3 py-2 text-base font-medium ${
+                  propertiesLinks.some((link) => isLinkActive(link.href))
+                    ? 'bg-blue-100 text-blue-700 dark:bg-blue-900 dark:text-blue-300'
+                    : 'text-gray-700 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-800'
+                }`}
+              >
+                <div className="flex items-center space-x-2">
+                  <Search className="h-5 w-5" />
+                  <span>Properties</span>
+                </div>
+                <ChevronDown
+                  className={`h-5 w-5 transition-transform ${
+                    propertiesDropdownOpen ? 'rotate-180' : ''
+                  }`}
+                />
+              </button>
+              {propertiesDropdownOpen && (
+                <div className="pl-6 mt-1 space-y-1">
+                  {propertiesLinks.map((link) => {
+                    const Icon = link.icon
+                    return (
+                      <Link
+                        key={link.href}
+                        href={link.href}
+                        onClick={() => {
+                          setMobileMenuOpen(false)
+                          setPropertiesDropdownOpen(false)
+                        }}
+                        className={`flex items-center space-x-2 rounded-md px-3 py-2 text-sm font-medium ${
+                          isLinkActive(link.href)
+                            ? 'bg-blue-50 text-blue-700 dark:bg-blue-900 dark:text-blue-300'
+                            : 'text-gray-700 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-800'
+                        }`}
+                      >
+                        <Icon className="h-4 w-4" />
+                        <span>{link.label}</span>
+                      </Link>
+                    )
+                  })}
+                </div>
+              )}
+            </div>
+
             {/* Mobile Listing Dropdown */}
             {hasListingDropdown && (
               <div>
                 <button
                   onClick={() => setListingDropdownOpen(!listingDropdownOpen)}
                   className={`flex items-center justify-between w-full rounded-md px-3 py-2 text-base font-medium ${
-                    listingLinks.some(link => isLinkActive(link.href))
+                    listingLinks.some((link) => isLinkActive(link.href))
                       ? 'bg-blue-100 text-blue-700 dark:bg-blue-900 dark:text-blue-300'
                       : 'text-gray-700 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-800'
                   }`}
@@ -515,7 +634,11 @@ export function Navbar() {
                     <List className="h-5 w-5" />
                     <span>Listing</span>
                   </div>
-                  <ChevronDown className={`h-5 w-5 transition-transform ${listingDropdownOpen ? 'rotate-180' : ''}`} />
+                  <ChevronDown
+                    className={`h-5 w-5 transition-transform ${
+                      listingDropdownOpen ? 'rotate-180' : ''
+                    }`}
+                  />
                 </button>
                 {listingDropdownOpen && (
                   <div className="pl-6 mt-1 space-y-1">
@@ -551,7 +674,7 @@ export function Navbar() {
                 <button
                   onClick={() => setAdminDropdownOpen(!adminDropdownOpen)}
                   className={`flex items-center justify-between w-full rounded-md px-3 py-2 text-base font-medium ${
-                    adminLinks.some(link => isLinkActive(link.href))
+                    adminLinks.some((link) => isLinkActive(link.href))
                       ? 'bg-blue-100 text-blue-700 dark:bg-blue-900 dark:text-blue-300'
                       : 'text-gray-700 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-800'
                   }`}
@@ -560,7 +683,11 @@ export function Navbar() {
                     <Users className="h-5 w-5" />
                     <span>Manage</span>
                   </div>
-                  <ChevronDown className={`h-5 w-5 transition-transform ${adminDropdownOpen ? 'rotate-180' : ''}`} />
+                  <ChevronDown
+                    className={`h-5 w-5 transition-transform ${
+                      adminDropdownOpen ? 'rotate-180' : ''
+                    }`}
+                  />
                 </button>
                 {adminDropdownOpen && (
                   <div className="pl-6 mt-1 space-y-1">
@@ -616,5 +743,3 @@ export function Navbar() {
     </nav>
   )
 }
-
-

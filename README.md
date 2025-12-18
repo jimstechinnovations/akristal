@@ -6,8 +6,8 @@ A production-ready real estate marketplace web application built with Next.js, S
 
 - **Company Name:** TheAkristalGroup
 - **Motto:** REDEFINING REAL ESTATE
-- **Email:** theakristalgroup@gmail.com
-- **Phone:** 0791900316
+- **Email:** info@akristal.com
+- **Phone:** +250791900316
 - **Address:** KK 15 Rd, Kigali, Rwanda
 
 ## 🧱 Tech Stack
@@ -59,10 +59,10 @@ A production-ready real estate marketplace web application built with Next.js, S
    NEXT_PUBLIC_APP_URL=http://localhost:3000
    SMTP_HOST=smtp.zoho.com
    SMTP_PORT=587
-   SMTP_USER=theakristalgroup@gmail.com
+   SMTP_USER=info@akristal.com
    SMTP_PASSWORD=your_zoho_app_password
-   BUSINESS_EMAIL=theakristalgroup@gmail.com
-   BUSINESS_PHONE=0791900316
+   BUSINESS_EMAIL=info@akristal.com
+   BUSINESS_PHONE=+250791900316
    BUSINESS_ADDRESS=KK 15 Rd, Kigali, Rwanda
    ```
    
@@ -352,7 +352,7 @@ Copyright © 2024 TheAkristalGroup. All rights reserved.
 
 ## 🆘 Support
 
-For support, email theakristalgroup@gmail.com or call 0791900316.
+For support, email info@akristal.com or call +250791900316.
 
 ## 🔮 Future Enhancements
 

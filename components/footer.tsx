@@ -23,7 +23,7 @@ export function Footer() {
               REDEFINING REAL ESTATE
             </p>
             <p className="mt-2 text-sm text-gray-600 dark:text-gray-400">
-              Your trusted real estate marketplace in Rwanda
+              Your trusted real estate marketplace across Africa and beyond
             </p>
             <div className="mt-4 flex space-x-4">
               {socialLinks.map((social) => {
@@ -54,6 +54,14 @@ export function Footer() {
                   className="text-sm text-gray-600 hover:text-gray-900 dark:text-gray-400 dark:hover:text-gray-100"
                 >
                   About Us
+                </Link>
+              </li>
+              <li>
+                <Link
+                  href="/services"
+                  className="text-sm text-gray-600 hover:text-gray-900 dark:text-gray-400 dark:hover:text-gray-100"
+                >
+                  Services
                 </Link>
               </li>
               <li>
@@ -104,18 +112,18 @@ export function Footer() {
             <ul className="mt-4 space-y-2 text-sm text-gray-600 dark:text-gray-400">
               <li>
                 <a
-                  href="mailto:theakristalgroup@gmail.com"
+                  href="mailto:info@akristal.com"
                   className="hover:text-blue-600 dark:hover:text-blue-400 transition-colors"
                 >
-                  theakristalgroup@gmail.com
+                  info@akristal.com
                 </a>
               </li>
               <li>
                 <a
-                  href="tel:0791900316"
+                  href="tel:+250791900316"
                   className="hover:text-blue-600 dark:hover:text-blue-400 transition-colors"
                 >
-                  0791900316
+                  +250791900316
                 </a>
               </li>
               <li>KK 15 Rd, Kigali, Rwanda</li>
