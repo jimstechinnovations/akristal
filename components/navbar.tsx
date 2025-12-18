@@ -1,6 +1,7 @@
 'use client'
 
 import Link from 'next/link'
+import Image from 'next/image'
 import { usePathname } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
 import { useEffect, useState } from 'react'
@@ -230,16 +231,23 @@ export function Navbar() {
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         <div className="flex h-16 items-center justify-between">
           <div className="flex items-center">
-            <Link href="/" className="flex flex-col items-start">
-              <span className="hidden sm:block text-xl font-bold text-blue-600 dark:text-blue-400">
-                TheAkristalGroup
-              </span>
-              <span className="sm:hidden text-lg font-bold text-blue-600 dark:text-blue-400">
-                TAG
-              </span>
-              <span className="hidden sm:block text-xs font-medium text-gray-600 dark:text-gray-400 -mt-1">
-                REDEFINING REAL ESTATE
-              </span>
+            <Link href="/" className="flex items-center space-x-2">
+              <Image
+                src="/Akristal-svg.svg"
+                alt="TheAkristalGroup logo"
+                width={32}
+                height={32}
+                className="h-8 w-8 sm:h-9 sm:w-9"
+                priority
+              />
+              <div className="hidden sm:flex flex-col items-start">
+                <span className="text-xl font-bold text-blue-600 dark:text-blue-400">
+                  TheAkristalGroup
+                </span>
+                <span className="text-xs font-medium text-gray-600 dark:text-gray-400 -mt-1">
+                  REDEFINING REAL ESTATE
+                </span>
+              </div>
             </Link>
             <div className="hidden md:ml-10 md:flex md:space-x-4 md:items-center">
               {/* Main nav links (excluding Properties, which has its own dropdown) */}
