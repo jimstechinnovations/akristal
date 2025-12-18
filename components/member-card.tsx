@@ -27,7 +27,7 @@ export function MemberCard({ member }: MemberCardProps) {
             alt={member.name}
             fill
             sizes="(min-width: 1024px) 50vw, 100vw"
-            className="object-cover object-center"
+            className="object-contain object-top"
             onError={() => setImageError(true)}
           />
         </div>
