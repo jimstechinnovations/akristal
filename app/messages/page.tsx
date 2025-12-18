@@ -8,47 +8,66 @@ import type { Database } from '@/types/database'
 
 type ConversationRow = Database['public']['Tables']['conversations']['Row']
 type PropertyRow = Database['public']['Tables']['properties']['Row']
-type ProfileRow = Database['public']['Tables']['profiles']['Row']
 type MessageRow = Database['public']['Tables']['messages']['Row']
-type ConversationWithJoins = ConversationRow & {
+
+type ConversationWithProperty = ConversationRow & {
   properties: Pick<PropertyRow, 'title' | 'id' | 'cover_image_url'> | null
-  profiles_buyer_id: Pick<ProfileRow, 'full_name'> | null
-  profiles_seller_id: Pick<ProfileRow, 'full_name'> | null
 }
-type UnreadMessage = Pick<MessageRow, 'conversation_id'>
+
+type UnreadMessage = Pick<MessageRow, 'conversation_id' | 'sender_id'>
 
 export default async function MessagesPage() {
   const user = await requireAuth()
   const supabase = await createClient()
 
-  const isAdmin = user.profile?.role === 'admin'
+  const role = user.profile?.role
+  const isAdmin = role === 'admin'
 
   // Get conversations for the user; admins can view all
-  const baseQuery = supabase
+  let query = supabase
     .from('conversations')
-    .select(
-      '*, properties(title, id, cover_image_url), profiles!conversations_buyer_id_fkey(full_name), profiles!conversations_seller_id_fkey(full_name)'
-    )
+    .select('*, properties(title, id, cover_image_url)')
     .order('last_message_at', { ascending: false })
 
-  const conversationsResult = isAdmin
-    ? await baseQuery
-    : await baseQuery.or(`buyer_id.eq.${user.id},seller_id.eq.${user.id}`)
-  const conversations = (conversationsResult.data as unknown as ConversationWithJoins[] | null) ?? []
+  if (!isAdmin) {
+    if (role === 'buyer') {
+      query = query.eq('buyer_id', user.id)
+    } else if (role === 'seller' || role === 'agent') {
+      query = query.eq('seller_id', user.id)
+    } else {
+      query = query.or(`buyer_id.eq.${user.id},seller_id.eq.${user.id}`)
+    }
+  }
 
-  // Get unread message counts
+  const { data, error } = await query
+
+  if (error) {
+    console.error('MessagesPage conversations error:', error)
+  }
+
+  const conversations = (data as ConversationWithProperty[] | null) ?? []
+
+  // Get unread message counts (only other users' messages)
   const conversationIds = conversations.map((c) => c.id)
-  const unreadCountsResult = await supabase
-    .from('messages')
-    .select('conversation_id')
-    .in('conversation_id', conversationIds)
-    .eq('is_read', false)
-  const unreadCounts = (unreadCountsResult.data as unknown as UnreadMessage[] | null) ?? []
-
   const unreadMap = new Map<string, number>()
-  unreadCounts.forEach((msg) => {
-    unreadMap.set(msg.conversation_id, (unreadMap.get(msg.conversation_id) || 0) + 1)
-  })
+
+  if (conversationIds.length > 0) {
+    const { data: unreadData, error: unreadError } = await supabase
+      .from('messages')
+      .select('conversation_id, sender_id, is_read')
+      .in('conversation_id', conversationIds)
+      .eq('is_read', false)
+      .neq('sender_id', user.id)
+
+    if (unreadError) {
+      console.error('MessagesPage unread error:', unreadError)
+    }
+
+    const unreadCounts = (unreadData as UnreadMessage[] | null) ?? []
+    unreadCounts.forEach((msg) => {
+      unreadMap.set(msg.conversation_id, (unreadMap.get(msg.conversation_id) || 0) + 1)
+    })
+  }
 
   return (
     <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
@@ -64,11 +83,6 @@ export default async function MessagesPage() {
           <CardContent className="p-0">
             <div className="divide-y divide-gray-200 dark:divide-gray-700">
               {conversations.map((conv) => {
-                const otherUser = isAdmin
-                  ? null
-                  : user.id === conv.buyer_id
-                    ? conv.profiles_seller_id
-                    : conv.profiles_buyer_id
                 const unreadCount = unreadMap.get(conv.id) || 0
 
                 return (
@@ -100,8 +114,12 @@ export default async function MessagesPage() {
                         </div>
                         <p className="mt-1 text-sm text-gray-600 dark:text-gray-400">
                           {isAdmin
-                            ? `Buyer: ${conv.profiles_buyer_id?.full_name || 'User'} • Seller: ${conv.profiles_seller_id?.full_name || 'User'}`
-                            : otherUser?.full_name || 'User'}
+                            ? 'Buyer & Seller'
+                            : role === 'buyer'
+                              ? 'Chat with seller'
+                              : role === 'seller' || role === 'agent'
+                                ? 'Chat with buyer'
+                                : 'Buyer & Seller'}
                         </p>
                         {unreadCount > 0 && (
                           <span className="mt-2 inline-block rounded-full bg-blue-600 px-2 py-1 text-xs text-white">

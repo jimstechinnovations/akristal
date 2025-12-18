@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useEffect, useRef } from 'react'
+import Link from 'next/link'
 import { createClient } from '@/lib/supabase/client'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -109,10 +110,20 @@ export function MessageThread({
 
   return (
     <div className="flex h-[calc(100vh-12rem)] flex-col">
-      <div className="mb-4">
-        <h1 className="text-2xl font-bold">
-          {conversation.properties?.title || 'Conversation'}
-        </h1>
+      <div className="mb-4 flex flex-col sm:flex-row sm:items-baseline sm:justify-between gap-1">
+        <div>
+          <h1 className="text-2xl font-bold text-gray-900 dark:text-white">
+            {conversation.properties?.title || 'Conversation'}
+          </h1>
+          {conversation.properties?.id && (
+            <Link
+              href={`/properties/${conversation.properties.id}`}
+              className="text-sm text-blue-600 hover:underline dark:text-blue-400"
+            >
+              View property details
+            </Link>
+          )}
+        </div>
       </div>
 
       <Card className="flex-1 overflow-hidden">

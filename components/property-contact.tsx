@@ -1,6 +1,7 @@
 'use client'
 
 import { useState } from 'react'
+import { useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -22,6 +23,7 @@ export function PropertyContact({ property, seller }: PropertyContactProps) {
   const [message, setMessage] = useState('')
   const [loading, setLoading] = useState(false)
   const [isFavorite, setIsFavorite] = useState(false)
+  const router = useRouter()
   const supabase = createClient()
 
   const handleInquiry = async () => {
@@ -91,6 +93,9 @@ export function PropertyContact({ property, seller }: PropertyContactProps) {
 
       toast.success('Message sent successfully!')
       setMessage('')
+
+      // Navigate to the conversation (chat room) for this property
+      router.push(`/messages/${conversationId}`)
     } catch (error: unknown) {
       toast.error(getErrorMessage(error) || 'Failed to send message')
     } finally {

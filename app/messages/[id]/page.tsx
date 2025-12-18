@@ -7,11 +7,13 @@ import type { Database } from '@/types/database'
 export default async function ConversationPage({
   params,
 }: {
-  params: { id: string }
+  params: Promise<{ id: string }>
 }) {
   const user = await requireAuth()
   const supabase = await createClient()
   const isAdmin = user.profile?.role === 'admin'
+
+  const { id } = await params
 
   type ConversationRow = Database['public']['Tables']['conversations']['Row']
   type MessageRow = Database['public']['Tables']['messages']['Row']
@@ -27,7 +29,7 @@ export default async function ConversationPage({
   const { data: conversation } = await supabase
     .from('conversations')
     .select('*, properties(title, id)')
-    .eq('id', params.id)
+    .eq('id', id)
     .single()
 
   const conv = (conversation as unknown as ConversationWithProperty | null) ?? null
@@ -45,7 +47,7 @@ export default async function ConversationPage({
   const { data: messages } = await supabase
     .from('messages')
     .select('*, profiles!messages_sender_id_fkey(full_name, avatar_url)')
-    .eq('conversation_id', params.id)
+    .eq('conversation_id', id)
     .order('created_at', { ascending: true })
 
   // Mark messages as read
@@ -58,7 +60,7 @@ export default async function ConversationPage({
   }
 
   await (supabase as unknown as MarkReadRpcClient).rpc('mark_conversation_read', {
-    p_conversation_id: params.id,
+    p_conversation_id: id,
   })
 
   return (
