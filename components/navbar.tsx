@@ -31,6 +31,11 @@ import {
   ChevronDown,
   User,
   Settings,
+  Info,
+  Phone,
+  HelpCircle,
+  Shield,
+  FileText,
 } from 'lucide-react'
 
 type Profile = Database['public']['Tables']['profiles']['Row']
@@ -50,6 +55,7 @@ export function Navbar() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
   const [mounted, setMounted] = useState(false)
   const [propertiesDropdownOpen, setPropertiesDropdownOpen] = useState(false)
+  const [moreDropdownOpen, setMoreDropdownOpen] = useState(false)
   const [listingDropdownOpen, setListingDropdownOpen] = useState(false)
   const [adminDropdownOpen, setAdminDropdownOpen] = useState(false)
   const [profileDropdownOpen, setProfileDropdownOpen] = useState(false)
@@ -123,8 +129,10 @@ export function Navbar() {
     navLinks.push({ href: '/', label: 'Home', icon: Home })
   }
 
-  // Dedicated Services page
-  navLinks.push({ href: '/services', label: 'Services', icon: Briefcase })
+  // Dedicated Services page for authenticated users
+  if (user) {
+    navLinks.push({ href: '/services', label: 'Services', icon: Briefcase })
+  }
 
   if (user) {
     if (role === 'buyer') {
@@ -185,6 +193,17 @@ export function Navbar() {
   const adminLinks = getAdminLinks()
   const hasAdminDropdown = adminLinks.length > 0
 
+  // Static "More" links (shown in dropdown when logged out)
+  const moreLinks: NavLink[] = [
+    { href: '/about', label: 'About Us', icon: Info },
+    { href: '/members', label: 'Members', icon: Users },
+    { href: '/services', label: 'Services', icon: Briefcase },
+    { href: '/contact', label: 'Contact Us', icon: Phone },
+    { href: '/support', label: 'Support', icon: HelpCircle },
+    { href: '/privacy', label: 'Privacy Policy', icon: Shield },
+    { href: '/terms', label: 'Terms & Conditions', icon: FileText },
+  ]
+
   // Properties dropdown links (role-aware)
   const propertiesLinks: NavLink[] =
     role === 'admin'
@@ -231,7 +250,10 @@ export function Navbar() {
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         <div className="flex h-16 items-center justify-between">
           <div className="flex items-center">
-            <Link href="/" className="flex items-center space-x-2">
+            <Link
+              href={user ? getDashboardLink(role) : '/'}
+              className="flex items-center space-x-2"
+            >
               <Image
                 src="/Akristal-svg.svg"
                 alt="TheAkristalGroup logo"
@@ -250,7 +272,7 @@ export function Navbar() {
               </div>
             </Link>
             <div className="hidden md:ml-10 md:flex md:space-x-4 md:items-center">
-              {/* Main nav links (excluding Properties, which has its own dropdown) */}
+              {/* Main nav links (excluding Properties/More dropdowns) */}
               {navLinks.map((link) => {
                 const Icon = link.icon
                 return (
@@ -319,6 +341,59 @@ export function Navbar() {
                   </>
                 )}
               </div>
+
+              {/* More dropdown (logged-out informational links) */}
+              {!user && (
+                <div className="relative">
+                  <button
+                    onClick={() => setMoreDropdownOpen(!moreDropdownOpen)}
+                    className={`flex items-center space-x-1 rounded-md px-3 py-2 text-sm font-medium transition-colors ${
+                      moreLinks.some((link) => isLinkActive(link.href))
+                        ? 'bg-blue-100 text-blue-700 dark:bg-blue-900 dark:text-blue-300'
+                        : 'text-gray-700 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-800'
+                    }`}
+                  >
+                    <Info className="h-4 w-4" />
+                    <span>More</span>
+                    <ChevronDown
+                      className={`h-4 w-4 transition-transform ${
+                        moreDropdownOpen ? 'rotate-180' : ''
+                      }`}
+                    />
+                  </button>
+
+                  {moreDropdownOpen && (
+                    <>
+                      <div
+                        className="fixed inset-0 z-10"
+                        onClick={() => setMoreDropdownOpen(false)}
+                      />
+                      <div className="absolute left-0 mt-1 w-56 rounded-md bg-white shadow-lg ring-1 ring-black ring-opacity-5 dark:bg-gray-800 dark:ring-gray-700 z-20">
+                        <div className="py-1">
+                          {moreLinks.map((link) => {
+                            const Icon = link.icon
+                            return (
+                              <Link
+                                key={link.href}
+                                href={link.href}
+                                onClick={() => setMoreDropdownOpen(false)}
+                                className={`flex items-center space-x-2 px-4 py-2 text-sm transition-colors ${
+                                  isLinkActive(link.href)
+                                    ? 'bg-blue-50 text-blue-700 dark:bg-blue-900 dark:text-blue-300'
+                                    : 'text-gray-700 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-700'
+                                }`}
+                              >
+                                <Icon className="h-4 w-4" />
+                                <span>{link.label}</span>
+                              </Link>
+                            )
+                          })}
+                        </div>
+                      </div>
+                    </>
+                  )}
+                </div>
+              )}
 
               {/* Listing Dropdown for Seller/Agent */}
               {hasListingDropdown && (
@@ -626,6 +701,55 @@ export function Navbar() {
                 </div>
               )}
             </div>
+
+            {/* Mobile More Dropdown (logged-out informational links) */}
+            {!user && (
+              <div>
+                <button
+                  onClick={() => setMoreDropdownOpen(!moreDropdownOpen)}
+                  className={`flex items-center justify-between w-full rounded-md px-3 py-2 text-base font-medium ${
+                    moreLinks.some((link) => isLinkActive(link.href))
+                      ? 'bg-blue-100 text-blue-700 dark:bg-blue-900 dark:text-blue-300'
+                      : 'text-gray-700 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-800'
+                  }`}
+                >
+                  <div className="flex items-center space-x-2">
+                    <Info className="h-5 w-5" />
+                    <span>More</span>
+                  </div>
+                  <ChevronDown
+                    className={`h-5 w-5 transition-transform ${
+                      moreDropdownOpen ? 'rotate-180' : ''
+                    }`}
+                  />
+                </button>
+                {moreDropdownOpen && (
+                  <div className="pl-6 mt-1 space-y-1">
+                    {moreLinks.map((link) => {
+                      const Icon = link.icon
+                      return (
+                        <Link
+                          key={link.href}
+                          href={link.href}
+                          onClick={() => {
+                            setMobileMenuOpen(false)
+                            setMoreDropdownOpen(false)
+                          }}
+                          className={`flex items-center space-x-2 rounded-md px-3 py-2 text-sm font-medium ${
+                            isLinkActive(link.href)
+                              ? 'bg-blue-50 text-blue-700 dark:bg-blue-900 dark:text-blue-300'
+                              : 'text-gray-700 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-800'
+                          }`}
+                        >
+                          <Icon className="h-4 w-4" />
+                          <span>{link.label}</span>
+                        </Link>
+                      )
+                    })}
+                  </div>
+                )}
+              </div>
+            )}
 
             {/* Mobile Listing Dropdown */}
             {hasListingDropdown && (
