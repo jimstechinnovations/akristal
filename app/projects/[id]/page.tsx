@@ -77,10 +77,10 @@ export default async function ProjectPage({
   const currentUser = await getCurrentUser()
   const isAdmin = currentUser?.profile?.role === 'admin'
 
-  // Fetch project
+  // Fetch project (explicitly include media_urls to ensure it's selected)
   const { data: project, error } = await supabase
     .from('projects')
-    .select('*')
+    .select('id, title, description, media_urls, created_by, status, created_at, updated_at')
     .eq('id', id)
     .single()
 
@@ -117,12 +117,14 @@ export default async function ProjectPage({
   }
 
   // Parse project media_urls
-  typedProject.media_urls = parseMediaUrls(typedProject.media_urls)
+  // First check raw data from database
+  const rawMediaUrls = (project as any).media_urls
+  console.log('Raw media_urls from DB:', rawMediaUrls, 'Type:', typeof rawMediaUrls)
   
-  // Debug: Log to help diagnose issues (remove in production if needed)
-  if (typedProject.media_urls) {
-    console.log('Project media URLs parsed:', typedProject.media_urls)
-  }
+  typedProject.media_urls = parseMediaUrls(rawMediaUrls)
+  
+  // Debug: Log to help diagnose issues
+  console.log('Parsed media URLs:', typedProject.media_urls)
 
   // Check if user can view this project
   const canView =
