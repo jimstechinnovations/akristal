@@ -184,6 +184,7 @@ export function Navbar() {
         { href: '/admin/properties', label: 'Properties', icon: List },
         { href: '/admin/categories', label: 'Categories', icon: Tags },
         { href: '/admin/users', label: 'Users', icon: Users },
+        { href: '/admin/members', label: 'Members', icon: Users },
         { href: '/admin/payments', label: 'Payments', icon: CreditCard },
       ]
     }
@@ -205,6 +206,8 @@ export function Navbar() {
     { href: '/privacy', label: 'Privacy Policy', icon: Shield },
     { href: '/terms', label: 'Terms & Conditions', icon: FileText },
   ]
+  
+  // Note: Members is in "More" dropdown for logged-out users, but in "Manage" dropdown for admins
 
   // "More" links for logged-in users
   const moreLoggedInLinks: NavLink[] = [

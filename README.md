@@ -82,6 +82,7 @@ A production-ready real estate marketplace web application built with Next.js, S
    - `property-videos` - For property videos
    - `documents` - For payment statements and documents
    - `project-media` - For project updates, offers, and events media (images and videos)
+   - `team` - For team member images
 
 6. **Run the development server**
    ```bash
@@ -242,6 +243,11 @@ The application uses a comprehensive PostgreSQL schema with the following main t
 - `payments` - Payment transactions
 - `site_content` - Admin-managed content
 - `activity_logs` - System activity tracking
+- `members` - Team/company members (admin-managed)
+- `projects` - Project management
+- `project_updates` - Project updates
+- `project_offers` - Project offers
+- `project_events` - Project events
 
 All tables include Row Level Security (RLS) policies for data protection.
 

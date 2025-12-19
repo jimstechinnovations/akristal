@@ -227,6 +227,20 @@ CREATE TABLE IF NOT EXISTS public.activity_logs (
   created_at TIMESTAMP WITH TIME ZONE DEFAULT TIMEZONE('utc', NOW())
 );
 
+--- Members table (for team/company members page)
+CREATE TABLE IF NOT EXISTS public.members (
+  id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+  name VARCHAR(255) NOT NULL,
+  role VARCHAR(255) NOT NULL,
+  image_url TEXT,
+  details TEXT NOT NULL,
+  display_order INTEGER DEFAULT 0,
+  is_active BOOLEAN DEFAULT true,
+  created_by UUID REFERENCES public.profiles(id) ON DELETE SET NULL,
+  created_at TIMESTAMP WITH TIME ZONE DEFAULT TIMEZONE('utc', NOW()),
+  updated_at TIMESTAMP WITH TIME ZONE DEFAULT TIMEZONE('utc', NOW())
+);
+
 -- Indexes for performance
 CREATE INDEX IF NOT EXISTS idx_properties_seller_id ON public.properties(seller_id);
 CREATE INDEX IF NOT EXISTS idx_properties_agent_id ON public.properties(agent_id);
@@ -271,6 +285,9 @@ CREATE INDEX IF NOT EXISTS idx_activity_logs_user_id ON public.activity_logs(use
 CREATE INDEX IF NOT EXISTS idx_activity_logs_action ON public.activity_logs(action);
 CREATE INDEX IF NOT EXISTS idx_activity_logs_created_at ON public.activity_logs(created_at DESC);
 
+CREATE INDEX IF NOT EXISTS idx_members_display_order ON public.members(display_order);
+CREATE INDEX IF NOT EXISTS idx_members_is_active ON public.members(is_active);
+
 -- Row Level Security (RLS) Policies
 
 -- Enable RLS on all tables
@@ -284,6 +301,7 @@ ALTER TABLE public.inquiries ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.payments ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.site_content ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.activity_logs ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.members ENABLE ROW LEVEL SECURITY;
 
 -- Profiles policies
 CREATE POLICY "Users can view all profiles" ON public.profiles FOR SELECT USING (true);
@@ -475,6 +493,45 @@ CREATE POLICY "Admins can view all activity logs" ON public.activity_logs FOR SE
   );
 CREATE POLICY "System can insert activity logs" ON public.activity_logs FOR INSERT WITH CHECK (true);
 
+-- Members policies
+-- Public can view active members
+CREATE POLICY "Public can view active members" ON public.members FOR SELECT
+  USING (is_active = true);
+
+-- Admins can view all members
+CREATE POLICY "Admins can view all members" ON public.members FOR SELECT
+  USING (
+    EXISTS (
+      SELECT 1 FROM public.profiles
+      WHERE id = auth.uid() AND role = 'admin'
+    )
+  );
+
+-- Only admins can insert, update, or delete members
+CREATE POLICY "Admins can insert members" ON public.members FOR INSERT
+  WITH CHECK (
+    EXISTS (
+      SELECT 1 FROM public.profiles
+      WHERE id = auth.uid() AND role = 'admin'
+    )
+  );
+
+CREATE POLICY "Admins can update members" ON public.members FOR UPDATE
+  USING (
+    EXISTS (
+      SELECT 1 FROM public.profiles
+      WHERE id = auth.uid() AND role = 'admin'
+    )
+  );
+
+CREATE POLICY "Admins can delete members" ON public.members FOR DELETE
+  USING (
+    EXISTS (
+      SELECT 1 FROM public.profiles
+      WHERE id = auth.uid() AND role = 'admin'
+    )
+  );
+
 -- Functions and Triggers
 
 -- Function to update updated_at timestamp
@@ -503,6 +560,9 @@ CREATE TRIGGER update_payments_updated_at BEFORE UPDATE ON public.payments
   FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
 
 CREATE TRIGGER update_site_content_updated_at BEFORE UPDATE ON public.site_content
+  FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
+
+CREATE TRIGGER update_members_updated_at BEFORE UPDATE ON public.members
   FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
 
 -- Function to update favorites count

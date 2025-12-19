@@ -23,6 +23,7 @@ DROP TRIGGER IF EXISTS update_projects_updated_at ON public.projects;
 DROP TRIGGER IF EXISTS update_project_updates_updated_at ON public.project_updates;
 DROP TRIGGER IF EXISTS update_project_offers_updated_at ON public.project_offers;
 DROP TRIGGER IF EXISTS update_project_events_updated_at ON public.project_events;
+DROP TRIGGER IF EXISTS update_members_updated_at ON public.members;
 
 -- Drop all functions
 DROP FUNCTION IF EXISTS update_updated_at_column();
@@ -95,6 +96,13 @@ DROP POLICY IF EXISTS "Admins can manage site content" ON public.site_content;
 
 DROP POLICY IF EXISTS "Admins can view all activity logs" ON public.activity_logs;
 DROP POLICY IF EXISTS "System can insert activity logs" ON public.activity_logs;
+
+-- Members policies
+DROP POLICY IF EXISTS "Public can view active members" ON public.members;
+DROP POLICY IF EXISTS "Admins can view all members" ON public.members;
+DROP POLICY IF EXISTS "Admins can insert members" ON public.members;
+DROP POLICY IF EXISTS "Admins can update members" ON public.members;
+DROP POLICY IF EXISTS "Admins can delete members" ON public.members;
 
 -- Project management policies
 DROP POLICY IF EXISTS "Anyone can view active projects" ON public.projects;
@@ -169,6 +177,9 @@ DROP INDEX IF EXISTS idx_activity_logs_user_id;
 DROP INDEX IF EXISTS idx_activity_logs_action;
 DROP INDEX IF EXISTS idx_activity_logs_created_at;
 
+DROP INDEX IF EXISTS idx_members_display_order;
+DROP INDEX IF EXISTS idx_members_is_active;
+
 -- Project management indexes
 DROP INDEX IF EXISTS idx_projects_created_by;
 DROP INDEX IF EXISTS idx_projects_status;
@@ -200,8 +211,10 @@ ALTER TABLE IF EXISTS public.project_events DISABLE ROW LEVEL SECURITY;
 ALTER TABLE IF EXISTS public.project_offers DISABLE ROW LEVEL SECURITY;
 ALTER TABLE IF EXISTS public.project_updates DISABLE ROW LEVEL SECURITY;
 ALTER TABLE IF EXISTS public.projects DISABLE ROW LEVEL SECURITY;
+ALTER TABLE IF EXISTS public.members DISABLE ROW LEVEL SECURITY;
 
 -- Drop all tables (in reverse dependency order)
+DROP TABLE IF EXISTS public.members;
 DROP TABLE IF EXISTS public.activity_logs;
 DROP TABLE IF EXISTS public.site_content;
 DROP TABLE IF EXISTS public.payments;

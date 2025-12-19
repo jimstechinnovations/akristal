@@ -1,3 +1,4 @@
+import { createClient } from '@/lib/supabase/server'
 import { MemberCard } from '@/components/member-card'
 
 export const metadata = {
@@ -5,26 +6,29 @@ export const metadata = {
   description: 'Meet distinguished members and partners of TheAkristalGroup.',
 }
 
-const members = [
-  {
-    name: 'Prince Ibunkun Adetayo Oyekunle',
-    role: 'Engineer, Developer & Real Estate Innovator',
-    imageUrl:
-      'https://bhiaowmjscvgxxbiqzhe.supabase.co/storage/v1/object/public/teams/user2.jpg',
-    details:
-      'Prince Ibunkun Adetayo Oyekunle embodies the synergy between technology and real estate. As a computer/civil engineer and real estate developer, he has carved a unique path that integrates digital innovation with physical development. His work in tech security & guard, home automation, construction, and real estate financing reflects a holistic approach to modern challenges, while his leadership and vision inspire those around him. From his academic roots up to his current stature as a professional of distinction, his journey illustrates the power of versatility, determination, and foresight. In every endeavor, he demonstrates that excellence is not confined to one field but can be achieved across disciplines when driven by passion and purpose. Prince Ibunkun Adetayo Oyekunle is not only a developer and engineer—he is a visionary shaping the future of living and technology.',
-  },
-  {
-    name: 'Dr. Valentino Heavens (Ph.D Honoris Causa, B.TECH, DFCILMMD, FIMC, NBDSP, CMS, CMC®, CIL)',
-    role: 'Executive Coach & Transformational Leadership Expert',
-    imageUrl:
-      'https://bhiaowmjscvgxxbiqzhe.supabase.co/storage/v1/object/public/teams/user1.jpg',
-    details:
-      'Dr. Valentino Heavens is the MD/CEO of Black Belt Global Consulting and the visionary behind the BlackBeltCEO Network. He is a distinguished Executive Coach, Certified Management Consultant (CMC®), and Transformational Leadership Expert with decades of experience empowering businesses and leaders across Africa and beyond. He holds a B.Tech in Computer Science. He is a Fellow of the Institute of Management Consultants (FIMC), Doctoral Research Fellow of The Chartered Institute of Leadership, Manpower and Management Development (DFCILMMD) Nigeria/USA, Certified Management Specialist (CMS) from London Graduate School, a Fellow of The Academy of Management Executives (AME-USA), Faculty Member at Kaduna Business School (Nigeria), and a licensed National BDSP. Dr. Heavens brings an uncommon blend of strategic insight, leadership development, and spiritual clarity to organizational transformation.',
-  }
-]
+type MemberRow = {
+  id: string
+  name: string
+  role: string
+  image_url: string | null
+  details: string
+  display_order: number
+  is_active: boolean
+}
 
-export default function MembersPage() {
+export default async function MembersPage() {
+  const supabase = await createClient()
+
+  // Fetch active members, ordered by display_order
+  const { data: members, error } = await supabase
+    .from('members')
+    .select('*')
+    .eq('is_active', true)
+    .order('display_order', { ascending: true })
+    .order('created_at', { ascending: false })
+
+  const typedMembers = (members as MemberRow[] | null) ?? []
+
   return (
     <div className="mx-auto max-w-7xl px-4 py-10 sm:px-6 lg:px-8">
       <div className="mb-10 text-center">
@@ -37,11 +41,29 @@ export default function MembersPage() {
         </p>
       </div>
 
-      <div className="grid gap-6 md:grid-cols-2">
-        {members.map((member) => (
-          <MemberCard key={member.name} member={member} />
-        ))}
-      </div>
+      {error ? (
+        <div className="text-center py-12">
+          <p className="text-red-600 dark:text-red-400">Error loading members: {error.message}</p>
+        </div>
+      ) : typedMembers.length > 0 ? (
+        <div className="grid gap-6 md:grid-cols-2">
+          {typedMembers.map((member) => (
+            <MemberCard
+              key={member.id}
+              member={{
+                name: member.name,
+                role: member.role,
+                imageUrl: member.image_url || '',
+                details: member.details,
+              }}
+            />
+          ))}
+        </div>
+      ) : (
+        <div className="text-center py-12">
+          <p className="text-gray-600 dark:text-gray-400">No members available at this time.</p>
+        </div>
+      )}
     </div>
   )
 }
