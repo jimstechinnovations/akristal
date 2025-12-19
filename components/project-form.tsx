@@ -28,6 +28,7 @@ export function ProjectForm({ project }: { project?: ProjectRow }) {
     title: project?.title || '',
     description: project?.description || '',
     status: project?.status || 'draft',
+    created_at: project?.created_at ? new Date(project.created_at).toISOString().slice(0, 16) : '',
   })
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -39,6 +40,10 @@ export function ProjectForm({ project }: { project?: ProjectRow }) {
       formDataObj.append('title', formData.title)
       formDataObj.append('description', formData.description)
       formDataObj.append('status', formData.status)
+      if (!project && formData.created_at) {
+        // Only allow backdating when creating, not updating
+        formDataObj.append('created_at', new Date(formData.created_at).toISOString())
+      }
 
       let result
       if (project) {
@@ -116,6 +121,23 @@ export function ProjectForm({ project }: { project?: ProjectRow }) {
               <option value="archived">Archived</option>
             </select>
           </div>
+
+          {!project && (
+            <div>
+              <label className="block text-sm font-medium mb-1 text-gray-900 dark:text-white">
+                Created Date (Optional - for backdating)
+              </label>
+              <Input
+                type="datetime-local"
+                value={formData.created_at}
+                onChange={(e) => setFormData({ ...formData, created_at: e.target.value })}
+                className="w-full"
+              />
+              <p className="mt-1 text-xs text-gray-500 dark:text-gray-400">
+                Leave empty to use current date and time. Set a past date to backdate the project creation.
+              </p>
+            </div>
+          )}
 
           <div className="flex gap-4">
             <Button type="submit" disabled={loading}>

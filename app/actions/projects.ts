@@ -69,11 +69,17 @@ export async function createProject(formData: FormData) {
     const user = await requireRole(['admin'])
     const supabase = await createClient()
 
+    const createdAtStr = formData.get('created_at')
+    const createdAt = createdAtStr && createdAtStr !== '' 
+      ? new Date(createdAtStr as string).toISOString() 
+      : undefined
+
     const projectData: ProjectInsert = {
       title: formData.get('title') as string,
       description: (formData.get('description') as string) || null,
       created_by: user.id,
       status: (formData.get('status') as 'draft' | 'active' | 'completed' | 'archived') || 'draft',
+      created_at: createdAt,
     }
 
     type ProjectsInsertClient = {
