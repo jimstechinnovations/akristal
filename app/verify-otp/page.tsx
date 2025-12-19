@@ -150,7 +150,9 @@ function VerifyOTPPageInner() {
         // Use router.replace for client-side navigation
         if (userRole === 'admin') {
           router.replace('/admin')
-        } else if (userRole === 'seller' || userRole === 'agent') {
+        } else if (userRole === 'agent') {
+          router.replace('/agent/dashboard')
+        } else if (userRole === 'seller') {
           router.replace('/seller/dashboard')
         } else {
           router.replace('/buyer/dashboard')
