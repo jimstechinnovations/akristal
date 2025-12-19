@@ -30,7 +30,6 @@ export function MemberForm({ member }: { member?: MemberRow }) {
   const [formData, setFormData] = useState({
     name: member?.name || '',
     role: member?.role || '',
-    image_url: member?.image_url || '',
     details: member?.details || '',
     display_order: member?.display_order?.toString() || '0',
     is_active: member?.is_active !== undefined ? member.is_active.toString() : 'true',
@@ -63,7 +62,6 @@ export function MemberForm({ member }: { member?: MemberRow }) {
   const removeImage = () => {
     setImageFile(null)
     setImagePreview(null)
-    setFormData({ ...formData, image_url: '' })
   }
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -71,7 +69,7 @@ export function MemberForm({ member }: { member?: MemberRow }) {
     setLoading(true)
 
     try {
-      let imageUrl = formData.image_url
+      let imageUrl = member?.image_url || ''
 
       // Upload new image if a file was selected
       if (imageFile) {
@@ -90,6 +88,9 @@ export function MemberForm({ member }: { member?: MemberRow }) {
         if (uploadData?.path) {
           imageUrl = getPublicUrl('team', uploadData.path)
         }
+      } else if (!imagePreview) {
+        // If no image file and no preview, clear the image URL
+        imageUrl = ''
       }
 
       const formDataObj = new FormData()
@@ -197,20 +198,6 @@ export function MemberForm({ member }: { member?: MemberRow }) {
                 </label>
               </div>
             )}
-            <div className="text-xs text-gray-500 dark:text-gray-400 mt-1">
-              Or enter image URL manually:
-            </div>
-            <Input
-              value={formData.image_url}
-              onChange={(e) => {
-                setFormData({ ...formData, image_url: e.target.value })
-                if (e.target.value && !imageFile) {
-                  setImagePreview(e.target.value)
-                }
-              }}
-              placeholder="https://example.com/image.jpg"
-              className="mt-1"
-            />
           </div>
 
           <div>
