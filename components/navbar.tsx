@@ -128,9 +128,11 @@ export function Navbar() {
   // Only show Home for non-authenticated users
   if (!user) {
     navLinks.push({ href: '/', label: 'Home', icon: Home })
+    navLinks.push({ href: '/projects', label: 'Projects', icon: Briefcase })
   }
 
   // Services and Favorites will be in "More" dropdown for logged-in users
+  // Projects will also be in "More" dropdown for logged-in users
   // So we don't add them to main navLinks here
 
   if (user) {
@@ -178,6 +180,7 @@ export function Navbar() {
   const getAdminLinks = () => {
     if (role === 'admin') {
       return [
+        { href: '/projects', label: 'Projects', icon: Briefcase },
         { href: '/admin/properties', label: 'Properties', icon: List },
         { href: '/admin/categories', label: 'Categories', icon: Tags },
         { href: '/admin/users', label: 'Users', icon: Users },

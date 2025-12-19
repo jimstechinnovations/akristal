@@ -18,6 +18,11 @@ DROP TRIGGER IF EXISTS update_conversation_timestamp ON public.messages;
 -- Keeping drop here to clean up existing databases that might have this trigger
 DROP TRIGGER IF EXISTS on_auth_user_created ON auth.users;
 DROP TRIGGER IF EXISTS update_location_point ON public.properties;
+-- Project management triggers
+DROP TRIGGER IF EXISTS update_projects_updated_at ON public.projects;
+DROP TRIGGER IF EXISTS update_project_updates_updated_at ON public.project_updates;
+DROP TRIGGER IF EXISTS update_project_offers_updated_at ON public.project_offers;
+DROP TRIGGER IF EXISTS update_project_events_updated_at ON public.project_events;
 
 -- Drop all functions
 DROP FUNCTION IF EXISTS update_updated_at_column();
@@ -91,6 +96,39 @@ DROP POLICY IF EXISTS "Admins can manage site content" ON public.site_content;
 DROP POLICY IF EXISTS "Admins can view all activity logs" ON public.activity_logs;
 DROP POLICY IF EXISTS "System can insert activity logs" ON public.activity_logs;
 
+-- Project management policies
+DROP POLICY IF EXISTS "Anyone can view active projects" ON public.projects;
+DROP POLICY IF EXISTS "Users can view own projects" ON public.projects;
+DROP POLICY IF EXISTS "Admins can view all projects" ON public.projects;
+DROP POLICY IF EXISTS "Sellers, agents, and admins can create projects" ON public.projects;
+DROP POLICY IF EXISTS "Only admins can create projects" ON public.projects;
+DROP POLICY IF EXISTS "Users can update own projects or admin can update any" ON public.projects;
+DROP POLICY IF EXISTS "Users can delete own projects or admin can delete any" ON public.projects;
+
+DROP POLICY IF EXISTS "Anyone can view visible updates" ON public.project_updates;
+DROP POLICY IF EXISTS "Users can view all updates for own projects" ON public.project_updates;
+DROP POLICY IF EXISTS "Admins can view all updates" ON public.project_updates;
+DROP POLICY IF EXISTS "Sellers, agents, and admins can create updates" ON public.project_updates;
+DROP POLICY IF EXISTS "Only admins can create updates" ON public.project_updates;
+DROP POLICY IF EXISTS "Users can update own updates or admin can update any" ON public.project_updates;
+DROP POLICY IF EXISTS "Users can delete own updates or admin can delete any" ON public.project_updates;
+
+DROP POLICY IF EXISTS "Anyone can view visible offers" ON public.project_offers;
+DROP POLICY IF EXISTS "Users can view all offers for own projects" ON public.project_offers;
+DROP POLICY IF EXISTS "Admins can view all offers" ON public.project_offers;
+DROP POLICY IF EXISTS "Sellers, agents, and admins can create offers" ON public.project_offers;
+DROP POLICY IF EXISTS "Only admins can create offers" ON public.project_offers;
+DROP POLICY IF EXISTS "Users can update own offers or admin can update any" ON public.project_offers;
+DROP POLICY IF EXISTS "Users can delete own offers or admin can delete any" ON public.project_offers;
+
+DROP POLICY IF EXISTS "Anyone can view visible events" ON public.project_events;
+DROP POLICY IF EXISTS "Users can view all events for own projects" ON public.project_events;
+DROP POLICY IF EXISTS "Admins can view all events" ON public.project_events;
+DROP POLICY IF EXISTS "Sellers, agents, and admins can create events" ON public.project_events;
+DROP POLICY IF EXISTS "Only admins can create events" ON public.project_events;
+DROP POLICY IF EXISTS "Users can update own events or admin can update any" ON public.project_events;
+DROP POLICY IF EXISTS "Users can delete own events or admin can delete any" ON public.project_events;
+
 -- Drop all indexes
 DROP INDEX IF EXISTS idx_properties_seller_id;
 DROP INDEX IF EXISTS idx_properties_agent_id;
@@ -131,6 +169,21 @@ DROP INDEX IF EXISTS idx_activity_logs_user_id;
 DROP INDEX IF EXISTS idx_activity_logs_action;
 DROP INDEX IF EXISTS idx_activity_logs_created_at;
 
+-- Project management indexes
+DROP INDEX IF EXISTS idx_projects_created_by;
+DROP INDEX IF EXISTS idx_projects_status;
+DROP INDEX IF EXISTS idx_project_updates_project_id;
+DROP INDEX IF EXISTS idx_project_updates_schedule_visibility;
+DROP INDEX IF EXISTS idx_project_updates_scheduled_at;
+DROP INDEX IF EXISTS idx_project_offers_project_id;
+DROP INDEX IF EXISTS idx_project_offers_start_datetime;
+DROP INDEX IF EXISTS idx_project_offers_end_datetime;
+DROP INDEX IF EXISTS idx_project_offers_schedule_visibility;
+DROP INDEX IF EXISTS idx_project_events_project_id;
+DROP INDEX IF EXISTS idx_project_events_start_datetime;
+DROP INDEX IF EXISTS idx_project_events_end_datetime;
+DROP INDEX IF EXISTS idx_project_events_schedule_visibility;
+
 -- Disable RLS on all tables before dropping
 ALTER TABLE IF EXISTS public.activity_logs DISABLE ROW LEVEL SECURITY;
 ALTER TABLE IF EXISTS public.site_content DISABLE ROW LEVEL SECURITY;
@@ -142,6 +195,11 @@ ALTER TABLE IF EXISTS public.property_favorites DISABLE ROW LEVEL SECURITY;
 ALTER TABLE IF EXISTS public.properties DISABLE ROW LEVEL SECURITY;
 ALTER TABLE IF EXISTS public.categories DISABLE ROW LEVEL SECURITY;
 ALTER TABLE IF EXISTS public.profiles DISABLE ROW LEVEL SECURITY;
+-- Project management tables
+ALTER TABLE IF EXISTS public.project_events DISABLE ROW LEVEL SECURITY;
+ALTER TABLE IF EXISTS public.project_offers DISABLE ROW LEVEL SECURITY;
+ALTER TABLE IF EXISTS public.project_updates DISABLE ROW LEVEL SECURITY;
+ALTER TABLE IF EXISTS public.projects DISABLE ROW LEVEL SECURITY;
 
 -- Drop all tables (in reverse dependency order)
 DROP TABLE IF EXISTS public.activity_logs;
@@ -154,6 +212,11 @@ DROP TABLE IF EXISTS public.property_favorites;
 DROP TABLE IF EXISTS public.properties;
 DROP TABLE IF EXISTS public.categories;
 DROP TABLE IF EXISTS public.profiles;
+-- Project management tables
+DROP TABLE IF EXISTS public.project_events;
+DROP TABLE IF EXISTS public.project_offers;
+DROP TABLE IF EXISTS public.project_updates;
+DROP TABLE IF EXISTS public.projects;
 
 -- Drop custom types
 DROP TYPE IF EXISTS payment_method;
@@ -162,6 +225,9 @@ DROP TYPE IF EXISTS listing_status;
 DROP TYPE IF EXISTS property_status;
 DROP TYPE IF EXISTS property_type;
 DROP TYPE IF EXISTS user_role;
+-- Project management types
+DROP TYPE IF EXISTS schedule_visibility;
+DROP TYPE IF EXISTS project_status;
 
 -- Note: Extensions are not dropped as they may be used by other schemas
 -- If you need to drop extensions, uncomment the following:

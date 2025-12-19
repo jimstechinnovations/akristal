@@ -77,9 +77,11 @@ A production-ready real estate marketplace web application built with Next.js, S
 5. **Set up Supabase Storage Buckets**
    
    Create the following storage buckets in Supabase:
-   - `images` or `property-images` - For property images
+   - `property-images` - For property images
+   - `property-documents` - For property documents
+   - `property-videos` - For property videos
    - `documents` - For payment statements and documents
-   - `videos` - For property videos (optional)
+   - `project-media` - For project updates, offers, and events media (images and videos)
 
 6. **Run the development server**
    ```bash
