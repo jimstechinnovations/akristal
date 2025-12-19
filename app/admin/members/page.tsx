@@ -3,6 +3,7 @@ import { requireAdmin } from '@/lib/auth'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import Link from 'next/link'
+import Image from 'next/image'
 import { Plus, Edit } from 'lucide-react'
 import { DeleteMemberButton } from '@/components/delete-member-button'
 
@@ -55,7 +56,18 @@ export default async function AdminMembersPage() {
         ) : members && members.length > 0 ? (
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
             {(members as MemberRow[]).map((member) => (
-              <Card key={member.id} className="bg-white dark:bg-[#1e293b]">
+              <Card key={member.id} className="bg-white dark:bg-[#1e293b] overflow-hidden">
+                {member.image_url && (
+                  <div className="relative h-48 w-full overflow-hidden bg-gradient-to-br from-blue-50 to-blue-100 dark:from-slate-800 dark:to-slate-900">
+                    <Image
+                      src={member.image_url}
+                      alt={member.name}
+                      fill
+                      className="object-cover object-top"
+                      unoptimized
+                    />
+                  </div>
+                )}
                 <CardHeader>
                   <div className="flex items-start justify-between">
                     <div className="flex-1">
