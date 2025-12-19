@@ -79,6 +79,24 @@ export function PropertyForm({ property }: { property?: PropertyRow }) {
   })
   const [images, setImages] = useState<File[]>([])
   const [imagePreviews, setImagePreviews] = useState<string[]>(property?.image_urls || [])
+  const [documents, setDocuments] = useState<File[]>([])
+  const [documentPreviews, setDocumentPreviews] = useState<
+    Array<{ name: string; url: string; isFile: boolean }>
+  >(
+    property?.document_urls?.map((url) => ({
+      name: url.split('/').pop() || 'Document',
+      url,
+      isFile: false,
+    })) || []
+  )
+  const [videos, setVideos] = useState<File[]>([])
+  const [videoPreviews, setVideoPreviews] = useState<Array<{ name: string; url: string; isFile: boolean }>>(
+    property?.video_urls?.map((url) => ({
+      name: url.split('/').pop() || 'Video',
+      url,
+      isFile: false,
+    })) || []
+  )
   const supabase = createClient()
 
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -97,6 +115,46 @@ export function PropertyForm({ property }: { property?: PropertyRow }) {
   const removeImage = (index: number) => {
     setImages((prev) => prev.filter((_, i) => i !== index))
     setImagePreviews((prev) => prev.filter((_, i) => i !== index))
+  }
+
+  const handleDocumentChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const files = Array.from(e.target.files || [])
+    setDocuments((prev) => [...prev, ...files])
+    files.forEach((file) => {
+      setDocumentPreviews((prev) => [...prev, { name: file.name, url: '', isFile: true }])
+    })
+  }
+
+  const removeDocument = (index: number) => {
+    const preview = documentPreviews[index]
+    if (preview.isFile) {
+      // Find the corresponding file index (count only file previews before this index)
+      const fileIndex = documentPreviews
+        .slice(0, index)
+        .filter((p) => p.isFile).length
+      setDocuments((prev) => prev.filter((_, i) => i !== fileIndex))
+    }
+    setDocumentPreviews((prev) => prev.filter((_, i) => i !== index))
+  }
+
+  const handleVideoChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const files = Array.from(e.target.files || [])
+    setVideos((prev) => [...prev, ...files])
+    files.forEach((file) => {
+      setVideoPreviews((prev) => [...prev, { name: file.name, url: '', isFile: true }])
+    })
+  }
+
+  const removeVideo = (index: number) => {
+    const preview = videoPreviews[index]
+    if (preview.isFile) {
+      // Find the corresponding file index (count only file previews before this index)
+      const fileIndex = videoPreviews
+        .slice(0, index)
+        .filter((p) => p.isFile).length
+      setVideos((prev) => prev.filter((_, i) => i !== fileIndex))
+    }
+    setVideoPreviews((prev) => prev.filter((_, i) => i !== index))
   }
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -142,13 +200,45 @@ export function PropertyForm({ property }: { property?: PropertyRow }) {
         ...imageUrls,
       ]
 
+      // Upload documents
+      const documentUrls: string[] = []
+      for (const document of documents) {
+        const fileName = `${user.id}/${Date.now()}-${document.name}`
+        const { data, error } = await uploadFile('property-documents', fileName, document)
+        if (error) throw error
+        if (data) {
+          const url = getPublicUrl('property-documents', data.path)
+          documentUrls.push(url)
+        }
+      }
+      // Combine uploaded documents with existing document URLs
+      const existingDocumentUrls = documentPreviews
+        .filter((preview) => !preview.isFile && preview.url)
+        .map((preview) => preview.url)
+      const allDocumentUrls = [...existingDocumentUrls, ...documentUrls]
+
+      // Upload videos
+      const videoUrls: string[] = []
+      for (const video of videos) {
+        const fileName = `${user.id}/${Date.now()}-${video.name}`
+        const { data, error } = await uploadFile('property-videos', fileName, video)
+        if (error) throw error
+        if (data) {
+          const url = getPublicUrl('property-videos', data.path)
+          videoUrls.push(url)
+        }
+      }
+      // Combine uploaded videos with existing video URLs
+      const existingVideoUrls = videoPreviews
+        .filter((preview) => !preview.isFile && preview.url)
+        .map((preview) => preview.url)
+      const allVideoUrls = [...existingVideoUrls, ...videoUrls]
+
       // Shared parsed fields
       const latitude = formData.latitude ? parseFloat(formData.latitude) : null
       const longitude = formData.longitude ? parseFloat(formData.longitude) : null
       const amenities = parseList(formData.amenities)
       const features = parseList(formData.features)
-      const documentUrls = parseList(formData.document_urls)
-      const videoUrls = parseList(formData.video_urls)
 
       if (property) {
         // For updates, don't change listing status here.
@@ -176,8 +266,8 @@ export function PropertyForm({ property }: { property?: PropertyRow }) {
           image_urls: allImageUrls,
           amenities,
           features,
-          document_urls: documentUrls,
-          video_urls: videoUrls,
+          document_urls: allDocumentUrls,
+          video_urls: allVideoUrls,
         }
         const { error } = await (supabase as any)
           .from('properties')
@@ -186,6 +276,10 @@ export function PropertyForm({ property }: { property?: PropertyRow }) {
 
         if (error) throw error
         toast.success('Property updated successfully!')
+        
+        // Redirect to the property detail page after update
+        router.push(`/properties/${property.id}`)
+        return
       } else {
         const insertData: PropertyInsert = {
           seller_id: user.id,
@@ -210,8 +304,8 @@ export function PropertyForm({ property }: { property?: PropertyRow }) {
           image_urls: allImageUrls,
           amenities,
           features,
-          document_urls: documentUrls,
-          video_urls: videoUrls,
+          document_urls: allDocumentUrls,
+          video_urls: allVideoUrls,
           status: 'available',
           // Admin listings are auto-approved, others go to pending_approval
           listing_status: isAdmin ? 'approved' : 'pending_approval',
@@ -219,7 +313,11 @@ export function PropertyForm({ property }: { property?: PropertyRow }) {
           approved_by: isAdmin ? user.id : null,
         }
 
-        const { error } = await (supabase as any).from('properties').insert(insertData)
+        const { data: newProperty, error } = await (supabase as any)
+          .from('properties')
+          .insert(insertData)
+          .select()
+          .single()
 
         if (error) throw error
         toast.success(
@@ -227,13 +325,12 @@ export function PropertyForm({ property }: { property?: PropertyRow }) {
             ? 'Property created and automatically approved as an admin listing.'
             : 'Property created successfully! Awaiting admin approval.'
         )
-      }
 
-      // Redirect based on role
-      if (isAdmin) {
-        router.push('/admin/properties')
-      } else {
-        router.push('/seller/dashboard')
+        // Redirect to the property detail page
+        if (newProperty?.id) {
+          router.push(`/properties/${newProperty.id}`)
+          return
+        }
       }
     } catch (error: unknown) {
       toast.error(getErrorMessage(error) || 'Failed to save property')
@@ -455,26 +552,70 @@ export function PropertyForm({ property }: { property?: PropertyRow }) {
 
           <div>
             <label className="block text-sm font-medium mb-1 text-gray-900 dark:text-white">
-              Document URLs (optional, one per line)
+              Documents (optional)
             </label>
-            <textarea
-              className="flex min-h-[80px] w-full rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm text-gray-900 placeholder:text-gray-500 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-100 dark:placeholder:text-gray-400"
-              value={formData.document_urls}
-              onChange={(e) => setFormData({ ...formData, document_urls: e.target.value })}
-              placeholder="https://example.com/doc1.pdf\nhttps://example.com/doc2.pdf"
+            <input
+              type="file"
+              multiple
+              accept=".pdf,.doc,.docx,.txt,.xls,.xlsx"
+              onChange={handleDocumentChange}
+              className="block w-full text-sm text-gray-500 file:mr-4 file:rounded-lg file:border-0 file:bg-blue-50 file:px-4 file:py-2 file:text-sm file:font-semibold file:text-blue-700 hover:file:bg-blue-100 dark:file:bg-blue-900 dark:file:text-blue-200"
             />
+            {documentPreviews.length > 0 && (
+              <div className="mt-4 space-y-2">
+                {documentPreviews.map((preview, index) => (
+                  <div
+                    key={index}
+                    className="flex items-center justify-between rounded-lg border border-gray-300 bg-gray-50 px-3 py-2 dark:border-gray-600 dark:bg-gray-800"
+                  >
+                    <span className="text-sm text-gray-900 dark:text-gray-100">
+                      {preview.name}
+                    </span>
+                    <button
+                      type="button"
+                      onClick={() => removeDocument(index)}
+                      className="rounded-full bg-red-500 px-2 py-1 text-xs text-white hover:bg-red-600"
+                    >
+                      Remove
+                    </button>
+                  </div>
+                ))}
+              </div>
+            )}
           </div>
 
           <div>
             <label className="block text-sm font-medium mb-1 text-gray-900 dark:text-white">
-              Video URLs (optional, one per line)
+              Videos (optional)
             </label>
-            <textarea
-              className="flex min-h-[80px] w-full rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm text-gray-900 placeholder:text-gray-500 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-100 dark:placeholder:text-gray-400"
-              value={formData.video_urls}
-              onChange={(e) => setFormData({ ...formData, video_urls: e.target.value })}
-              placeholder="https://youtube.com/....\nhttps://vimeo.com/..."
+            <input
+              type="file"
+              multiple
+              accept="video/*"
+              onChange={handleVideoChange}
+              className="block w-full text-sm text-gray-500 file:mr-4 file:rounded-lg file:border-0 file:bg-blue-50 file:px-4 file:py-2 file:text-sm file:font-semibold file:text-blue-700 hover:file:bg-blue-100 dark:file:bg-blue-900 dark:file:text-blue-200"
             />
+            {videoPreviews.length > 0 && (
+              <div className="mt-4 space-y-2">
+                {videoPreviews.map((preview, index) => (
+                  <div
+                    key={index}
+                    className="flex items-center justify-between rounded-lg border border-gray-300 bg-gray-50 px-3 py-2 dark:border-gray-600 dark:bg-gray-800"
+                  >
+                    <span className="text-sm text-gray-900 dark:text-gray-100">
+                      {preview.name}
+                    </span>
+                    <button
+                      type="button"
+                      onClick={() => removeVideo(index)}
+                      className="rounded-full bg-red-500 px-2 py-1 text-xs text-white hover:bg-red-600"
+                    >
+                      Remove
+                    </button>
+                  </div>
+                ))}
+              </div>
+            )}
           </div>
 
           <div>

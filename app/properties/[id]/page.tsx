@@ -3,6 +3,9 @@ import { notFound } from 'next/navigation'
 import Image from 'next/image'
 import { PropertyDetails } from '@/components/property-details'
 import { PropertyContact } from '@/components/property-contact'
+import { PropertySellerActions } from '@/components/property-seller-actions'
+import { PropertyConversations } from '@/components/property-conversations'
+import { getCurrentUser } from '@/lib/auth'
 import { formatCurrency } from '@/lib/utils'
 import { Building2, MapPin, Bed, Bath, Car, Calendar } from 'lucide-react'
 import type { Database } from '@/types/database'
@@ -10,6 +13,17 @@ import type { Database } from '@/types/database'
 type PropertyRow = Database['public']['Tables']['properties']['Row']
 type SellerProfile = Pick<Database['public']['Tables']['profiles']['Row'], 'full_name' | 'email' | 'phone'>
 type PropertyWithSeller = PropertyRow & { profiles: SellerProfile | SellerProfile[] | null }
+type ConversationRow = Database['public']['Tables']['conversations']['Row']
+type ProfileRow = Database['public']['Tables']['profiles']['Row']
+type MessageRow = Database['public']['Tables']['messages']['Row']
+type ConversationWithBuyer = ConversationRow & {
+  profiles_buyer_id: Pick<ProfileRow, 'full_name' | 'id'> | null
+}
+type ConversationWithParticipants = ConversationRow & {
+  profiles_buyer_id: Pick<ProfileRow, 'full_name' | 'id'> | null
+  profiles_seller_id: Pick<ProfileRow, 'full_name' | 'id'> | null
+  last_message?: Pick<MessageRow, 'content' | 'created_at' | 'sender_id'> | null
+}
 
 export default async function PropertyPage({
   params,
@@ -38,6 +52,54 @@ export default async function PropertyPage({
     .eq('id', id)
 
   const seller = Array.isArray(property.profiles) ? property.profiles[0] : property.profiles
+
+  // Check if current user is the seller
+  const currentUser = await getCurrentUser()
+  const isSeller = currentUser?.id === property.seller_id
+
+  // Fetch conversations for seller (all conversations on this property)
+  let sellerConversations: ConversationWithBuyer[] = []
+  if (isSeller) {
+    const { data: conversationsData } = await supabase
+      .from('conversations')
+      .select('*, profiles_buyer_id:buyer_id(full_name, id)')
+      .eq('property_id', id)
+      .order('last_message_at', { ascending: false })
+
+    sellerConversations = (conversationsData as ConversationWithBuyer[] | null) ?? []
+  }
+
+  // Fetch conversations for current user (if logged in) - shows their conversations on this property
+  let userConversations: ConversationWithParticipants[] = []
+  if (currentUser) {
+    const { data: userConvData } = await supabase
+      .from('conversations')
+      .select(
+        '*, profiles_buyer_id:buyer_id(full_name, id), profiles_seller_id:seller_id(full_name, id)'
+      )
+      .eq('property_id', id)
+      .or(`buyer_id.eq.${currentUser.id},seller_id.eq.${currentUser.id}`)
+      .order('last_message_at', { ascending: false })
+
+    const conversations = (userConvData as ConversationWithParticipants[] | null) ?? []
+
+    // Fetch last message for each conversation
+    for (const conv of conversations) {
+      const { data: lastMsg } = await supabase
+        .from('messages')
+        .select('content, created_at, sender_id')
+        .eq('conversation_id', conv.id)
+        .order('created_at', { ascending: false })
+        .limit(1)
+        .maybeSingle()
+
+      if (lastMsg) {
+        conv.last_message = lastMsg as Pick<MessageRow, 'content' | 'created_at' | 'sender_id'>
+      }
+    }
+
+    userConversations = conversations
+  }
 
   return (
     <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
@@ -137,10 +199,23 @@ export default async function PropertyPage({
           )}
 
           <PropertyDetails property={property} />
+
+          {/* Show conversations for current user if they have any */}
+          {currentUser && userConversations.length > 0 && (
+            <PropertyConversations
+              conversations={userConversations}
+              currentUserId={currentUser.id}
+              propertyId={id}
+            />
+          )}
         </div>
 
         <div className="lg:col-span-1">
-          <PropertyContact property={property} seller={seller} />
+          {isSeller ? (
+            <PropertySellerActions property={property} conversations={sellerConversations} />
+          ) : (
+            <PropertyContact property={property} seller={seller} />
+          )}
         </div>
       </div>
     </div>

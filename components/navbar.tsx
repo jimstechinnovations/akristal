@@ -56,6 +56,7 @@ export function Navbar() {
   const [mounted, setMounted] = useState(false)
   const [propertiesDropdownOpen, setPropertiesDropdownOpen] = useState(false)
   const [moreDropdownOpen, setMoreDropdownOpen] = useState(false)
+  const [moreLoggedInDropdownOpen, setMoreLoggedInDropdownOpen] = useState(false)
   const [listingDropdownOpen, setListingDropdownOpen] = useState(false)
   const [adminDropdownOpen, setAdminDropdownOpen] = useState(false)
   const [profileDropdownOpen, setProfileDropdownOpen] = useState(false)
@@ -129,15 +130,13 @@ export function Navbar() {
     navLinks.push({ href: '/', label: 'Home', icon: Home })
   }
 
-  // Dedicated Services page for authenticated users
-  if (user) {
-    navLinks.push({ href: '/services', label: 'Services', icon: Briefcase })
-  }
+  // Services and Favorites will be in "More" dropdown for logged-in users
+  // So we don't add them to main navLinks here
 
   if (user) {
     if (role === 'buyer') {
       navLinks.push({ href: '/buyer/dashboard', label: 'Dashboard', icon: LayoutDashboard })
-      navLinks.push({ href: '/buyer/favorites', label: 'Favorites', icon: Heart })
+      // Favorites moved to "More" dropdown
       navLinks.push({ href: '/messages', label: 'Messages', icon: MessageSquare })
     } else if (role === 'seller') {
       navLinks.push({ href: '/seller/dashboard', label: 'Dashboard', icon: LayoutDashboard })
@@ -203,6 +202,16 @@ export function Navbar() {
     { href: '/privacy', label: 'Privacy Policy', icon: Shield },
     { href: '/terms', label: 'Terms & Conditions', icon: FileText },
   ]
+
+  // "More" links for logged-in users
+  const moreLoggedInLinks: NavLink[] = [
+    { href: '/services', label: 'Services', icon: Briefcase },
+  ]
+  
+  // Add Favorites for buyers
+  if (user && role === 'buyer') {
+    moreLoggedInLinks.push({ href: '/buyer/favorites', label: 'Favorites', icon: Heart })
+  }
 
   // Properties dropdown links (role-aware)
   const propertiesLinks: NavLink[] =
@@ -377,6 +386,59 @@ export function Navbar() {
                                 key={link.href}
                                 href={link.href}
                                 onClick={() => setMoreDropdownOpen(false)}
+                                className={`flex items-center space-x-2 px-4 py-2 text-sm transition-colors ${
+                                  isLinkActive(link.href)
+                                    ? 'bg-blue-50 text-blue-700 dark:bg-blue-900 dark:text-blue-300'
+                                    : 'text-gray-700 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-700'
+                                }`}
+                              >
+                                <Icon className="h-4 w-4" />
+                                <span>{link.label}</span>
+                              </Link>
+                            )
+                          })}
+                        </div>
+                      </div>
+                    </>
+                  )}
+                </div>
+              )}
+
+              {/* More dropdown (logged-in users: Services, Favorites) */}
+              {user && moreLoggedInLinks.length > 0 && (
+                <div className="relative">
+                  <button
+                    onClick={() => setMoreLoggedInDropdownOpen(!moreLoggedInDropdownOpen)}
+                    className={`flex items-center space-x-1 rounded-md px-3 py-2 text-sm font-medium transition-colors ${
+                      moreLoggedInLinks.some((link) => isLinkActive(link.href))
+                        ? 'bg-blue-100 text-blue-700 dark:bg-blue-900 dark:text-blue-300'
+                        : 'text-gray-700 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-800'
+                    }`}
+                  >
+                    <Briefcase className="h-4 w-4" />
+                    <span>More</span>
+                    <ChevronDown
+                      className={`h-4 w-4 transition-transform ${
+                        moreLoggedInDropdownOpen ? 'rotate-180' : ''
+                      }`}
+                    />
+                  </button>
+
+                  {moreLoggedInDropdownOpen && (
+                    <>
+                      <div
+                        className="fixed inset-0 z-10"
+                        onClick={() => setMoreLoggedInDropdownOpen(false)}
+                      />
+                      <div className="absolute left-0 mt-1 w-56 rounded-md bg-white shadow-lg ring-1 ring-black ring-opacity-5 dark:bg-gray-800 dark:ring-gray-700 z-20">
+                        <div className="py-1">
+                          {moreLoggedInLinks.map((link) => {
+                            const Icon = link.icon
+                            return (
+                              <Link
+                                key={link.href}
+                                href={link.href}
+                                onClick={() => setMoreLoggedInDropdownOpen(false)}
                                 className={`flex items-center space-x-2 px-4 py-2 text-sm transition-colors ${
                                   isLinkActive(link.href)
                                     ? 'bg-blue-50 text-blue-700 dark:bg-blue-900 dark:text-blue-300'
@@ -734,6 +796,55 @@ export function Navbar() {
                           onClick={() => {
                             setMobileMenuOpen(false)
                             setMoreDropdownOpen(false)
+                          }}
+                          className={`flex items-center space-x-2 rounded-md px-3 py-2 text-sm font-medium ${
+                            isLinkActive(link.href)
+                              ? 'bg-blue-50 text-blue-700 dark:bg-blue-900 dark:text-blue-300'
+                              : 'text-gray-700 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-800'
+                          }`}
+                        >
+                          <Icon className="h-4 w-4" />
+                          <span>{link.label}</span>
+                        </Link>
+                      )
+                    })}
+                  </div>
+                )}
+              </div>
+            )}
+
+            {/* Mobile More Dropdown (logged-in users: Services, Favorites) */}
+            {user && moreLoggedInLinks.length > 0 && (
+              <div>
+                <button
+                  onClick={() => setMoreLoggedInDropdownOpen(!moreLoggedInDropdownOpen)}
+                  className={`flex items-center justify-between w-full rounded-md px-3 py-2 text-base font-medium ${
+                    moreLoggedInLinks.some((link) => isLinkActive(link.href))
+                      ? 'bg-blue-100 text-blue-700 dark:bg-blue-900 dark:text-blue-300'
+                      : 'text-gray-700 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-800'
+                  }`}
+                >
+                  <div className="flex items-center space-x-2">
+                    <Briefcase className="h-5 w-5" />
+                    <span>More</span>
+                  </div>
+                  <ChevronDown
+                    className={`h-5 w-5 transition-transform ${
+                      moreLoggedInDropdownOpen ? 'rotate-180' : ''
+                    }`}
+                  />
+                </button>
+                {moreLoggedInDropdownOpen && (
+                  <div className="pl-6 mt-1 space-y-1">
+                    {moreLoggedInLinks.map((link) => {
+                      const Icon = link.icon
+                      return (
+                        <Link
+                          key={link.href}
+                          href={link.href}
+                          onClick={() => {
+                            setMobileMenuOpen(false)
+                            setMoreLoggedInDropdownOpen(false)
                           }}
                           className={`flex items-center space-x-2 rounded-md px-3 py-2 text-sm font-medium ${
                             isLinkActive(link.href)

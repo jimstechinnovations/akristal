@@ -50,8 +50,15 @@ export default async function SellerPropertiesPage() {
             {(properties as PropertyRow[]).map((property) => (
               <div key={property.id} className="space-y-2">
                 <PropertyCard property={property} />
-                <div className="flex justify-end">
-                  <DeleteListingButton propertyId={property.id} />
+                <div className="flex gap-2">
+                  <Link href={`/seller/properties/${property.id}/edit`} className="flex-1">
+                    <Button variant="outline" size="sm" className="w-full">
+                      Edit
+                    </Button>
+                  </Link>
+                  <div className="flex-1">
+                    <DeleteListingButton propertyId={property.id} />
+                  </div>
                 </div>
               </div>
             ))}
