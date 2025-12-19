@@ -236,16 +236,32 @@ export async function createProjectUpdate(projectId: string, formData: FormData)
     }
 
     const mediaUrlsStr = formData.get('media_urls')
-    const mediaUrls = mediaUrlsStr && mediaUrlsStr !== 'null' ? JSON.parse(mediaUrlsStr as string) : []
+    let mediaUrls: string[] = []
+    if (mediaUrlsStr && mediaUrlsStr !== 'null' && mediaUrlsStr !== '') {
+      try {
+        mediaUrls = JSON.parse(mediaUrlsStr as string)
+        if (!Array.isArray(mediaUrls)) {
+          console.error('media_urls is not an array:', mediaUrls)
+          mediaUrls = []
+        }
+      } catch (parseError) {
+        console.error('Failed to parse media_urls:', parseError, 'Raw value:', mediaUrlsStr)
+        mediaUrls = []
+      }
+    }
+
+    console.log('Creating update with media URLs:', mediaUrls)
 
     const updateData: ProjectUpdateInsert = {
       project_id: projectId,
       description: formData.get('description') as string,
-      media_urls: mediaUrls,
+      media_urls: mediaUrls.length > 0 ? mediaUrls : undefined,
       schedule_visibility: (formData.get('schedule_visibility') as 'immediate' | 'scheduled' | 'hidden') || 'immediate',
       scheduled_at: formData.get('scheduled_at') ? (formData.get('scheduled_at') as string) : null,
       created_by: user.id,
     }
+
+    console.log('Inserting update data:', { ...updateData, media_urls: mediaUrls })
 
     const { error } = await (supabase as any).from('project_updates').insert(updateData)
 
@@ -286,7 +302,7 @@ export async function createProjectOffer(projectId: string, formData: FormData) 
       project_id: projectId,
       title: formData.get('title') as string,
       description: formData.get('description') as string,
-      media_urls: mediaUrls,
+      media_urls: mediaUrls.length > 0 ? mediaUrls : undefined,
       start_datetime: formData.get('start_datetime') as string,
       end_datetime: formData.get('end_datetime') as string,
       schedule_visibility: (formData.get('schedule_visibility') as 'immediate' | 'scheduled' | 'hidden') || 'immediate',
@@ -327,13 +343,27 @@ export async function createProjectEvent(projectId: string, formData: FormData) 
     }
 
       const mediaUrlsStr = formData.get('media_urls')
-      const mediaUrls = mediaUrlsStr && mediaUrlsStr !== 'null' ? JSON.parse(mediaUrlsStr as string) : []
+      let mediaUrls: string[] = []
+      if (mediaUrlsStr && mediaUrlsStr !== 'null' && mediaUrlsStr !== '') {
+        try {
+          mediaUrls = JSON.parse(mediaUrlsStr as string)
+          if (!Array.isArray(mediaUrls)) {
+            console.error('media_urls is not an array:', mediaUrls)
+            mediaUrls = []
+          }
+        } catch (parseError) {
+          console.error('Failed to parse media_urls:', parseError, 'Raw value:', mediaUrlsStr)
+          mediaUrls = []
+        }
+      }
+
+      console.log('Creating event with media URLs:', mediaUrls)
 
       const eventData: ProjectEventInsert = {
       project_id: projectId,
       title: formData.get('title') as string,
       description: formData.get('description') as string,
-      media_urls: mediaUrls,
+      media_urls: mediaUrls.length > 0 ? mediaUrls : undefined,
       start_datetime: formData.get('start_datetime') as string,
       end_datetime: formData.get('end_datetime') as string,
       schedule_visibility: (formData.get('schedule_visibility') as 'immediate' | 'scheduled' | 'hidden') || 'immediate',

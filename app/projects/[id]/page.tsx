@@ -121,9 +121,33 @@ export default async function ProjectPage({
     .eq('project_id', id)
     .order('start_datetime', { ascending: true })
 
-  const typedUpdates = (updates as ProjectUpdateRow[] | null) ?? []
-  const typedOffers = (offers as ProjectOfferRow[] | null) ?? []
-  const typedEvents = (events as ProjectEventRow[] | null) ?? []
+  // Parse media_urls if they come as strings (PostgreSQL TEXT[] can sometimes be returned as string)
+  const parseMediaUrls = (mediaUrls: any): string[] | null => {
+    if (!mediaUrls) return null
+    if (Array.isArray(mediaUrls)) return mediaUrls
+    if (typeof mediaUrls === 'string') {
+      try {
+        const parsed = JSON.parse(mediaUrls)
+        return Array.isArray(parsed) ? parsed : null
+      } catch {
+        return null
+      }
+    }
+    return null
+  }
+
+  const typedUpdates = ((updates as ProjectUpdateRow[] | null) ?? []).map((update) => ({
+    ...update,
+    media_urls: parseMediaUrls(update.media_urls),
+  }))
+  const typedOffers = ((offers as ProjectOfferRow[] | null) ?? []).map((offer) => ({
+    ...offer,
+    media_urls: parseMediaUrls(offer.media_urls),
+  }))
+  const typedEvents = ((events as ProjectEventRow[] | null) ?? []).map((event) => ({
+    ...event,
+    media_urls: parseMediaUrls(event.media_urls),
+  }))
 
   // Filter visible content for public view
   const now = new Date()
@@ -213,9 +237,6 @@ export default async function ProjectPage({
               <Card key={update.id}>
                 <CardContent className="pt-6">
                   <div className="mb-4 flex items-start justify-between gap-4">
-                    <p className="text-gray-700 dark:text-gray-300 whitespace-pre-wrap flex-1">
-                      {update.description}
-                    </p>
                     {canEdit && (
                       <div className="flex-shrink-0">
                         <DeleteProjectItemButton itemId={update.id} itemType="update" />
@@ -223,18 +244,31 @@ export default async function ProjectPage({
                     )}
                   </div>
                   {update.media_urls && Array.isArray(update.media_urls) && update.media_urls.length > 0 && (
-                    <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 mb-4">
-                      {update.media_urls.map((url, idx) => (
-                        <div key={idx} className="relative h-48 w-full overflow-hidden rounded-lg">
-                          {url.match(/\.(jpg|jpeg|png|gif|webp)$/i) ? (
-                            <Image src={url} alt={`Update media ${idx + 1}`} fill className="object-cover" />
-                          ) : (
-                            <video src={url} controls className="h-full w-full object-cover" />
-                          )}
-                        </div>
-                      ))}
+                    <div className="mb-4 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+                      {update.media_urls.map((url, idx) => {
+                        if (!url || typeof url !== 'string') return null
+                        const isImage = url.match(/\.(jpg|jpeg|png|gif|webp)$/i)
+                        return (
+                          <div key={idx} className="relative h-48 w-full overflow-hidden rounded-lg bg-gray-100 dark:bg-gray-800">
+                            {isImage ? (
+                              <Image 
+                                src={url} 
+                                alt={`Update media ${idx + 1}`} 
+                                fill 
+                                className="object-cover"
+                                unoptimized
+                              />
+                            ) : (
+                              <video src={url} controls className="h-full w-full object-cover" />
+                            )}
+                          </div>
+                        )
+                      })}
                     </div>
                   )}
+                  <p className="text-gray-700 dark:text-gray-300 whitespace-pre-wrap mb-4">
+                    {update.description}
+                  </p>
                   <div className="mt-4 text-xs text-gray-500 dark:text-gray-400">
                     {new Date(update.created_at).toLocaleString()}
                   </div>
@@ -259,18 +293,16 @@ export default async function ProjectPage({
                   </div>
                 </CardHeader>
                 <CardContent>
-                  <p className="text-sm text-gray-600 dark:text-gray-400 line-clamp-3 mb-4">
-                    {offer.description}
-                  </p>
-                  {offer.media_urls && Array.isArray(offer.media_urls) && offer.media_urls.length > 0 && (
+                  {offer.media_urls && Array.isArray(offer.media_urls) && offer.media_urls.length > 0 && offer.media_urls[0] && (
                     <div className="mb-4">
-                      <div className="relative h-32 w-full overflow-hidden rounded-lg">
+                      <div className="relative h-32 w-full overflow-hidden rounded-lg bg-gray-100 dark:bg-gray-800">
                         {offer.media_urls[0].match(/\.(jpg|jpeg|png|gif|webp)$/i) ? (
                           <Image
                             src={offer.media_urls[0]}
                             alt={offer.title}
                             fill
                             className="object-cover"
+                            unoptimized
                           />
                         ) : (
                           <video src={offer.media_urls[0]} controls className="h-full w-full object-cover" />
@@ -278,6 +310,9 @@ export default async function ProjectPage({
                       </div>
                     </div>
                   )}
+                  <p className="text-sm text-gray-600 dark:text-gray-400 line-clamp-3 mb-4">
+                    {offer.description}
+                  </p>
                   <div className="flex items-center space-x-2 text-xs text-gray-500 dark:text-gray-400">
                     <Calendar className="h-3 w-3" />
                     <span>
@@ -306,18 +341,16 @@ export default async function ProjectPage({
                   </div>
                 </CardHeader>
                 <CardContent>
-                  <p className="text-sm text-gray-600 dark:text-gray-400 line-clamp-3 mb-4">
-                    {event.description}
-                  </p>
-                  {event.media_urls && Array.isArray(event.media_urls) && event.media_urls.length > 0 && (
+                  {event.media_urls && Array.isArray(event.media_urls) && event.media_urls.length > 0 && event.media_urls[0] && (
                     <div className="mb-4">
-                      <div className="relative h-32 w-full overflow-hidden rounded-lg">
+                      <div className="relative h-32 w-full overflow-hidden rounded-lg bg-gray-100 dark:bg-gray-800">
                         {event.media_urls[0].match(/\.(jpg|jpeg|png|gif|webp)$/i) ? (
                           <Image
                             src={event.media_urls[0]}
                             alt={event.title}
                             fill
                             className="object-cover"
+                            unoptimized
                           />
                         ) : (
                           <video src={event.media_urls[0]} controls className="h-full w-full object-cover" />
@@ -325,6 +358,9 @@ export default async function ProjectPage({
                       </div>
                     </div>
                   )}
+                  <p className="text-sm text-gray-600 dark:text-gray-400 line-clamp-3 mb-4">
+                    {event.description}
+                  </p>
                   <div className="flex items-center space-x-2 text-xs text-gray-500 dark:text-gray-400">
                     <Calendar className="h-3 w-3" />
                     <span>

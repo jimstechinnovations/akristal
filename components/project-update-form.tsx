@@ -57,23 +57,44 @@ export function ProjectUpdateForm({ projectId }: { projectId: string }) {
 
       // Upload media files
       const mediaUrls: string[] = []
-      for (const file of mediaFiles) {
-        const fileName = `${user.id}/${Date.now()}-${file.name}`
-        const { data, error } = await uploadFile('project-media', fileName, file)
-        if (error) throw error
-        if (data) {
-          const url = getPublicUrl('project-media', data.path)
-          mediaUrls.push(url)
+      if (mediaFiles.length > 0) {
+        for (const file of mediaFiles) {
+          try {
+            const fileName = `${user.id}/${Date.now()}-${file.name}`
+            const { data, error } = await uploadFile('project-media', fileName, file)
+            if (error) {
+              console.error('Media upload error:', error)
+              toast.error(`Failed to upload ${file.name}: ${error.message || 'Unknown error'}`)
+              setLoading(false)
+              return
+            }
+            if (data) {
+              const url = getPublicUrl('project-media', data.path)
+              mediaUrls.push(url)
+            } else {
+              console.error('No data returned from upload for file:', file.name)
+              toast.error(`Failed to upload ${file.name}: No data returned`)
+              setLoading(false)
+              return
+            }
+          } catch (uploadError: any) {
+            console.error('Media upload exception:', uploadError)
+            toast.error(`Failed to upload ${file.name}: ${uploadError.message || 'Unknown error'}`)
+            setLoading(false)
+            return
+          }
         }
       }
 
       const formDataObj = new FormData()
       formDataObj.append('description', description)
-      formDataObj.append('media_urls', JSON.stringify(mediaUrls.length > 0 ? mediaUrls : []))
+      formDataObj.append('media_urls', JSON.stringify(mediaUrls))
       formDataObj.append('schedule_visibility', scheduleVisibility)
       if (scheduleVisibility === 'scheduled' && scheduledAt) {
         formDataObj.append('scheduled_at', scheduledAt)
       }
+
+      console.log('Submitting update with media URLs:', mediaUrls)
 
       const result = await createProjectUpdate(projectId, formDataObj)
 
