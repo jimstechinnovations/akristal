@@ -8,6 +8,7 @@ import { Edit, Calendar, Tag, Image as ImageIcon, Video } from 'lucide-react'
 import Image from 'next/image'
 import { ProjectManagementTabs } from '@/components/project-management-tabs'
 import { DeleteProjectItemButton } from '@/components/delete-project-item-button'
+import { DeleteProjectButton } from '@/components/delete-project-button'
 
 type ProjectStatus = 'draft' | 'active' | 'completed' | 'archived'
 type ScheduleVisibility = 'immediate' | 'scheduled' | 'hidden'
@@ -16,6 +17,7 @@ type ProjectRow = {
   id: string
   title: string
   description: string | null
+  media_urls: string[] | null
   created_by: string
   status: ProjectStatus
   created_at: string
@@ -88,6 +90,40 @@ export default async function ProjectPage({
 
   const typedProject = project as ProjectRow
 
+  // Parse media_urls if they come as strings (PostgreSQL TEXT[] can sometimes be returned as string)
+  const parseMediaUrls = (mediaUrls: any): string[] | null => {
+    if (!mediaUrls) return null
+    if (Array.isArray(mediaUrls)) {
+      // Filter out any null/undefined values and ensure all are strings
+      const filtered = mediaUrls.filter((url): url is string => typeof url === 'string' && url.length > 0)
+      return filtered.length > 0 ? filtered : null
+    }
+    if (typeof mediaUrls === 'string') {
+      // Try to parse as JSON first
+      try {
+        const parsed = JSON.parse(mediaUrls)
+        if (Array.isArray(parsed)) {
+          const filtered = parsed.filter((url): url is string => typeof url === 'string' && url.length > 0)
+          return filtered.length > 0 ? filtered : null
+        }
+      } catch {
+        // If JSON parsing fails, it might be a single URL string
+        if (mediaUrls.trim().length > 0) {
+          return [mediaUrls.trim()]
+        }
+      }
+    }
+    return null
+  }
+
+  // Parse project media_urls
+  typedProject.media_urls = parseMediaUrls(typedProject.media_urls)
+  
+  // Debug: Log to help diagnose issues (remove in production if needed)
+  if (typedProject.media_urls) {
+    console.log('Project media URLs parsed:', typedProject.media_urls)
+  }
+
   // Check if user can view this project
   const canView =
     typedProject.status === 'active' ||
@@ -120,21 +156,6 @@ export default async function ProjectPage({
     .select('*')
     .eq('project_id', id)
     .order('start_datetime', { ascending: true })
-
-  // Parse media_urls if they come as strings (PostgreSQL TEXT[] can sometimes be returned as string)
-  const parseMediaUrls = (mediaUrls: any): string[] | null => {
-    if (!mediaUrls) return null
-    if (Array.isArray(mediaUrls)) return mediaUrls
-    if (typeof mediaUrls === 'string') {
-      try {
-        const parsed = JSON.parse(mediaUrls)
-        return Array.isArray(parsed) ? parsed : null
-      } catch {
-        return null
-      }
-    }
-    return null
-  }
 
   const typedUpdates = ((updates as ProjectUpdateRow[] | null) ?? []).map((update) => ({
     ...update,
@@ -206,14 +227,45 @@ export default async function ProjectPage({
           </div>
         </div>
         {canEdit && (
-          <Link href={`/projects/${id}/edit`}>
-            <Button variant="outline">
-              <Edit className="mr-2 h-4 w-4" />
-              Edit Project
-            </Button>
-          </Link>
+          <div className="flex gap-2">
+            <Link href={`/projects/${id}/edit`}>
+              <Button variant="outline">
+                <Edit className="mr-2 h-4 w-4" />
+                Edit Project
+              </Button>
+            </Link>
+            <DeleteProjectButton projectId={id} />
+          </div>
         )}
       </div>
+
+      {typedProject.media_urls && Array.isArray(typedProject.media_urls) && typedProject.media_urls.length > 0 && (
+        <Card className="mb-8">
+          <CardContent className="pt-6">
+            <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+              {typedProject.media_urls.map((url, idx) => {
+                if (!url || typeof url !== 'string') return null
+                const isImage = url.match(/\.(jpg|jpeg|png|gif|webp)$/i)
+                return (
+                  <div key={idx} className="relative h-64 w-full overflow-hidden rounded-lg bg-gray-100 dark:bg-gray-800">
+                    {isImage ? (
+                      <Image 
+                        src={url} 
+                        alt={`Project media ${idx + 1}`} 
+                        fill 
+                        className="object-cover"
+                        unoptimized
+                      />
+                    ) : (
+                      <video src={url} controls className="h-full w-full object-cover" />
+                    )}
+                  </div>
+                )
+              })}
+            </div>
+          </CardContent>
+        </Card>
+      )}
 
       {typedProject.description && (
         <Card className="mb-8">

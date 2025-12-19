@@ -666,6 +666,7 @@ CREATE TABLE IF NOT EXISTS public.projects (
   id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
   title VARCHAR(255) NOT NULL,
   description TEXT,
+  media_urls TEXT[], -- Array of URLs for images and videos
   created_by UUID NOT NULL REFERENCES public.profiles(id) ON DELETE CASCADE,
   status project_status DEFAULT 'draft',
   created_at TIMESTAMP WITH TIME ZONE DEFAULT TIMEZONE('utc', NOW()),

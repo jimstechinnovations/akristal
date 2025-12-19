@@ -211,6 +211,11 @@ export function Navbar() {
     { href: '/services', label: 'Services', icon: Briefcase },
   ]
   
+  // Add Projects for buyers, sellers, and agents (admins have it in Manage dropdown)
+  if (user && (role === 'buyer' || role === 'seller' || role === 'agent')) {
+    moreLoggedInLinks.push({ href: '/projects', label: 'Projects', icon: Briefcase })
+  }
+  
   // Add Favorites for buyers
   if (user && role === 'buyer') {
     moreLoggedInLinks.push({ href: '/buyer/favorites', label: 'Favorites', icon: Heart })

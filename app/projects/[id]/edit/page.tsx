@@ -9,6 +9,7 @@ type ProjectRow = {
   id: string
   title: string
   description: string | null
+  media_urls: string[] | null
   created_by: string
   status: ProjectStatus
   created_at: string

@@ -12,6 +12,7 @@ type ScheduleVisibility = 'immediate' | 'scheduled' | 'hidden'
 type ProjectInsert = {
   title: string
   description?: string | null
+  media_urls?: string[]
   created_by: string
   status?: ProjectStatus
   created_at?: string
@@ -21,6 +22,7 @@ type ProjectInsert = {
 type ProjectUpdate = {
   title?: string
   description?: string | null
+  media_urls?: string[]
   status?: ProjectStatus
   updated_at?: string
 }
@@ -74,9 +76,25 @@ export async function createProject(formData: FormData) {
       ? new Date(createdAtStr as string).toISOString() 
       : undefined
 
+    const mediaUrlsStr = formData.get('media_urls')
+    let mediaUrls: string[] = []
+    if (mediaUrlsStr && mediaUrlsStr !== 'null' && mediaUrlsStr !== '') {
+      try {
+        mediaUrls = JSON.parse(mediaUrlsStr as string)
+        if (!Array.isArray(mediaUrls)) {
+          console.error('media_urls is not an array:', mediaUrls)
+          mediaUrls = []
+        }
+      } catch (parseError) {
+        console.error('Failed to parse media_urls:', parseError, 'Raw value:', mediaUrlsStr)
+        mediaUrls = []
+      }
+    }
+
     const projectData: ProjectInsert = {
       title: formData.get('title') as string,
       description: (formData.get('description') as string) || null,
+      media_urls: mediaUrls.length > 0 ? mediaUrls : undefined,
       created_by: user.id,
       status: (formData.get('status') as 'draft' | 'active' | 'completed' | 'archived') || 'draft',
       created_at: createdAt,
@@ -138,6 +156,21 @@ export async function updateProject(id: string, formData: FormData) {
       return { success: false, error: 'Unauthorized' }
     }
 
+    const mediaUrlsStr = formData.get('media_urls')
+    let mediaUrls: string[] = []
+    if (mediaUrlsStr && mediaUrlsStr !== 'null' && mediaUrlsStr !== '') {
+      try {
+        mediaUrls = JSON.parse(mediaUrlsStr as string)
+        if (!Array.isArray(mediaUrls)) {
+          console.error('media_urls is not an array:', mediaUrls)
+          mediaUrls = []
+        }
+      } catch (parseError) {
+        console.error('Failed to parse media_urls:', parseError, 'Raw value:', mediaUrlsStr)
+        mediaUrls = []
+      }
+    }
+
     const updateData: ProjectUpdate = {}
     const title = formData.get('title')
     if (typeof title === 'string') updateData.title = title
@@ -148,6 +181,11 @@ export async function updateProject(id: string, formData: FormData) {
     const status = formData.get('status')
     if (typeof status === 'string') {
       updateData.status = status as 'draft' | 'active' | 'completed' | 'archived'
+    }
+    
+    if (mediaUrlsStr !== null) {
+      // If media_urls is provided (even if empty), update it
+      updateData.media_urls = mediaUrls.length > 0 ? mediaUrls : []
     }
 
     type ProjectsUpdateClient = {
@@ -189,13 +227,14 @@ export async function updateProject(id: string, formData: FormData) {
 
 export async function deleteProject(id: string) {
   try {
-    const user = await requireRole(['seller', 'agent', 'admin'])
+    // Only admins can delete projects
+    await requireRole(['admin'])
     const supabase = await createClient()
 
-    // Check if user owns the project or is admin
+    // Check if project exists
     const { data: existingProject } = await supabase
       .from('projects')
-      .select('created_by')
+      .select('id')
       .eq('id', id)
       .single()
 
@@ -203,17 +242,13 @@ export async function deleteProject(id: string) {
       return { success: false, error: 'Project not found' }
     }
 
-    const existingCreator = (existingProject as { created_by: string } | null) ?? null
-
-    if (existingCreator?.created_by !== user.id && user.profile?.role !== 'admin') {
-      return { success: false, error: 'Unauthorized' }
-    }
-
+    // Delete project (CASCADE will automatically delete all related records: updates, offers, events)
     const { error } = await supabase.from('projects').delete().eq('id', id)
 
     if (error) throw error
 
     revalidatePath('/projects')
+    revalidatePath(`/projects/${id}`)
 
     return { success: true }
   } catch (error: unknown) {
