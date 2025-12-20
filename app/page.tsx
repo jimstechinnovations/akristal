@@ -24,6 +24,11 @@ type FeaturedVideoItem = {
   address?: string
   property_type?: string
   status?: string
+  project_type?: string | null
+  pre_selling_price?: number | null
+  pre_selling_currency?: string | null
+  main_price?: number | null
+  main_currency?: string | null
 }
 
 export default async function HomePage() {
@@ -75,7 +80,7 @@ export default async function HomePage() {
   // Fetch projects with videos
   const { data: projectsWithVideosData } = await supabase
     .from('projects')
-    .select('id, title, status, media_urls')
+    .select('id, title, status, type, pre_selling_price, pre_selling_currency, main_price, main_currency, media_urls')
     .eq('status', 'active')
     .not('media_urls', 'is', null)
     .order('created_at', { ascending: false })
@@ -124,6 +129,11 @@ export default async function HomePage() {
       id: string
       title: string
       status: string
+      type?: string | null
+      pre_selling_price?: number | null
+      pre_selling_currency?: string | null
+      main_price?: number | null
+      main_currency?: string | null
       media_urls: string[] | null
     }>
     
@@ -145,6 +155,11 @@ export default async function HomePage() {
           type: 'project',
           videoUrl: videoUrl.trim(),
           status: project.status,
+          project_type: project.type || null,
+          pre_selling_price: project.pre_selling_price || null,
+          pre_selling_currency: project.pre_selling_currency || null,
+          main_price: project.main_price || null,
+          main_currency: project.main_currency || null,
         })
       }
     })
@@ -281,10 +296,33 @@ export default async function HomePage() {
                         )}
                       </>
                     )}
-                    {item.type === 'project' && item.status && (
-                      <p className="text-xs sm:text-sm text-gray-600 dark:text-gray-400 capitalize">
-                        Status: {item.status}
-                      </p>
+                    {item.type === 'project' && (
+                      <>
+                        {item.project_type && (
+                          <p className="text-xs font-semibold text-[#c89b3c] mb-2 capitalize">
+                            {item.project_type.replace(/_/g, ' ')}
+                          </p>
+                        )}
+                        {(item.pre_selling_price || item.main_price) && (
+                          <div className="space-y-1 mb-2">
+                            {item.pre_selling_price && (
+                              <p className="text-xs sm:text-sm font-semibold text-[#c89b3c]">
+                                Pre-selling: {formatCurrency(item.pre_selling_price, item.pre_selling_currency || 'RWF')}
+                              </p>
+                            )}
+                            {item.main_price && (
+                              <p className="text-xs sm:text-sm font-semibold text-[#c89b3c]">
+                                {formatCurrency(item.main_price, item.main_currency || 'RWF')}
+                              </p>
+                            )}
+                          </div>
+                        )}
+                        {item.status && (
+                          <p className="text-xs text-gray-600 dark:text-gray-400 capitalize">
+                            Status: {item.status}
+                          </p>
+                        )}
+                      </>
                     )}
                   </div>
                 </Link>

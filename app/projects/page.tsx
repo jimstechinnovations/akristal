@@ -4,6 +4,7 @@ import Link from 'next/link'
 import { Button } from '@/components/ui/button'
 import { Plus } from 'lucide-react'
 import { getCurrentUser } from '@/lib/auth'
+import { formatCurrency } from '@/lib/utils'
 
 type ProjectStatus = 'draft' | 'active' | 'completed' | 'archived'
 
@@ -13,6 +14,11 @@ type ProjectRow = {
   description: string | null
   created_by: string
   status: ProjectStatus
+  type?: string | null
+  pre_selling_price?: number | null
+  pre_selling_currency?: string | null
+  main_price?: number | null
+  main_currency?: string | null
   created_at: string
   updated_at: string
 }
@@ -26,7 +32,7 @@ export default async function ProjectsPage() {
   // Fetch projects based on user role
   let query = supabase
     .from('projects')
-    .select('*')
+    .select('id, title, description, created_by, status, type, pre_selling_price, pre_selling_currency, main_price, main_currency, created_at, updated_at')
     .order('created_at', { ascending: false })
 
   if (isAdmin) {
@@ -71,9 +77,36 @@ export default async function ProjectsPage() {
                   <CardTitle className="text-gray-900 dark:text-white">{project.title}</CardTitle>
                 </CardHeader>
                 <CardContent>
-                  <p className="text-sm text-gray-600 dark:text-gray-400 line-clamp-3">
+                  {project.type && (
+                    <div className="mb-2">
+                      <span className="inline-flex rounded-full bg-[#c89b3c]/20 px-3 py-1 text-xs font-semibold text-[#c89b3c] capitalize">
+                        {project.type.replace(/_/g, ' ')}
+                      </span>
+                    </div>
+                  )}
+                  <p className="text-sm text-gray-600 dark:text-gray-400 line-clamp-3 mb-4">
                     {project.description || 'No description available.'}
                   </p>
+                  {(project.pre_selling_price || project.main_price) && (
+                    <div className="mb-4 space-y-1">
+                      {project.pre_selling_price && (
+                        <div className="text-sm">
+                          <span className="text-gray-600 dark:text-gray-400">Pre-selling: </span>
+                          <span className="font-semibold text-[#c89b3c]">
+                            {formatCurrency(project.pre_selling_price, project.pre_selling_currency || 'RWF')}
+                          </span>
+                        </div>
+                      )}
+                      {project.main_price && (
+                        <div className="text-sm">
+                          <span className="text-gray-600 dark:text-gray-400">Main Price: </span>
+                          <span className="font-semibold text-[#c89b3c]">
+                            {formatCurrency(project.main_price, project.main_currency || 'RWF')}
+                          </span>
+                        </div>
+                      )}
+                    </div>
+                  )}
                   <div className="mt-4 flex items-center justify-between">
                     <span
                       className={`inline-flex rounded-full px-2 py-1 text-xs font-semibold ${
