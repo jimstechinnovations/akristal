@@ -207,11 +207,11 @@ export default async function ProjectPage({
       )
 
   return (
-    <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
-      <div className="mb-6 flex items-center justify-between">
-        <div>
-          <h1 className="text-3xl font-bold text-gray-900 dark:text-white">{typedProject.title}</h1>
-          <div className="mt-2 flex items-center space-x-4">
+    <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8 overflow-x-hidden">
+      <div className="mb-6 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+        <div className="flex-1 min-w-0">
+          <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 dark:text-white break-words">{typedProject.title}</h1>
+          <div className="mt-2 flex flex-wrap items-center gap-2 sm:gap-4">
             <span
               className={`inline-flex rounded-full px-3 py-1 text-sm font-semibold ${
                 typedProject.status === 'active'
@@ -223,20 +223,23 @@ export default async function ProjectPage({
             >
               {typedProject.status}
             </span>
-            <span className="text-sm text-gray-600 dark:text-gray-400">
+            <span className="text-sm text-gray-600 dark:text-gray-400 whitespace-nowrap">
               Created {new Date(typedProject.created_at).toLocaleDateString()}
             </span>
           </div>
         </div>
         {canEdit && (
-          <div className="flex gap-2">
-            <Link href={`/projects/${id}/edit`}>
-              <Button variant="outline">
+          <div className="flex gap-2 flex-shrink-0">
+            <Link href={`/projects/${id}/edit`} className="flex-1 sm:flex-none">
+              <Button variant="outline" className="w-full sm:w-auto">
                 <Edit className="mr-2 h-4 w-4" />
-                Edit Project
+                <span className="hidden sm:inline">Edit Project</span>
+                <span className="sm:hidden">Edit</span>
               </Button>
             </Link>
-            <DeleteProjectButton projectId={id} />
+            <div className="flex-shrink-0">
+              <DeleteProjectButton projectId={id} />
+            </div>
           </div>
         )}
       </div>
@@ -341,9 +344,9 @@ export default async function ProjectPage({
             {visibleOffers.map((offer) => (
               <Card key={offer.id}>
                 <CardHeader>
-                  <div className="flex items-start justify-between">
-                    <CardTitle className="text-gray-900 dark:text-white">{offer.title}</CardTitle>
-                    {canEdit && <DeleteProjectItemButton itemId={offer.id} itemType="offer" />}
+                  <div className="flex items-start justify-between gap-2">
+                    <CardTitle className="text-gray-900 dark:text-white flex-1 min-w-0 break-words">{offer.title}</CardTitle>
+                    {canEdit && <div className="flex-shrink-0"><DeleteProjectItemButton itemId={offer.id} itemType="offer" /></div>}
                   </div>
                 </CardHeader>
                 <CardContent>
@@ -389,9 +392,9 @@ export default async function ProjectPage({
             {visibleEvents.map((event) => (
               <Card key={event.id}>
                 <CardHeader>
-                  <div className="flex items-start justify-between">
-                    <CardTitle className="text-gray-900 dark:text-white">{event.title}</CardTitle>
-                    {canEdit && <DeleteProjectItemButton itemId={event.id} itemType="event" />}
+                  <div className="flex items-start justify-between gap-2">
+                    <CardTitle className="text-gray-900 dark:text-white flex-1 min-w-0 break-words">{event.title}</CardTitle>
+                    {canEdit && <div className="flex-shrink-0"><DeleteProjectItemButton itemId={event.id} itemType="event" /></div>}
                   </div>
                 </CardHeader>
                 <CardContent>
