@@ -4,7 +4,7 @@ import { notFound } from 'next/navigation'
 import { ProjectForm } from '@/components/project-form'
 
 type ProjectStatus = 'draft' | 'active' | 'completed' | 'archived'
-type ProjectType = 'bungalow' | 'duplex' | 'terraces' | 'town_house' | 'apartment' | 'high_rising' | 'condominiums'
+type ProjectType = 'bungalow' | 'duplex' | 'terraces' | 'town_house' | 'apartment' | 'high_rising' | 'condominiums' | 'commercial_spaces'
 
 type ProjectRow = {
   id: string

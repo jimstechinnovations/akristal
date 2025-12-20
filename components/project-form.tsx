@@ -14,7 +14,7 @@ import { X } from 'lucide-react'
 import Image from 'next/image'
 
 type ProjectStatus = 'draft' | 'active' | 'completed' | 'archived'
-type ProjectType = 'bungalow' | 'duplex' | 'terraces' | 'town_house' | 'apartment' | 'high_rising' | 'condominiums'
+type ProjectType = 'bungalow' | 'duplex' | 'terraces' | 'town_house' | 'apartment' | 'high_rising' | 'condominiums' | 'commercial_spaces'
 
 type ProjectRow = {
   id: string
@@ -263,6 +263,7 @@ export function ProjectForm({ project }: { project?: ProjectRow }) {
               <option value="apartment">Apartment</option>
               <option value="high_rising">High Rising</option>
               <option value="condominiums">Condominiums</option>
+              <option value="commercial_spaces">Commercial Spaces</option>
             </select>
           </div>
 
