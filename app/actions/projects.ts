@@ -9,7 +9,7 @@ import { getErrorMessage } from '@/lib/utils'
 type ProjectStatus = 'draft' | 'active' | 'completed' | 'archived'
 type ScheduleVisibility = 'immediate' | 'scheduled' | 'hidden'
 
-type ProjectType = 'bungalow' | 'duplex' | 'terresse' | 'town_house' | 'apartment' | 'high_rising' | 'block' | 'flat'
+type ProjectType = 'bungalow' | 'duplex' | 'terraces' | 'town_house' | 'apartment' | 'high_rising' | 'condominiums'
 
 type ProjectInsert = {
   title: string

@@ -716,7 +716,7 @@ END $$;
 
 -- Project Type Enum
 DO $$ BEGIN
-  CREATE TYPE project_type AS ENUM ('bungalow', 'duplex', 'terresse', 'town_house', 'apartment', 'high_rising', 'block', 'flat');
+  CREATE TYPE project_type AS ENUM ('bungalow', 'duplex', 'terraces', 'town_house', 'apartment', 'high_rising', 'condominiums');
 EXCEPTION
   WHEN duplicate_object THEN null;
 END $$;
@@ -736,7 +736,7 @@ CREATE TABLE IF NOT EXISTS public.projects (
   media_urls TEXT[], -- Array of URLs for images and videos
   created_by UUID NOT NULL REFERENCES public.profiles(id) ON DELETE CASCADE,
   status project_status DEFAULT 'draft',
-  type project_type, -- Bungalow, Duplex, Terresse, Town House, Apartment, High rising, Block or Flat
+  type project_type, -- Bungalow, Duplex, Terraces, Town House, Apartment, High rising, Condominiums
   pre_selling_price DECIMAL(12, 2), -- Pre-selling price
   pre_selling_currency TEXT DEFAULT 'RWF', -- Currency for pre-selling price
   main_price DECIMAL(12, 2), -- Main price

@@ -4,7 +4,7 @@
 
 -- Create Project Type Enum
 DO $$ BEGIN
-  CREATE TYPE project_type AS ENUM ('bungalow', 'duplex', 'terresse', 'town_house', 'apartment', 'high_rising', 'block', 'flat');
+  CREATE TYPE project_type AS ENUM ('bungalow', 'duplex', 'terraces', 'town_house', 'apartment', 'high_rising', 'condominiums');
 EXCEPTION
   WHEN duplicate_object THEN null;
 END $$;
@@ -18,7 +18,7 @@ ALTER TABLE public.projects
   ADD COLUMN IF NOT EXISTS main_currency TEXT DEFAULT 'RWF';
 
 -- Add comments for documentation
-COMMENT ON COLUMN public.projects.type IS 'Project type: Bungalow, Duplex, Terresse, Town House, Apartment, High rising, Block or Flat';
+COMMENT ON COLUMN public.projects.type IS 'Project type: Bungalow, Duplex, Terraces, Town House, Apartment, High rising, Condominiums';
 COMMENT ON COLUMN public.projects.pre_selling_price IS 'Pre-selling price for the project';
 COMMENT ON COLUMN public.projects.pre_selling_currency IS 'Currency for pre-selling price (default: RWF)';
 COMMENT ON COLUMN public.projects.main_price IS 'Main price for the project';
