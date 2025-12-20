@@ -45,6 +45,11 @@ export default async function PropertyPage({
     notFound()
   }
 
+  // Ensure video_urls is properly handled (can be null, undefined, or array)
+  const videoUrls: string[] = Array.isArray(property.video_urls)
+    ? property.video_urls.filter((url): url is string => Boolean(url && typeof url === 'string' && url.trim()))
+    : []
+
   // Increment view count
   await (supabase as any)
     .from('properties')
@@ -147,6 +152,27 @@ export default async function PropertyPage({
       ) : (
         <div className="mb-8 flex h-96 w-full items-center justify-center rounded-lg bg-gray-200 dark:bg-gray-700">
           <Building2 className="h-24 w-24 text-gray-400" />
+        </div>
+      )}
+
+      {/* Video Gallery */}
+      {videoUrls.length > 0 && (
+        <div className="mb-8">
+          <h2 className="mb-4 text-2xl font-semibold text-gray-900 dark:text-white">Videos</h2>
+          <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
+            {videoUrls.map((url, index) => (
+              <div key={index} className="relative aspect-video w-full overflow-hidden rounded-lg bg-black">
+                <video
+                  src={url}
+                  controls
+                  className="h-full w-full object-contain"
+                  preload="metadata"
+                >
+                  Your browser does not support the video tag.
+                </video>
+              </div>
+            ))}
+          </div>
         </div>
       )}
 
