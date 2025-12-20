@@ -203,22 +203,31 @@ export function ProjectEventForm({ projectId }: { projectId: string }) {
               className="block w-full text-sm text-gray-500 file:mr-4 file:rounded-lg file:border-0 file:bg-blue-50 file:px-4 file:py-2 file:text-sm file:font-semibold file:text-blue-700 hover:file:bg-blue-100 dark:file:bg-blue-900 dark:file:text-blue-200"
             />
             {mediaPreviews.length > 0 && (
-              <div className="mt-4 grid grid-cols-4 gap-4">
+              <div className="mt-4 grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-4">
                 {mediaPreviews.map((preview, index) => (
                   <div key={index} className="relative">
-                    {preview.startsWith('data:image') ? (
-                      <img
-                        src={preview}
-                        alt={`Preview ${index + 1}`}
-                        className="h-24 w-full rounded-lg object-cover"
-                      />
-                    ) : (
-                      <video src={preview} className="h-24 w-full rounded-lg object-cover" />
-                    )}
+                    <div className="relative aspect-video w-full overflow-hidden rounded-lg bg-black">
+                      {preview.startsWith('data:image') ? (
+                        <img
+                          src={preview}
+                          alt={`Preview ${index + 1}`}
+                          className="h-full w-full object-cover"
+                        />
+                      ) : (
+                        <video 
+                          src={preview} 
+                          controls
+                          className="h-full w-full object-contain"
+                          preload="metadata"
+                        >
+                          Your browser does not support the video tag.
+                        </video>
+                      )}
+                    </div>
                     <button
                       type="button"
                       onClick={() => removeMedia(index)}
-                      className="absolute right-1 top-1 rounded-full bg-red-500 p-1 text-white"
+                      className="absolute right-1 top-1 rounded-full bg-red-500 p-1 text-white hover:bg-red-600"
                     >
                       <X className="h-3 w-3" />
                     </button>

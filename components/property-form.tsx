@@ -141,7 +141,11 @@ export function PropertyForm({ property }: { property?: PropertyRow }) {
     const files = Array.from(e.target.files || [])
     setVideos((prev) => [...prev, ...files])
     files.forEach((file) => {
-      setVideoPreviews((prev) => [...prev, { name: file.name, url: '', isFile: true }])
+      const reader = new FileReader()
+      reader.onload = (e) => {
+        setVideoPreviews((prev) => [...prev, { name: file.name, url: e.target?.result as string, isFile: true }])
+      }
+      reader.readAsDataURL(file)
     })
   }
 
@@ -596,21 +600,25 @@ export function PropertyForm({ property }: { property?: PropertyRow }) {
               className="block w-full text-sm text-gray-500 file:mr-4 file:rounded-lg file:border-0 file:bg-blue-50 file:px-4 file:py-2 file:text-sm file:font-semibold file:text-blue-700 hover:file:bg-blue-100 dark:file:bg-blue-900 dark:file:text-blue-200"
             />
             {videoPreviews.length > 0 && (
-              <div className="mt-4 space-y-2">
+              <div className="mt-4 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
                 {videoPreviews.map((preview, index) => (
-                  <div
-                    key={index}
-                    className="flex items-center justify-between rounded-lg border border-gray-300 bg-gray-50 px-3 py-2 dark:border-gray-600 dark:bg-gray-800"
-                  >
-                    <span className="text-sm text-gray-900 dark:text-gray-100">
-                      {preview.name}
-                    </span>
+                  <div key={index} className="relative">
+                    <div className="relative aspect-video w-full overflow-hidden rounded-lg bg-black">
+                      <video
+                        src={preview.url}
+                        controls
+                        className="h-full w-full object-contain"
+                        preload="metadata"
+                      >
+                        Your browser does not support the video tag.
+                      </video>
+                    </div>
                     <button
                       type="button"
                       onClick={() => removeVideo(index)}
-                      className="rounded-full bg-red-500 px-2 py-1 text-xs text-white hover:bg-red-600"
+                      className="absolute right-1 top-1 rounded-full bg-red-500 p-1 text-white hover:bg-red-600"
                     >
-                      Remove
+                      ×
                     </button>
                   </div>
                 ))}
