@@ -77,7 +77,7 @@ export function MemberForm({ member }: { member?: MemberRow }) {
         const fileName = `${Date.now()}-${Math.random().toString(36).substring(7)}.${fileExt}`
         const filePath = `members/${fileName}`
 
-        const { data: uploadData, error: uploadError } = await uploadFile('team', filePath, imageFile)
+        const { data: uploadData, error: uploadError } = await uploadFile('teams', filePath, imageFile)
 
         if (uploadError) {
           toast.error(`Failed to upload image: ${getErrorMessage(uploadError)}`)
@@ -86,7 +86,7 @@ export function MemberForm({ member }: { member?: MemberRow }) {
         }
 
         if (uploadData?.path) {
-          imageUrl = getPublicUrl('team', uploadData.path)
+          imageUrl = getPublicUrl('teams', uploadData.path)
         }
       } else if (!imagePreview) {
         // If no image file and no preview, clear the image URL

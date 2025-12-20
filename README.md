@@ -82,7 +82,7 @@ A production-ready real estate marketplace web application built with Next.js, S
    - `property-videos` - For property videos
    - `documents` - For payment statements and documents
    - `project-media` - For project updates, offers, and events media (images and videos)
-   - `team` - For team member images
+   - `teams` - For team member images
 
 6. **Run the development server**
    ```bash
