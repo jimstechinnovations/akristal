@@ -4,6 +4,7 @@ import { notFound } from 'next/navigation'
 import { ProjectForm } from '@/components/project-form'
 
 type ProjectStatus = 'draft' | 'active' | 'completed' | 'archived'
+type ProjectType = 'bungalow' | 'duplex' | 'terresse' | 'town_house' | 'apartment' | 'high_rising' | 'block' | 'flat'
 
 type ProjectRow = {
   id: string
@@ -12,6 +13,11 @@ type ProjectRow = {
   media_urls: string[] | null
   created_by: string
   status: ProjectStatus
+  type?: ProjectType | null
+  pre_selling_price?: number | null
+  pre_selling_currency?: string | null
+  main_price?: number | null
+  main_currency?: string | null
   created_at: string
   updated_at: string
 }

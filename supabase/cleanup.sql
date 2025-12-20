@@ -241,6 +241,7 @@ DROP TYPE IF EXISTS user_role;
 -- Project management types
 DROP TYPE IF EXISTS schedule_visibility;
 DROP TYPE IF EXISTS project_status;
+DROP TYPE IF EXISTS project_type;
 
 -- Note: Extensions are not dropped as they may be used by other schemas
 -- If you need to drop extensions, uncomment the following:

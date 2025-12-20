@@ -9,12 +9,19 @@ import { getErrorMessage } from '@/lib/utils'
 type ProjectStatus = 'draft' | 'active' | 'completed' | 'archived'
 type ScheduleVisibility = 'immediate' | 'scheduled' | 'hidden'
 
+type ProjectType = 'bungalow' | 'duplex' | 'terresse' | 'town_house' | 'apartment' | 'high_rising' | 'block' | 'flat'
+
 type ProjectInsert = {
   title: string
   description?: string | null
   media_urls?: string[]
   created_by: string
   status?: ProjectStatus
+  type?: ProjectType | null
+  pre_selling_price?: number | null
+  pre_selling_currency?: string | null
+  main_price?: number | null
+  main_currency?: string | null
   created_at?: string
   updated_at?: string
 }
@@ -24,6 +31,11 @@ type ProjectUpdate = {
   description?: string | null
   media_urls?: string[]
   status?: ProjectStatus
+  type?: ProjectType | null
+  pre_selling_price?: number | null
+  pre_selling_currency?: string | null
+  main_price?: number | null
+  main_currency?: string | null
   updated_at?: string
 }
 
@@ -91,12 +103,21 @@ export async function createProject(formData: FormData) {
       }
     }
 
+    const typeValue = formData.get('type')
+    const preSellingPrice = formData.get('pre_selling_price')
+    const mainPrice = formData.get('main_price')
+
     const projectData: ProjectInsert = {
       title: formData.get('title') as string,
       description: (formData.get('description') as string) || null,
       media_urls: mediaUrls.length > 0 ? mediaUrls : undefined,
       created_by: user.id,
       status: (formData.get('status') as 'draft' | 'active' | 'completed' | 'archived') || 'draft',
+      type: typeValue && typeValue !== '' ? (typeValue as ProjectType) : null,
+      pre_selling_price: preSellingPrice && preSellingPrice !== '' ? parseFloat(preSellingPrice as string) : null,
+      pre_selling_currency: formData.get('pre_selling_currency') as string || null,
+      main_price: mainPrice && mainPrice !== '' ? parseFloat(mainPrice as string) : null,
+      main_currency: formData.get('main_currency') as string || null,
       created_at: createdAt,
     }
 
@@ -181,6 +202,23 @@ export async function updateProject(id: string, formData: FormData) {
     const status = formData.get('status')
     if (typeof status === 'string') {
       updateData.status = status as 'draft' | 'active' | 'completed' | 'archived'
+    }
+
+    const type = formData.get('type')
+    if (type !== null) {
+      updateData.type = type && type !== '' ? (type as ProjectType) : null
+    }
+
+    const preSellingPrice = formData.get('pre_selling_price')
+    if (preSellingPrice !== null) {
+      updateData.pre_selling_price = preSellingPrice && preSellingPrice !== '' ? parseFloat(preSellingPrice as string) : null
+      updateData.pre_selling_currency = formData.get('pre_selling_currency') as string || null
+    }
+
+    const mainPrice = formData.get('main_price')
+    if (mainPrice !== null) {
+      updateData.main_price = mainPrice && mainPrice !== '' ? parseFloat(mainPrice as string) : null
+      updateData.main_currency = formData.get('main_currency') as string || null
     }
     
     if (mediaUrlsStr !== null) {

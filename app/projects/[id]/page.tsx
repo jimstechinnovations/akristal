@@ -9,6 +9,7 @@ import Image from 'next/image'
 import { ProjectManagementTabs } from '@/components/project-management-tabs'
 import { DeleteProjectItemButton } from '@/components/delete-project-item-button'
 import { DeleteProjectButton } from '@/components/delete-project-button'
+import { formatCurrency } from '@/lib/utils'
 
 type ProjectStatus = 'draft' | 'active' | 'completed' | 'archived'
 type ScheduleVisibility = 'immediate' | 'scheduled' | 'hidden'
@@ -20,6 +21,11 @@ type ProjectRow = {
   media_urls: string[] | null
   created_by: string
   status: ProjectStatus
+  type?: string | null
+  pre_selling_price?: number | null
+  pre_selling_currency?: string | null
+  main_price?: number | null
+  main_currency?: string | null
   created_at: string
   updated_at: string
 }
@@ -80,7 +86,7 @@ export default async function ProjectPage({
   // Fetch project (explicitly include media_urls to ensure it's selected)
   const { data: project, error } = await supabase
     .from('projects')
-    .select('id, title, description, media_urls, created_by, status, created_at, updated_at')
+    .select('id, title, description, media_urls, created_by, status, type, pre_selling_price, pre_selling_currency, main_price, main_currency, created_at, updated_at')
     .eq('id', id)
     .single()
 
@@ -272,15 +278,47 @@ export default async function ProjectPage({
         </Card>
       )}
 
-      {typedProject.description && (
-        <Card className="mb-8">
-          <CardContent className="pt-6">
-            <p className="text-gray-700 dark:text-gray-300 whitespace-pre-wrap">
-              {typedProject.description}
-            </p>
-          </CardContent>
-        </Card>
-      )}
+      {/* Project Details */}
+      <Card className="mb-8">
+        <CardContent className="pt-6">
+          <div className="space-y-4">
+            {typedProject.type && (
+              <div>
+                <span className="text-sm font-semibold text-gray-600 dark:text-gray-400">Type: </span>
+                <span className="text-sm text-gray-900 dark:text-white capitalize">
+                  {typedProject.type.replace(/_/g, ' ')}
+                </span>
+              </div>
+            )}
+            <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+              {typedProject.pre_selling_price && (
+                <div>
+                  <span className="text-sm font-semibold text-gray-600 dark:text-gray-400">Pre-selling Price: </span>
+                  <span className="text-lg font-bold text-[#c89b3c]">
+                    {formatCurrency(typedProject.pre_selling_price, typedProject.pre_selling_currency || 'RWF')}
+                  </span>
+                </div>
+              )}
+              {typedProject.main_price && (
+                <div>
+                  <span className="text-sm font-semibold text-gray-600 dark:text-gray-400">Main Price: </span>
+                  <span className="text-lg font-bold text-[#c89b3c]">
+                    {formatCurrency(typedProject.main_price, typedProject.main_currency || 'RWF')}
+                  </span>
+                </div>
+              )}
+            </div>
+            {typedProject.description && (
+              <div>
+                <h3 className="mb-2 text-lg font-semibold text-gray-900 dark:text-white">Description</h3>
+                <p className="text-gray-700 dark:text-gray-300 whitespace-pre-wrap">
+                  {typedProject.description}
+                </p>
+              </div>
+            )}
+          </div>
+        </CardContent>
+      </Card>
 
       {/* Management Forms (only for admins) */}
       {canEdit && <ProjectManagementTabs projectId={id} />}

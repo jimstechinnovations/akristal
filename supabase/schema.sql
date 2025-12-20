@@ -714,6 +714,13 @@ EXCEPTION
   WHEN duplicate_object THEN null;
 END $$;
 
+-- Project Type Enum
+DO $$ BEGIN
+  CREATE TYPE project_type AS ENUM ('bungalow', 'duplex', 'terresse', 'town_house', 'apartment', 'high_rising', 'block', 'flat');
+EXCEPTION
+  WHEN duplicate_object THEN null;
+END $$;
+
 -- Schedule Visibility Enum (controls when content is visible)
 DO $$ BEGIN
   CREATE TYPE schedule_visibility AS ENUM ('immediate', 'scheduled', 'hidden');
@@ -729,6 +736,11 @@ CREATE TABLE IF NOT EXISTS public.projects (
   media_urls TEXT[], -- Array of URLs for images and videos
   created_by UUID NOT NULL REFERENCES public.profiles(id) ON DELETE CASCADE,
   status project_status DEFAULT 'draft',
+  type project_type, -- Bungalow, Duplex, Terresse, Town House, Apartment, High rising, Block or Flat
+  pre_selling_price DECIMAL(12, 2), -- Pre-selling price
+  pre_selling_currency TEXT DEFAULT 'RWF', -- Currency for pre-selling price
+  main_price DECIMAL(12, 2), -- Main price
+  main_currency TEXT DEFAULT 'RWF', -- Currency for main price
   created_at TIMESTAMP WITH TIME ZONE DEFAULT TIMEZONE('utc', NOW()),
   updated_at TIMESTAMP WITH TIME ZONE DEFAULT TIMEZONE('utc', NOW())
 );

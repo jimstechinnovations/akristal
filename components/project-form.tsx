@@ -14,6 +14,7 @@ import { X } from 'lucide-react'
 import Image from 'next/image'
 
 type ProjectStatus = 'draft' | 'active' | 'completed' | 'archived'
+type ProjectType = 'bungalow' | 'duplex' | 'terresse' | 'town_house' | 'apartment' | 'high_rising' | 'block' | 'flat'
 
 type ProjectRow = {
   id: string
@@ -22,6 +23,11 @@ type ProjectRow = {
   media_urls: string[] | null
   created_by: string
   status: ProjectStatus
+  type?: ProjectType | null
+  pre_selling_price?: number | null
+  pre_selling_currency?: string | null
+  main_price?: number | null
+  main_currency?: string | null
   created_at: string
   updated_at: string
 }
@@ -34,6 +40,11 @@ export function ProjectForm({ project }: { project?: ProjectRow }) {
     title: project?.title || '',
     description: project?.description || '',
     status: project?.status || 'draft',
+    type: project?.type || '',
+    pre_selling_price: project?.pre_selling_price?.toString() || '',
+    pre_selling_currency: project?.pre_selling_currency || 'RWF',
+    main_price: project?.main_price?.toString() || '',
+    main_currency: project?.main_currency || 'RWF',
     created_at: project?.created_at ? new Date(project.created_at).toISOString().slice(0, 16) : '',
   })
   const [mediaFiles, setMediaFiles] = useState<File[]>([])
@@ -121,6 +132,17 @@ export function ProjectForm({ project }: { project?: ProjectRow }) {
       formDataObj.append('description', formData.description)
       formDataObj.append('status', formData.status)
       formDataObj.append('media_urls', JSON.stringify(mediaUrls))
+      if (formData.type) {
+        formDataObj.append('type', formData.type)
+      }
+      if (formData.pre_selling_price) {
+        formDataObj.append('pre_selling_price', formData.pre_selling_price)
+        formDataObj.append('pre_selling_currency', formData.pre_selling_currency)
+      }
+      if (formData.main_price) {
+        formDataObj.append('main_price', formData.main_price)
+        formDataObj.append('main_currency', formData.main_currency)
+      }
       if (!project && formData.created_at) {
         // Only allow backdating when creating, not updating
         formDataObj.append('created_at', new Date(formData.created_at).toISOString())
@@ -137,6 +159,22 @@ export function ProjectForm({ project }: { project?: ProjectRow }) {
         toast.error(result.error)
       } else {
         toast.success(project ? 'Project updated successfully!' : 'Project created successfully!')
+        // Reset form for new projects
+        if (!project) {
+          setFormData({
+            title: '',
+            description: '',
+            status: 'draft',
+            type: '',
+            pre_selling_price: '',
+            pre_selling_currency: 'RWF',
+            main_price: '',
+            main_currency: 'RWF',
+            created_at: '',
+          })
+          setMediaFiles([])
+          setMediaPreviews([])
+        }
         if (result.project) {
           router.push(`/projects/${result.project.id}`)
         } else if (project) {
@@ -201,6 +239,85 @@ export function ProjectForm({ project }: { project?: ProjectRow }) {
               <option value="completed">Completed</option>
               <option value="archived">Archived</option>
             </select>
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium mb-1 text-gray-900 dark:text-white">
+              Type <span className="text-gray-500 dark:text-gray-400">(Optional)</span>
+            </label>
+            <select
+              className="flex h-10 w-full rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm text-gray-900 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-100"
+              value={formData.type}
+              onChange={(e) =>
+                setFormData({
+                  ...formData,
+                  type: e.target.value,
+                })
+              }
+            >
+              <option value="">Select Type</option>
+              <option value="bungalow">Bungalow</option>
+              <option value="duplex">Duplex</option>
+              <option value="terresse">Terresse</option>
+              <option value="town_house">Town House</option>
+              <option value="apartment">Apartment</option>
+              <option value="high_rising">High Rising</option>
+              <option value="block">Block</option>
+              <option value="flat">Flat</option>
+            </select>
+          </div>
+
+          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+            <div>
+              <label className="block text-sm font-medium mb-1 text-gray-900 dark:text-white">
+                Pre-selling Price <span className="text-gray-500 dark:text-gray-400">(Optional)</span>
+              </label>
+              <div className="flex gap-2">
+                <Input
+                  type="number"
+                  step="0.01"
+                  value={formData.pre_selling_price}
+                  onChange={(e) => setFormData({ ...formData, pre_selling_price: e.target.value })}
+                  placeholder="0.00"
+                  className="flex-1"
+                />
+                <select
+                  className="w-24 rounded-lg border border-gray-300 bg-white px-2 py-2 text-sm text-gray-900 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-100"
+                  value={formData.pre_selling_currency}
+                  onChange={(e) => setFormData({ ...formData, pre_selling_currency: e.target.value })}
+                >
+                  <option value="RWF">RWF</option>
+                  <option value="USD">USD</option>
+                  <option value="EUR">EUR</option>
+                  <option value="GBP">GBP</option>
+                </select>
+              </div>
+            </div>
+            <div>
+              <label className="block text-sm font-medium mb-1 text-gray-900 dark:text-white">
+                Main Price <span className="text-gray-500 dark:text-gray-400">(Optional)</span>
+              </label>
+              <div className="flex gap-2">
+                <Input
+                  type="number"
+                  step="0.01"
+                  value={formData.main_price}
+                  onChange={(e) => setFormData({ ...formData, main_price: e.target.value })}
+                  placeholder="0.00"
+                  className="flex-1"
+                />
+                <select
+                  className="w-24 rounded-lg border border-gray-300 bg-white px-2 py-2 text-sm text-gray-900 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-100"
+                  value={formData.main_currency}
+                  onChange={(e) => setFormData({ ...formData, main_currency: e.target.value })}
+                >
+                  <option value="RWF">RWF</option>
+                  <option value="USD">USD</option>
+                  <option value="EUR">EUR</option>
+                  <option value="GBP">GBP</option>
+                </select>
+              </div>
+            </div>
           </div>
 
           <div>
