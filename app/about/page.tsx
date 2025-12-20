@@ -224,6 +224,13 @@ export default function AboutPage() {
                 >
                   info@akristal.com
                 </a>
+                {', '}
+                <a
+                  href="mailto:theakristalgroup@gmail.com"
+                  className="text-blue-600 hover:underline dark:text-blue-400"
+                >
+                  theakristalgroup@gmail.com
+                </a>
               </p>
               <p>
                 <strong>Phone:</strong>{' '}

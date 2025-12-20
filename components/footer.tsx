@@ -127,6 +127,14 @@ export function Footer() {
                 </a>
               </li>
               <li>
+                <a
+                  href="mailto:theakristalgroup@gmail.com"
+                  className="hover:text-blue-600 dark:hover:text-blue-400 transition-colors"
+                >
+                  theakristalgroup@gmail.com
+                </a>
+              </li>
+              <li>
                 <span className="font-semibold text-gray-900 dark:text-gray-100">Primary:</span>{' '}
                 <a
                   href="tel:+250791900316"

@@ -2,7 +2,7 @@ import Link from 'next/link'
 import { createClient } from '@/lib/supabase/server'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
-import { Search, Home, Key, Building2, Car, Heart, MapPin, Store } from 'lucide-react'
+import { Search, Home, Key, Building2, Car, Heart, MapPin, Store, TrendingUp, CheckCircle2, FolderKanban, Play, Video } from 'lucide-react'
 import Image from 'next/image'
 import type { Database } from '@/types/database'
 import { formatCurrency } from '@/lib/utils'
@@ -13,18 +13,141 @@ type FeaturedProperty = Pick<
   'id' | 'title' | 'price' | 'currency' | 'cover_image_url' | 'city' | 'address' | 'property_type'
 >
 
+type FeaturedVideoItem = {
+  id: string
+  title: string
+  type: 'property' | 'project'
+  videoUrl: string
+  price?: number
+  currency?: string
+  city?: string
+  address?: string
+  property_type?: string
+  status?: string
+}
+
 export default async function HomePage() {
   const supabase = await createClient()
+  
+  // Fetch counts for achievements
+  const [propertiesCount, paymentsCount, projectsCount] = await Promise.all([
+    supabase
+      .from('properties')
+      .select('id', { count: 'exact', head: true })
+      .eq('listing_status', 'approved'),
+    supabase
+      .from('payments')
+      .select('id', { count: 'exact', head: true })
+      .eq('payment_status', 'completed'),
+    supabase
+      .from('projects')
+      .select('id', { count: 'exact', head: true }),
+  ])
+
+  const listingsCount = propertiesCount.count || 0
+  const transactionsCount = paymentsCount.count || 0
+  const projectsCountValue = projectsCount.count || 0
   
   // Fetch featured properties
   const { data } = await supabase
     .from('properties')
-    .select('id, title, price, currency, cover_image_url, city, address, property_type')
+    .select('id, title, price, currency, cover_image_url, city, address, property_type, video_urls')
     .eq('listing_status', 'approved')
     .eq('status', 'available')
     .order('created_at', { ascending: false })
     .limit(6)
-  const featuredProperties = data as FeaturedProperty[] | null
+  const featuredProperties = data as (FeaturedProperty & { video_urls?: string[] })[] | null
+
+  // Fetch properties with videos
+  const { data: propertiesWithVideosData } = await supabase
+    .from('properties')
+    .select('id, title, price, currency, city, address, property_type, video_urls')
+    .eq('listing_status', 'approved')
+    .eq('status', 'available')
+    .not('video_urls', 'is', null)
+    .order('created_at', { ascending: false })
+    .limit(6)
+
+  // Fetch projects with videos
+  const { data: projectsWithVideosData } = await supabase
+    .from('projects')
+    .select('id, title, status, media_urls')
+    .eq('status', 'active')
+    .not('media_urls', 'is', null)
+    .order('created_at', { ascending: false })
+    .limit(6)
+
+  // Combine and format video items
+  const featuredVideos: FeaturedVideoItem[] = []
+  
+  // Add properties with videos
+  if (propertiesWithVideosData) {
+    const propertiesWithVideos = propertiesWithVideosData as Array<{
+      id: string
+      title: string
+      price: number
+      currency: string | null
+      city: string
+      address: string
+      property_type: string
+      video_urls: string[] | null
+    }>
+    
+    propertiesWithVideos.forEach((property) => {
+      if (property.video_urls && Array.isArray(property.video_urls) && property.video_urls.length > 0) {
+        // Use first video URL
+        const videoUrl = property.video_urls[0]
+        if (videoUrl && typeof videoUrl === 'string' && videoUrl.trim()) {
+          featuredVideos.push({
+            id: property.id,
+            title: property.title,
+            type: 'property',
+            videoUrl: videoUrl.trim(),
+            price: property.price,
+            currency: property.currency || undefined,
+            city: property.city,
+            address: property.address,
+            property_type: property.property_type,
+          })
+        }
+      }
+    })
+  }
+
+  // Add projects with videos
+  if (projectsWithVideosData) {
+    const projectsWithVideos = projectsWithVideosData as Array<{
+      id: string
+      title: string
+      status: string
+      media_urls: string[] | null
+    }>
+    
+    projectsWithVideos.forEach((project) => {
+      const mediaUrls = Array.isArray(project.media_urls) 
+        ? project.media_urls.filter((url) => url && typeof url === 'string' && url.trim())
+        : []
+      
+      // Find first video URL (not an image)
+      const videoUrl = mediaUrls.find((url: string) => {
+        const isImage = url.match(/\.(jpg|jpeg|png|gif|webp)$/i)
+        return !isImage && url.trim()
+      })
+      
+      if (videoUrl) {
+        featuredVideos.push({
+          id: project.id,
+          title: project.title,
+          type: 'project',
+          videoUrl: videoUrl.trim(),
+          status: project.status,
+        })
+      }
+    })
+  }
+
+  // Limit to 6 items and shuffle for variety
+  const shuffledVideos = featuredVideos.sort(() => Math.random() - 0.5).slice(0, 6)
 
   return (
     <div className="flex min-h-screen flex-col bg-white dark:bg-[#0f172a]">
@@ -109,6 +232,79 @@ export default async function HomePage() {
         </div>
       </section>
 
+      {/* Featured Videos */}
+      {shuffledVideos.length > 0 && (
+        <section className="px-4 py-4 sm:py-6">
+          <div className="mx-auto max-w-7xl">
+            <div className="flex justify-between items-center mb-3 sm:mb-4">
+              <h2 className="text-lg sm:text-xl font-bold text-[#0d233e] dark:text-white">Featured Videos</h2>
+              <div className="flex gap-2">
+                <Link href="/properties" className="text-xs sm:text-sm text-[#c89b3c] hover:underline font-medium">
+                  View Properties
+                </Link>
+                <span className="text-xs sm:text-sm text-gray-400">|</span>
+                <Link href="/projects" className="text-xs sm:text-sm text-[#c89b3c] hover:underline font-medium">
+                  View Projects
+                </Link>
+              </div>
+            </div>
+            <div className="flex gap-3 sm:gap-4 overflow-x-auto pb-2 scrollbar-hide">
+              {shuffledVideos.map((item) => (
+                <Link 
+                  key={`${item.type}-${item.id}`} 
+                  href={item.type === 'property' ? `/properties/${item.id}` : `/projects/${item.id}`}
+                  className="min-w-[280px] sm:min-w-[320px] bg-white dark:bg-[#1e293b] rounded-lg overflow-hidden shadow-sm hover:shadow-md transition-all"
+                >
+                  <div className="relative aspect-video w-full bg-black group">
+                    <video
+                      src={item.videoUrl}
+                      className="h-full w-full object-cover"
+                      preload="metadata"
+                      muted
+                    />
+                    <div className="absolute inset-0 flex items-center justify-center bg-black/30 group-hover:bg-black/40 transition-colors">
+                      <div className="rounded-full bg-white/90 p-3 sm:p-4 group-hover:scale-110 transition-transform">
+                        <Play className="h-6 w-6 sm:h-8 sm:w-8 text-[#0d233e] ml-1" fill="currentColor" />
+                      </div>
+                    </div>
+                    <div className="absolute top-2 right-2">
+                      <span className="bg-[#c89b3c] text-[#0d233e] text-xs font-semibold px-2 py-1 rounded-full uppercase">
+                        {item.type === 'property' ? 'Property' : 'Project'}
+                      </span>
+                    </div>
+                  </div>
+                  <div className="p-3 sm:p-4">
+                    <h3 className="font-semibold text-[#0d233e] dark:text-white mb-1.5 sm:mb-2 text-sm sm:text-base line-clamp-2">
+                      {item.title}
+                    </h3>
+                    {item.type === 'property' && (
+                      <>
+                        {item.address && item.city && (
+                          <p className="text-xs sm:text-sm text-gray-600 dark:text-gray-400 mb-2 flex items-center gap-1 line-clamp-1">
+                            <MapPin className="h-3 w-3 sm:h-4 sm:w-4 flex-shrink-0" />
+                            <span className="truncate">{item.address}, {item.city}</span>
+                          </p>
+                        )}
+                        {item.price && (
+                          <p className="text-base sm:text-lg font-semibold text-[#c89b3c]">
+                            {formatCurrency(item.price, item.currency)}
+                          </p>
+                        )}
+                      </>
+                    )}
+                    {item.type === 'project' && item.status && (
+                      <p className="text-xs sm:text-sm text-gray-600 dark:text-gray-400 capitalize">
+                        Status: {item.status}
+                      </p>
+                    )}
+                  </div>
+                </Link>
+              ))}
+            </div>
+          </div>
+        </section>
+      )}
+
       {/* Featured Properties */}
       {featuredProperties && featuredProperties.length > 0 && (
         <section className="px-4 py-4 sm:py-6">
@@ -188,6 +384,61 @@ export default async function HomePage() {
                 </CardContent>
               </Card>
             ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Achievements Section */}
+      <section className="bg-gradient-to-br from-[#0d233e] to-[#1a4d3e] text-white py-8 sm:py-12 px-4">
+        <div className="mx-auto max-w-7xl">
+          <div className="text-center mb-8 sm:mb-12">
+            <p className="text-xs sm:text-sm font-semibold uppercase tracking-wider text-[#c89b3c] mb-2 sm:mb-3">
+              ACHIEVEMENTS
+            </p>
+            <h2 className="text-2xl sm:text-3xl lg:text-4xl font-bold">
+              Our Track Record of Excellence
+            </h2>
+          </div>
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-6 sm:gap-8">
+            <div className="text-center">
+              <div className="flex justify-center mb-4">
+                <div className="rounded-full bg-[#c89b3c]/20 p-4 sm:p-5">
+                  <Building2 className="h-8 w-8 sm:h-10 sm:w-10 text-[#c89b3c]" />
+                </div>
+              </div>
+              <div className="text-4xl sm:text-5xl lg:text-6xl font-bold text-[#c89b3c] mb-2 sm:mb-3">
+              {listingsCount.toLocaleString()}+
+              </div>
+              <div className="text-base sm:text-lg text-white/90 font-medium">
+                Listings
+              </div>
+            </div>
+            <div className="text-center">
+              <div className="flex justify-center mb-4">
+                <div className="rounded-full bg-[#c89b3c]/20 p-4 sm:p-5">
+                  <CheckCircle2 className="h-8 w-8 sm:h-10 sm:w-10 text-[#c89b3c]" />
+                </div>
+              </div>
+              <div className="text-4xl sm:text-5xl lg:text-6xl font-bold text-[#c89b3c] mb-2 sm:mb-3">
+                {transactionsCount.toLocaleString()}+
+              </div>
+              <div className="text-base sm:text-lg text-white/90 font-medium">
+                Transactions completed
+              </div>
+            </div>
+            <div className="text-center">
+              <div className="flex justify-center mb-4">
+                <div className="rounded-full bg-[#c89b3c]/20 p-4 sm:p-5">
+                  <FolderKanban className="h-8 w-8 sm:h-10 sm:w-10 text-[#c89b3c]" />
+                </div>
+              </div>
+              <div className="text-4xl sm:text-5xl lg:text-6xl font-bold text-[#c89b3c] mb-2 sm:mb-3">
+                {projectsCountValue.toLocaleString()}+
+              </div>
+              <div className="text-base sm:text-lg text-white/90 font-medium">
+                Projects
+              </div>
+            </div>
           </div>
         </div>
       </section>

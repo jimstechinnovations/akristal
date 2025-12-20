@@ -205,7 +205,7 @@ export default function TermsPage() {
               </p>
               <div className="text-gray-600 dark:text-gray-400">
                 <p>
-                  <strong>Email:</strong> info@akristal.com
+                  <strong>Email:</strong> info@akristal.com, theakristalgroup@gmail.com
                 </p>
                 <p>
                   <strong>Phone:</strong> +250791900316

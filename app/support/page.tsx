@@ -47,7 +47,7 @@ const faqs = [
   {
     question: 'What should I do if I encounter a problem?',
     answer:
-      'Contact our support team via email at info@akristal.com or call us on any of these numbers: Primary: +250791900316, West Africa: +2348132383836, East Africa: +250788357819, WhatsApp: +250734994909, South Africa: +27 67 684 6945. We aim to respond within 24 hours.',
+      'Contact our support team via email at info@akristal.com or theakristalgroup@gmail.com, or call us on any of these numbers: Primary: +250791900316, West Africa: +2348132383836, East Africa: +250788357819, WhatsApp: +250734994909, South Africa: +27 67 684 6945. We aim to respond within 24 hours.',
   },
 ]
 
@@ -90,9 +90,14 @@ export default function SupportPage() {
             <p className="mb-4 text-sm text-gray-600 dark:text-gray-400">
               Send us an email and we'll respond within 24 hours.
             </p>
-            <a href="mailto:info@akristal.com">
-              <Button variant="outline">info@akristal.com</Button>
-            </a>
+            <div className="space-y-2">
+              <a href="mailto:info@akristal.com" className="block">
+                <Button variant="outline" className="w-full">info@akristal.com</Button>
+              </a>
+              <a href="mailto:theakristalgroup@gmail.com" className="block">
+                <Button variant="outline" className="w-full">theakristalgroup@gmail.com</Button>
+              </a>
+            </div>
           </CardContent>
         </Card>
       </div>

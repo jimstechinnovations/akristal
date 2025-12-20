@@ -57,12 +57,20 @@ export default function ContactPage() {
                   </div>
                   <div>
                     <h3 className="font-semibold text-gray-900 dark:text-white">Email</h3>
-                    <a
-                      href="mailto:info@akristal.com"
-                      className="mt-1 text-sm text-blue-600 hover:underline dark:text-blue-400"
-                    >
-                      info@akristal.com
-                    </a>
+                    <div className="mt-1 space-y-1">
+                      <a
+                        href="mailto:info@akristal.com"
+                        className="block text-sm text-blue-600 hover:underline dark:text-blue-400"
+                      >
+                        info@akristal.com
+                      </a>
+                      <a
+                        href="mailto:theakristalgroup@gmail.com"
+                        className="block text-sm text-blue-600 hover:underline dark:text-blue-400"
+                      >
+                        theakristalgroup@gmail.com
+                      </a>
+                    </div>
                   </div>
                 </div>
               </CardContent>
