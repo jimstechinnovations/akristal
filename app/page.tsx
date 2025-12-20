@@ -2,7 +2,7 @@ import Link from 'next/link'
 import { createClient } from '@/lib/supabase/server'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
-import { Search, Home, Key, Building2, Car, Heart, MapPin, Store, TrendingUp, CheckCircle2, FolderKanban, Play, Video } from 'lucide-react'
+import { Search, Home, Key, Building2, Car, Heart, MapPin, Store, TrendingUp, CheckCircle2, FolderKanban, Play, Video, Users } from 'lucide-react'
 import Image from 'next/image'
 import type { Database } from '@/types/database'
 import { formatCurrency } from '@/lib/utils'
@@ -30,7 +30,7 @@ export default async function HomePage() {
   const supabase = await createClient()
   
   // Fetch counts for achievements
-  const [propertiesCount, paymentsCount, projectsCount] = await Promise.all([
+  const [propertiesCount, paymentsCount, projectsCount, usersCount] = await Promise.all([
     supabase
       .from('properties')
       .select('id', { count: 'exact', head: true })
@@ -42,11 +42,15 @@ export default async function HomePage() {
     supabase
       .from('projects')
       .select('id', { count: 'exact', head: true }),
+    supabase
+      .from('profiles')
+      .select('id', { count: 'exact', head: true }),
   ])
 
   const listingsCount = propertiesCount.count || 0
   const transactionsCount = paymentsCount.count || 0
   const projectsCountValue = projectsCount.count || 0
+  const usersCountValue = usersCount.count || 0
   
   // Fetch featured properties
   const { data } = await supabase
@@ -174,7 +178,7 @@ export default async function HomePage() {
       {/* Quick Actions */}
       <section className="px-4 py-4 sm:py-6">
         <div className="mx-auto max-w-7xl">
-          <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 sm:gap-4">
+          <div className="grid grid-cols-3 gap-2 sm:gap-4">
             <Link href="/properties?type=residential" className="flex flex-col items-center bg-white dark:bg-[#1e293b] p-3 sm:p-4 rounded-lg shadow-sm hover:shadow-md transition-all text-gray-900 dark:text-white">
               <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-[#0d233e] dark:bg-[#c89b3c] flex items-center justify-center mb-2">
                 <Home className="h-5 w-5 sm:h-6 sm:w-6 text-[#c89b3c] dark:text-[#0d233e]" />
@@ -192,12 +196,6 @@ export default async function HomePage() {
                 <Building2 className="h-5 w-5 sm:h-6 sm:w-6 text-[#c89b3c] dark:text-[#0d233e]" />
               </div>
               <span className="text-xs font-medium text-center">Commercial</span>
-            </Link>
-            <Link href="/properties" className="flex flex-col items-center bg-white dark:bg-[#1e293b] p-3 sm:p-4 rounded-lg shadow-sm hover:shadow-md transition-all text-gray-900 dark:text-white">
-              <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-[#0d233e] dark:bg-[#c89b3c] flex items-center justify-center mb-2">
-                <Car className="h-5 w-5 sm:h-6 sm:w-6 text-[#c89b3c] dark:text-[#0d233e]" />
-              </div>
-              <span className="text-xs font-medium text-center">Vehicles</span>
             </Link>
           </div>
         </div>
@@ -218,15 +216,6 @@ export default async function HomePage() {
             </Link>
             <Link href="/properties?type=land" className="px-3 sm:px-4 py-1.5 sm:py-2 bg-white dark:bg-[#1e293b] text-gray-700 dark:text-gray-300 border border-gray-300 dark:border-gray-600 rounded-full whitespace-nowrap text-xs sm:text-sm hover:bg-[#0d233e] hover:text-white dark:hover:bg-[#0d233e] transition-colors">
               Land
-            </Link>
-            <Link href="/properties" className="px-3 sm:px-4 py-1.5 sm:py-2 bg-white dark:bg-[#1e293b] text-gray-700 dark:text-gray-300 border border-gray-300 dark:border-gray-600 rounded-full whitespace-nowrap text-xs sm:text-sm hover:bg-[#0d233e] hover:text-white dark:hover:bg-[#0d233e] transition-colors">
-              Vehicles
-            </Link>
-            <Link href="/properties" className="px-3 sm:px-4 py-1.5 sm:py-2 bg-white dark:bg-[#1e293b] text-gray-700 dark:text-gray-300 border border-gray-300 dark:border-gray-600 rounded-full whitespace-nowrap text-xs sm:text-sm hover:bg-[#0d233e] hover:text-white dark:hover:bg-[#0d233e] transition-colors">
-              Businesses
-            </Link>
-            <Link href="/properties" className="px-3 sm:px-4 py-1.5 sm:py-2 bg-white dark:bg-[#1e293b] text-gray-700 dark:text-gray-300 border border-gray-300 dark:border-gray-600 rounded-full whitespace-nowrap text-xs sm:text-sm hover:bg-[#0d233e] hover:text-white dark:hover:bg-[#0d233e] transition-colors">
-              Lifestyle
             </Link>
           </div>
         </div>
@@ -399,7 +388,7 @@ export default async function HomePage() {
               Our Track Record of Excellence
             </h2>
           </div>
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-6 sm:gap-8">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 sm:gap-8">
             <div className="text-center">
               <div className="flex justify-center mb-4">
                 <div className="rounded-full bg-[#c89b3c]/20 p-4 sm:p-5">
@@ -437,6 +426,19 @@ export default async function HomePage() {
               </div>
               <div className="text-base sm:text-lg text-white/90 font-medium">
                 Projects
+              </div>
+            </div>
+            <div className="text-center">
+              <div className="flex justify-center mb-4">
+                <div className="rounded-full bg-[#c89b3c]/20 p-4 sm:p-5">
+                  <Users className="h-8 w-8 sm:h-10 sm:w-10 text-[#c89b3c]" />
+                </div>
+              </div>
+              <div className="text-4xl sm:text-5xl lg:text-6xl font-bold text-[#c89b3c] mb-2 sm:mb-3">
+                {usersCountValue.toLocaleString()}+
+              </div>
+              <div className="text-base sm:text-lg text-white/90 font-medium">
+                Users
               </div>
             </div>
           </div>
