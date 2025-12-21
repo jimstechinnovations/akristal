@@ -1,13 +1,13 @@
 import { createClient } from '@/lib/supabase/server'
 import { notFound } from 'next/navigation'
-import Image from 'next/image'
 import { PropertyDetails } from '@/components/property-details'
 import { PropertyContact } from '@/components/property-contact'
 import { PropertySellerActions } from '@/components/property-seller-actions'
 import { PropertyConversations } from '@/components/property-conversations'
+import { PropertyImageGallery } from '@/components/property-image-gallery'
 import { getCurrentUser } from '@/lib/auth'
 import { formatCurrency } from '@/lib/utils'
-import { Building2, MapPin, Bed, Bath, Car, Calendar } from 'lucide-react'
+import { MapPin, Bed, Bath, Car, Calendar } from 'lucide-react'
 import type { Database } from '@/types/database'
 
 type PropertyRow = Database['public']['Tables']['properties']['Row']
@@ -127,33 +127,11 @@ export default async function PropertyPage({
       </div>
 
       {/* Image Gallery */}
-      {property.image_urls && property.image_urls.length > 0 ? (
-        <div className="mb-8 grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
-          {property.image_urls.slice(0, 6).map((url, index) => (
-            <div key={index} className="relative h-64 w-full overflow-hidden rounded-lg">
-              <Image
-                src={url}
-                alt={`${property.title} - Image ${index + 1}`}
-                fill
-                className="object-cover"
-              />
-            </div>
-          ))}
-        </div>
-      ) : property.cover_image_url ? (
-        <div className="relative mb-8 h-96 w-full overflow-hidden rounded-lg">
-          <Image
-            src={property.cover_image_url}
-            alt={property.title}
-            fill
-            className="object-cover"
-          />
-        </div>
-      ) : (
-        <div className="mb-8 flex h-96 w-full items-center justify-center rounded-lg bg-gray-200 dark:bg-gray-700">
-          <Building2 className="h-24 w-24 text-gray-400" />
-        </div>
-      )}
+      <PropertyImageGallery
+        coverImageUrl={property.cover_image_url}
+        imageUrls={property.image_urls}
+        title={property.title}
+      />
 
       {/* Video Gallery */}
       {videoUrls.length > 0 && (

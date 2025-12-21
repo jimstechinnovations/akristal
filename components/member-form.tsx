@@ -11,6 +11,7 @@ import { uploadFile, getPublicUrl } from '@/lib/storage'
 import toast from 'react-hot-toast'
 import { getErrorMessage } from '@/lib/utils'
 import { X, Upload } from 'lucide-react'
+import { ImagePreviewModal } from '@/components/image-preview-modal'
 
 type MemberRow = {
   id: string
@@ -36,6 +37,7 @@ export function MemberForm({ member }: { member?: MemberRow }) {
   })
   const [imageFile, setImageFile] = useState<File | null>(null)
   const [imagePreview, setImagePreview] = useState<string | null>(member?.image_url || null)
+  const [isPreviewOpen, setIsPreviewOpen] = useState(false)
 
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0]
@@ -156,7 +158,10 @@ export function MemberForm({ member }: { member?: MemberRow }) {
             </label>
             {imagePreview ? (
               <div className="relative mb-2">
-                <div className="relative h-48 w-full overflow-hidden rounded-lg border border-gray-300 dark:border-gray-600">
+                <div 
+                  className="relative h-48 w-full overflow-hidden rounded-lg border border-gray-300 dark:border-gray-600 cursor-pointer hover:opacity-80 transition-opacity"
+                  onClick={() => setIsPreviewOpen(true)}
+                >
                   <Image
                     src={imagePreview}
                     alt="Member preview"
@@ -170,7 +175,7 @@ export function MemberForm({ member }: { member?: MemberRow }) {
                   variant="outline"
                   size="sm"
                   onClick={removeImage}
-                  className="absolute top-2 right-2 bg-white dark:bg-gray-800"
+                  className="absolute top-2 right-2 bg-white dark:bg-gray-800 z-10"
                 >
                   <X className="h-4 w-4" />
                 </Button>
@@ -255,6 +260,14 @@ export function MemberForm({ member }: { member?: MemberRow }) {
           </div>
         </CardContent>
       </Card>
+      {imagePreview && (
+        <ImagePreviewModal
+          images={[imagePreview]}
+          currentIndex={0}
+          isOpen={isPreviewOpen}
+          onClose={() => setIsPreviewOpen(false)}
+        />
+      )}
     </form>
   )
 }

@@ -484,15 +484,35 @@ export default async function HomePage() {
       </section>
 
       {/* CTA Section */}
-      <section className="bg-gradient-to-br from-[#0d233e] to-[#1e6b52] text-white py-8 sm:py-12 px-4 my-4 sm:my-6">
-        <div className="mx-auto max-w-7xl text-center">
-          <h2 className="text-xl sm:text-2xl font-bold mb-3 sm:mb-4">Ready to Find Your Next Property?</h2>
-          <p className="text-sm sm:text-lg text-white/90 mb-4 sm:mb-6 px-2">
+      <section className="relative text-white py-16 sm:py-24 px-4 my-8 sm:my-12 overflow-hidden w-full">
+        {/* Background Image - Full Width */}
+        <div className="absolute inset-0 z-0">
+          {featuredProperties && featuredProperties.length > 0 && featuredProperties[0].cover_image_url ? (
+            <Image
+              src={featuredProperties[0].cover_image_url}
+              alt="Property background"
+              fill
+              className="object-cover"
+              priority
+              quality={90}
+            />
+          ) : (
+            <div className="h-full w-full bg-gradient-to-br from-[#0d233e] to-[#1e6b52]" />
+          )}
+          {/* Overlay for better text readability - lighter overlay for more visibility */}
+          <div className="absolute inset-0 bg-gradient-to-br from-[#0d233e]/80 to-[#1e6b52]/80" />
+        </div>
+        {/* Content */}
+        <div className="relative z-10 mx-auto max-w-4xl text-center">
+          <h2 className="text-3xl sm:text-4xl lg:text-5xl font-bold mb-4 sm:mb-6 drop-shadow-lg">
+            Ready to Find Your Next Property?
+          </h2>
+          <p className="text-base sm:text-xl text-white/95 mb-6 sm:mb-8 px-2 drop-shadow-md">
             Join thousands of satisfied customers on TheAkristalGroup
           </p>
-          <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 justify-center">
+          <div className="flex flex-col sm:flex-row gap-4 sm:gap-6 justify-center">
             <Link href="/register" className="w-full sm:w-auto">
-              <Button size="lg" className="w-full sm:w-auto bg-[#c89b3c] text-[#0d233e] hover:bg-[#b88a2a] font-semibold">
+              <Button size="lg" className="w-full sm:w-auto bg-[#c89b3c] text-[#0d233e] hover:bg-[#b88a2a] font-semibold text-base sm:text-lg px-8 py-6 shadow-lg">
                 Get Started Today
               </Button>
             </Link>
@@ -500,7 +520,7 @@ export default async function HomePage() {
               <Button
                 size="lg"
                 variant="ghost"
-                className="w-full sm:w-auto border border-white bg-transparent text-white hover:bg-white/10"
+                className="w-full sm:w-auto border-2 border-white bg-white/10 backdrop-blur-sm text-white hover:bg-white/20 font-semibold text-base sm:text-lg px-8 py-6 shadow-lg"
               >
                 Browse Properties
               </Button>

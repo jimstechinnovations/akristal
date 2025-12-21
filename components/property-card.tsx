@@ -1,9 +1,13 @@
+'use client'
+
+import { useState } from 'react'
 import Link from 'next/link'
 import Image from 'next/image'
 import { Card, CardContent } from '@/components/ui/card'
 import { formatCurrency } from '@/lib/utils'
 import { Building2, MapPin, Bed, Bath } from 'lucide-react'
 import type { Database } from '@/types/database'
+import { ImagePreviewModal } from '@/components/image-preview-modal'
 
 type Property = Database['public']['Tables']['properties']['Row']
 
@@ -12,23 +16,53 @@ interface PropertyCardProps {
 }
 
 export function PropertyCard({ property }: PropertyCardProps) {
+  const [isPreviewOpen, setIsPreviewOpen] = useState(false)
+  const [previewIndex, setPreviewIndex] = useState(0)
+  
+  const allImages = property.cover_image_url 
+    ? [property.cover_image_url, ...(property.image_urls || [])].filter((url, index, self) => 
+        index === 0 || url !== property.cover_image_url
+      )
+    : (property.image_urls || [])
+
+  const handleImageClick = (e: React.MouseEvent) => {
+    if (allImages.length > 0) {
+      e.preventDefault()
+      e.stopPropagation()
+      setPreviewIndex(0)
+      setIsPreviewOpen(true)
+    }
+  }
+
+  const handleNext = () => {
+    setPreviewIndex((prev) => (prev + 1) % allImages.length)
+  }
+
+  const handlePrevious = () => {
+    setPreviewIndex((prev) => (prev - 1 + allImages.length) % allImages.length)
+  }
+
   return (
-    <Link href={`/properties/${property.id}`}>
-      <Card className="overflow-hidden transition-shadow hover:shadow-lg">
-        {property.cover_image_url ? (
-          <div className="relative h-48 w-full">
-            <Image
-              src={property.cover_image_url}
-              alt={property.title}
-              fill
-              className="object-cover"
-            />
-          </div>
-        ) : (
-          <div className="flex h-48 w-full items-center justify-center bg-gray-200 dark:bg-gray-700">
-            <Building2 className="h-12 w-12 text-gray-400" />
-          </div>
-        )}
+    <>
+      <Link href={`/properties/${property.id}`}>
+        <Card className="overflow-hidden transition-shadow hover:shadow-lg">
+          {property.cover_image_url ? (
+            <div 
+              className="relative h-48 w-full cursor-pointer"
+              onClick={handleImageClick}
+            >
+              <Image
+                src={property.cover_image_url}
+                alt={property.title}
+                fill
+                className="object-cover"
+              />
+            </div>
+          ) : (
+            <div className="flex h-48 w-full items-center justify-center bg-gray-200 dark:bg-gray-700">
+              <Building2 className="h-12 w-12 text-gray-400" />
+            </div>
+          )}
         <CardContent className="p-4">
           <h3 className="font-semibold text-gray-950 dark:text-white line-clamp-1">
             {property.title}
@@ -65,6 +99,17 @@ export function PropertyCard({ property }: PropertyCardProps) {
         </CardContent>
       </Card>
     </Link>
+    {allImages.length > 0 && (
+      <ImagePreviewModal
+        images={allImages}
+        currentIndex={previewIndex}
+        isOpen={isPreviewOpen}
+        onClose={() => setIsPreviewOpen(false)}
+        onNext={handleNext}
+        onPrevious={handlePrevious}
+      />
+    )}
+    </>
   )
 }
 

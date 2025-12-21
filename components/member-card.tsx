@@ -3,6 +3,7 @@
 import { useState } from 'react'
 import Image from 'next/image'
 import { Card, CardContent } from '@/components/ui/card'
+import { ImagePreviewModal } from '@/components/image-preview-modal'
 
 interface Member {
   name: string
@@ -20,18 +21,34 @@ const MAX_DESCRIPTION_LENGTH = 150 // Characters to show before "Read more"
 export function MemberCard({ member }: MemberCardProps) {
   const [imageError, setImageError] = useState(false)
   const [isExpanded, setIsExpanded] = useState(false)
+  const [isPreviewOpen, setIsPreviewOpen] = useState(false)
   
   const shouldTruncate = member.details.length > MAX_DESCRIPTION_LENGTH
   const displayText = isExpanded || !shouldTruncate 
     ? member.details 
     : `${member.details.substring(0, MAX_DESCRIPTION_LENGTH)}...`
 
+  const imageUrl = imageError ? '/user-placeholder.svg' : member.imageUrl
+  const hasValidImage = !imageError && member.imageUrl
+
+  const handleImageClick = (e: React.MouseEvent) => {
+    if (hasValidImage) {
+      e.preventDefault()
+      e.stopPropagation()
+      setIsPreviewOpen(true)
+    }
+  }
+
   return (
+    <>
     <Card className="overflow-hidden border border-gray-200/70 bg-white/90 shadow-sm transition hover:-translate-y-1 hover:shadow-lg dark:border-slate-700 dark:bg-slate-900/80">
       <div className="flex flex-col h-full">
-        <div className="relative w-full aspect-square overflow-hidden bg-gradient-to-br from-blue-50 to-blue-100 dark:from-slate-800 dark:to-slate-900">
+        <div 
+          className={`relative w-full aspect-square overflow-hidden bg-gradient-to-br from-blue-50 to-blue-100 dark:from-slate-800 dark:to-slate-900 ${hasValidImage ? 'cursor-pointer' : ''}`}
+          onClick={handleImageClick}
+        >
           <Image
-            src={imageError ? '/user-placeholder.svg' : member.imageUrl}
+            src={imageUrl}
             alt={member.name}
             fill
             sizes="(min-width: 1024px) 50vw, 100vw"
@@ -64,5 +81,14 @@ export function MemberCard({ member }: MemberCardProps) {
         </CardContent>
       </div>
     </Card>
+    {hasValidImage && (
+      <ImagePreviewModal
+        images={[member.imageUrl]}
+        currentIndex={0}
+        isOpen={isPreviewOpen}
+        onClose={() => setIsPreviewOpen(false)}
+      />
+    )}
+    </>
   )
 }

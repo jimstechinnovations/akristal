@@ -10,6 +10,7 @@ import toast from 'react-hot-toast'
 import { uploadFile, getPublicUrl } from '@/lib/storage'
 import type { Database, PropertyType } from '@/types/database'
 import { getErrorMessage } from '@/lib/utils'
+import { ImagePreviewModal } from '@/components/image-preview-modal'
 
 type PropertyRow = Database['public']['Tables']['properties']['Row']
 type PropertyInsert = Database['public']['Tables']['properties']['Insert']
@@ -79,6 +80,8 @@ export function PropertyForm({ property }: { property?: PropertyRow }) {
   })
   const [images, setImages] = useState<File[]>([])
   const [imagePreviews, setImagePreviews] = useState<string[]>(property?.image_urls || [])
+  const [isPreviewOpen, setIsPreviewOpen] = useState(false)
+  const [previewIndex, setPreviewIndex] = useState(0)
   const [documents, setDocuments] = useState<File[]>([])
   const [documentPreviews, setDocumentPreviews] = useState<
     Array<{ name: string; url: string; isFile: boolean }>
@@ -642,12 +645,16 @@ export function PropertyForm({ property }: { property?: PropertyRow }) {
                     <img
                       src={preview}
                       alt={`Preview ${index + 1}`}
-                      className="h-24 w-full rounded-lg object-cover"
+                      className="h-24 w-full rounded-lg object-cover cursor-pointer hover:opacity-80 transition-opacity"
+                      onClick={() => {
+                        setPreviewIndex(index)
+                        setIsPreviewOpen(true)
+                      }}
                     />
                     <button
                       type="button"
                       onClick={() => removeImage(index)}
-                      className="absolute right-1 top-1 rounded-full bg-red-500 p-1 text-white"
+                      className="absolute right-1 top-1 rounded-full bg-red-500 p-1 text-white hover:bg-red-600 z-10"
                     >
                       ×
                     </button>
@@ -671,6 +678,16 @@ export function PropertyForm({ property }: { property?: PropertyRow }) {
           </div>
         </CardContent>
       </Card>
+      {imagePreviews.length > 0 && (
+        <ImagePreviewModal
+          images={imagePreviews}
+          currentIndex={previewIndex}
+          isOpen={isPreviewOpen}
+          onClose={() => setIsPreviewOpen(false)}
+          onNext={() => setPreviewIndex((prev) => (prev + 1) % imagePreviews.length)}
+          onPrevious={() => setPreviewIndex((prev) => (prev - 1 + imagePreviews.length) % imagePreviews.length)}
+        />
+      )}
     </form>
   )
 }

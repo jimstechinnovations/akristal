@@ -12,6 +12,7 @@ import toast from 'react-hot-toast'
 import { getErrorMessage } from '@/lib/utils'
 import { X } from 'lucide-react'
 import Image from 'next/image'
+import { ImagePreviewModal } from '@/components/image-preview-modal'
 
 type ProjectStatus = 'draft' | 'active' | 'completed' | 'archived'
 type ProjectType = 'bungalow' | 'duplex' | 'terraces' | 'town_house' | 'apartment' | 'high_rising' | 'condominiums' | 'commercial_spaces'
@@ -51,6 +52,8 @@ export function ProjectForm({ project }: { project?: ProjectRow }) {
   const [mediaPreviews, setMediaPreviews] = useState<Array<{ url: string; isFile: boolean }>>(
     project?.media_urls?.map((url) => ({ url, isFile: false })) || []
   )
+  const [isPreviewOpen, setIsPreviewOpen] = useState(false)
+  const [previewIndex, setPreviewIndex] = useState(0)
 
   const handleMediaChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = Array.from(e.target.files || [])
@@ -355,28 +358,43 @@ export function ProjectForm({ project }: { project?: ProjectRow }) {
             />
             {mediaPreviews.length > 0 && (
               <div className="mt-4 grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-4">
-                {mediaPreviews.map((preview, index) => (
-                  <div key={index} className="relative">
-                    <div className="relative h-32 w-full overflow-hidden rounded-lg bg-gray-100 dark:bg-gray-800">
-                      {preview.url.startsWith('data:image') || preview.url.match(/\.(jpg|jpeg|png|gif|webp)$/i) ? (
-                        <img
-                          src={preview.url}
-                          alt={`Preview ${index + 1}`}
-                          className="h-full w-full object-cover"
-                        />
-                      ) : (
-                        <video src={preview.url} className="h-full w-full object-cover" />
-                      )}
+                {mediaPreviews.map((preview, index) => {
+                  const isImage = preview.url.startsWith('data:image') || preview.url.match(/\.(jpg|jpeg|png|gif|webp)$/i)
+                  return (
+                    <div key={index} className="relative">
+                      <div className="relative h-32 w-full overflow-hidden rounded-lg bg-gray-100 dark:bg-gray-800">
+                        {isImage ? (
+                          <img
+                            src={preview.url}
+                            alt={`Preview ${index + 1}`}
+                            className={`h-full w-full object-cover ${isImage ? 'cursor-pointer hover:opacity-80 transition-opacity' : ''}`}
+                            onClick={() => {
+                              if (isImage) {
+                                const imagePreviews = mediaPreviews
+                                  .map((p, i) => ({ url: p.url, index: i }))
+                                  .filter((p) => p.url.startsWith('data:image') || p.url.match(/\.(jpg|jpeg|png|gif|webp)$/i))
+                                const imageIndex = imagePreviews.findIndex((p) => p.index === index)
+                                if (imageIndex !== -1) {
+                                  setPreviewIndex(imageIndex)
+                                  setIsPreviewOpen(true)
+                                }
+                              }
+                            }}
+                          />
+                        ) : (
+                          <video src={preview.url} className="h-full w-full object-cover" />
+                        )}
+                      </div>
+                      <button
+                        type="button"
+                        onClick={() => removeMedia(index)}
+                        className="absolute right-1 top-1 rounded-full bg-red-500 p-1 text-white hover:bg-red-600 z-10"
+                      >
+                        <X className="h-3 w-3" />
+                      </button>
                     </div>
-                    <button
-                      type="button"
-                      onClick={() => removeMedia(index)}
-                      className="absolute right-1 top-1 rounded-full bg-red-500 p-1 text-white hover:bg-red-600"
-                    >
-                      <X className="h-3 w-3" />
-                    </button>
-                  </div>
-                ))}
+                  )
+                })}
               </div>
             )}
           </div>
@@ -412,6 +430,21 @@ export function ProjectForm({ project }: { project?: ProjectRow }) {
           </div>
         </CardContent>
       </Card>
+      {(() => {
+        const imagePreviews = mediaPreviews
+          .map((p) => p.url)
+          .filter((url) => url.startsWith('data:image') || url.match(/\.(jpg|jpeg|png|gif|webp)$/i))
+        return imagePreviews.length > 0 ? (
+          <ImagePreviewModal
+            images={imagePreviews}
+            currentIndex={previewIndex}
+            isOpen={isPreviewOpen}
+            onClose={() => setIsPreviewOpen(false)}
+            onNext={() => setPreviewIndex((prev) => (prev + 1) % imagePreviews.length)}
+            onPrevious={() => setPreviewIndex((prev) => (prev - 1 + imagePreviews.length) % imagePreviews.length)}
+          />
+        ) : null
+      })()}
     </form>
   )
 }

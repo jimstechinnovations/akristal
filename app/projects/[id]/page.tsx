@@ -4,11 +4,12 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import Link from 'next/link'
 import { getCurrentUser } from '@/lib/auth'
-import { Edit, Calendar, Tag, Image as ImageIcon, Video } from 'lucide-react'
-import Image from 'next/image'
+import { Edit, Calendar } from 'lucide-react'
 import { ProjectManagementTabs } from '@/components/project-management-tabs'
 import { DeleteProjectItemButton } from '@/components/delete-project-item-button'
 import { DeleteProjectButton } from '@/components/delete-project-button'
+import { ProjectMediaGallery } from '@/components/project-media-gallery'
+import { ProjectMediaItem } from '@/components/project-media-item'
 import { formatCurrency } from '@/lib/utils'
 
 type ProjectStatus = 'draft' | 'active' | 'completed' | 'archived'
@@ -253,27 +254,7 @@ export default async function ProjectPage({
       {typedProject.media_urls && Array.isArray(typedProject.media_urls) && typedProject.media_urls.length > 0 && (
         <Card className="mb-8">
           <CardContent className="pt-6">
-            <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
-              {typedProject.media_urls.map((url, idx) => {
-                if (!url || typeof url !== 'string') return null
-                const isImage = url.match(/\.(jpg|jpeg|png|gif|webp)$/i)
-                return (
-                  <div key={idx} className="relative h-64 w-full overflow-hidden rounded-lg bg-gray-100 dark:bg-gray-800">
-                    {isImage ? (
-                      <Image 
-                        src={url} 
-                        alt={`Project media ${idx + 1}`} 
-                        fill 
-                        className="object-cover"
-                        unoptimized
-                      />
-                    ) : (
-                      <video src={url} controls className="h-full w-full object-cover" />
-                    )}
-                  </div>
-                )
-              })}
-            </div>
+            <ProjectMediaGallery mediaUrls={typedProject.media_urls} title={typedProject.title} />
           </CardContent>
         </Card>
       )}
@@ -339,26 +320,8 @@ export default async function ProjectPage({
                     )}
                   </div>
                   {update.media_urls && Array.isArray(update.media_urls) && update.media_urls.length > 0 && (
-                    <div className="mb-4 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
-                      {update.media_urls.map((url, idx) => {
-                        if (!url || typeof url !== 'string') return null
-                        const isImage = url.match(/\.(jpg|jpeg|png|gif|webp)$/i)
-                        return (
-                          <div key={idx} className="relative h-48 w-full overflow-hidden rounded-lg bg-gray-100 dark:bg-gray-800">
-                            {isImage ? (
-                              <Image 
-                                src={url} 
-                                alt={`Update media ${idx + 1}`} 
-                                fill 
-                                className="object-cover"
-                                unoptimized
-                              />
-                            ) : (
-                              <video src={url} controls className="h-full w-full object-cover" />
-                            )}
-                          </div>
-                        )
-                      })}
+                    <div className="mb-4">
+                      <ProjectMediaGallery mediaUrls={update.media_urls} title={`Update ${update.id}`} />
                     </div>
                   )}
                   <p className="text-gray-700 dark:text-gray-300 whitespace-pre-wrap mb-4">
@@ -390,19 +353,11 @@ export default async function ProjectPage({
                 <CardContent>
                   {offer.media_urls && Array.isArray(offer.media_urls) && offer.media_urls.length > 0 && offer.media_urls[0] && (
                     <div className="mb-4">
-                      <div className="relative h-32 w-full overflow-hidden rounded-lg bg-gray-100 dark:bg-gray-800">
-                        {offer.media_urls[0].match(/\.(jpg|jpeg|png|gif|webp)$/i) ? (
-                          <Image
-                            src={offer.media_urls[0]}
-                            alt={offer.title}
-                            fill
-                            className="object-cover"
-                            unoptimized
-                          />
-                        ) : (
-                          <video src={offer.media_urls[0]} controls className="h-full w-full object-cover" />
-                        )}
-                      </div>
+                      <ProjectMediaItem
+                        mediaUrl={offer.media_urls[0]}
+                        alt={offer.title}
+                        className="h-32"
+                      />
                     </div>
                   )}
                   <p className="text-sm text-gray-600 dark:text-gray-400 line-clamp-3 mb-4">
@@ -438,19 +393,11 @@ export default async function ProjectPage({
                 <CardContent>
                   {event.media_urls && Array.isArray(event.media_urls) && event.media_urls.length > 0 && event.media_urls[0] && (
                     <div className="mb-4">
-                      <div className="relative h-32 w-full overflow-hidden rounded-lg bg-gray-100 dark:bg-gray-800">
-                        {event.media_urls[0].match(/\.(jpg|jpeg|png|gif|webp)$/i) ? (
-                          <Image
-                            src={event.media_urls[0]}
-                            alt={event.title}
-                            fill
-                            className="object-cover"
-                            unoptimized
-                          />
-                        ) : (
-                          <video src={event.media_urls[0]} controls className="h-full w-full object-cover" />
-                        )}
-                      </div>
+                      <ProjectMediaItem
+                        mediaUrl={event.media_urls[0]}
+                        alt={event.title}
+                        className="h-32"
+                      />
                     </div>
                   )}
                   <p className="text-sm text-gray-600 dark:text-gray-400 line-clamp-3 mb-4">
