@@ -15,19 +15,27 @@ interface MemberCardProps {
   member: Member
 }
 
+const MAX_DESCRIPTION_LENGTH = 150 // Characters to show before "Read more"
+
 export function MemberCard({ member }: MemberCardProps) {
   const [imageError, setImageError] = useState(false)
+  const [isExpanded, setIsExpanded] = useState(false)
+  
+  const shouldTruncate = member.details.length > MAX_DESCRIPTION_LENGTH
+  const displayText = isExpanded || !shouldTruncate 
+    ? member.details 
+    : `${member.details.substring(0, MAX_DESCRIPTION_LENGTH)}...`
 
   return (
     <Card className="overflow-hidden border border-gray-200/70 bg-white/90 shadow-sm transition hover:-translate-y-1 hover:shadow-lg dark:border-slate-700 dark:bg-slate-900/80">
       <div className="flex flex-col h-full">
-        <div className="relative h-56 w-full overflow-hidden bg-gradient-to-br from-blue-50 to-blue-100 dark:from-slate-800 dark:to-slate-900 md:h-60">
+        <div className="relative w-full aspect-square overflow-hidden bg-gradient-to-br from-blue-50 to-blue-100 dark:from-slate-800 dark:to-slate-900">
           <Image
             src={imageError ? '/user-placeholder.svg' : member.imageUrl}
             alt={member.name}
             fill
             sizes="(min-width: 1024px) 50vw, 100vw"
-            className="object-cover object-top"
+            className="object-contain"
             onError={() => setImageError(true)}
           />
         </div>
@@ -40,9 +48,19 @@ export function MemberCard({ member }: MemberCardProps) {
               {member.role}
             </p>
           </div>
-          <p className="text-sm leading-relaxed text-gray-700 dark:text-gray-300">
-            {member.details}
-          </p>
+          <div className="flex-1">
+            <p className="text-sm leading-relaxed text-gray-700 dark:text-gray-300">
+              {displayText}
+            </p>
+            {shouldTruncate && (
+              <button
+                onClick={() => setIsExpanded(!isExpanded)}
+                className="mt-2 p-0 h-auto text-sm font-medium text-blue-600 hover:text-blue-700 dark:text-blue-400 dark:hover:text-blue-300 underline"
+              >
+                {isExpanded ? 'Hide more' : 'Read more'}
+              </button>
+            )}
+          </div>
         </CardContent>
       </div>
     </Card>

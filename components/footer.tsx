@@ -1,5 +1,6 @@
 import Link from 'next/link'
-import { Youtube, Instagram, Facebook, Twitter, Image, Music } from 'lucide-react'
+import Image from 'next/image'
+import { Youtube, Instagram, Facebook, Twitter, ImageIcon, Music } from 'lucide-react'
 
 export function Footer() {
   const socialLinks = [
@@ -7,7 +8,7 @@ export function Footer() {
     { name: 'Instagram', url: 'http://instagram.com/theakristalgroup', icon: Instagram },
     { name: 'TikTok', url: 'http://tiktok.com/@akrystalgroupholdings', icon: Music },
     { name: 'Twitter', url: 'http://twitter.com/TheAkristalGrup', icon: Twitter },
-    { name: 'Pinterest', url: 'http://pinterest.com/theakristalgroup', icon: Image },
+    { name: 'Pinterest', url: 'http://pinterest.com/theakristalgroup', icon: ImageIcon },
     { name: 'Facebook', url: 'http://facebook.com/theakristalgroup', icon: Facebook },
   ]
 
@@ -16,13 +17,25 @@ export function Footer() {
       <div className="mx-auto max-w-7xl px-4 py-12 sm:px-6 lg:px-8">
         <div className="grid grid-cols-1 gap-8 md:grid-cols-4">
           <div>
+            <Link href="/" className="flex items-center space-x-2 mb-2">
+              <Image
+                src="/Akristal-svg.svg"
+                alt="TheAkristalGroup logo"
+                width={40}
+                height={40}
+                className="h-10 w-10"
+                priority
+              />
+          <div>
             <h3 className="text-lg font-bold text-blue-600 dark:text-blue-400">
               TheAkristalGroup
             </h3>
-            <p className="mt-1 text-xs font-medium text-gray-600 dark:text-gray-400">
+                <p className="text-xs font-medium text-gray-600 dark:text-gray-400">
               REDEFINING REAL ESTATE
             </p>
-            <p className="mt-2 text-sm text-gray-600 dark:text-gray-400">
+              </div>
+            </Link>
+            <p className="mt-4 text-sm text-gray-600 dark:text-gray-400">
               Your trusted real estate marketplace across Africa and beyond
             </p>
             <div className="mt-4 flex space-x-4">

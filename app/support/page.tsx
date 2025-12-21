@@ -93,7 +93,7 @@ export default function SupportPage() {
             <div className="space-y-2">
               <a href="mailto:info@akristal.com" className="block">
                 <Button variant="outline" className="w-full">info@akristal.com</Button>
-              </a>
+            </a>
               <a href="mailto:theakristalgroup@gmail.com" className="block">
                 <Button variant="outline" className="w-full">theakristalgroup@gmail.com</Button>
               </a>

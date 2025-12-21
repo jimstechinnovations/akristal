@@ -609,7 +609,7 @@ export function PropertyForm({ property }: { property?: PropertyRow }) {
                         controls
                         className="h-full w-full object-contain"
                         preload="metadata"
-                      >
+                  >
                         Your browser does not support the video tag.
                       </video>
                     </div>

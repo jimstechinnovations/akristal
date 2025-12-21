@@ -58,12 +58,12 @@ export default async function AdminMembersPage() {
             {(members as MemberRow[]).map((member) => (
               <Card key={member.id} className="bg-white dark:bg-[#1e293b] overflow-hidden">
                 {member.image_url && (
-                  <div className="relative h-48 w-full overflow-hidden bg-gradient-to-br from-blue-50 to-blue-100 dark:from-slate-800 dark:to-slate-900">
+                  <div className="relative w-full aspect-square overflow-hidden bg-gradient-to-br from-blue-50 to-blue-100 dark:from-slate-800 dark:to-slate-900">
                     <Image
                       src={member.image_url}
                       alt={member.name}
                       fill
-                      className="object-cover object-top"
+                      className="object-contain"
                       unoptimized
                     />
                   </div>

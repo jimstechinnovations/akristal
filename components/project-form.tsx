@@ -290,6 +290,17 @@ export function ProjectForm({ project }: { project?: ProjectRow }) {
                   <option value="USD">USD</option>
                   <option value="EUR">EUR</option>
                   <option value="GBP">GBP</option>
+                  <option value="ZAR">ZAR</option>
+                  <option value="KES">KES</option>
+                  <option value="UGX">UGX</option>
+                  <option value="TZS">TZS</option>
+                  <option value="ETB">ETB</option>
+                  <option value="NGN">NGN</option>
+                  <option value="GHS">GHS</option>
+                  <option value="XOF">XOF</option>
+                  <option value="XAF">XAF</option>
+                  <option value="EGP">EGP</option>
+                  <option value="MAD">MAD</option>
                 </select>
               </div>
             </div>
@@ -315,6 +326,17 @@ export function ProjectForm({ project }: { project?: ProjectRow }) {
                   <option value="USD">USD</option>
                   <option value="EUR">EUR</option>
                   <option value="GBP">GBP</option>
+                  <option value="ZAR">ZAR</option>
+                  <option value="KES">KES</option>
+                  <option value="UGX">UGX</option>
+                  <option value="TZS">TZS</option>
+                  <option value="ETB">ETB</option>
+                  <option value="NGN">NGN</option>
+                  <option value="GHS">GHS</option>
+                  <option value="XOF">XOF</option>
+                  <option value="XAF">XAF</option>
+                  <option value="EGP">EGP</option>
+                  <option value="MAD">MAD</option>
                 </select>
               </div>
             </div>

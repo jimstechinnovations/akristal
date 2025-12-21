@@ -244,7 +244,7 @@ export default async function ProjectPage({
               </Button>
             </Link>
             <div className="flex-shrink-0">
-              <DeleteProjectButton projectId={id} />
+            <DeleteProjectButton projectId={id} />
             </div>
           </div>
         )}
@@ -279,8 +279,8 @@ export default async function ProjectPage({
       )}
 
       {/* Project Details */}
-      <Card className="mb-8">
-        <CardContent className="pt-6">
+        <Card className="mb-8">
+          <CardContent className="pt-6">
           <div className="space-y-4">
             {typedProject.type && (
               <div>
@@ -311,14 +311,14 @@ export default async function ProjectPage({
             {typedProject.description && (
               <div>
                 <h3 className="mb-2 text-lg font-semibold text-gray-900 dark:text-white">Description</h3>
-                <p className="text-gray-700 dark:text-gray-300 whitespace-pre-wrap">
-                  {typedProject.description}
-                </p>
+            <p className="text-gray-700 dark:text-gray-300 whitespace-pre-wrap">
+              {typedProject.description}
+            </p>
               </div>
             )}
           </div>
-        </CardContent>
-      </Card>
+          </CardContent>
+        </Card>
 
       {/* Management Forms (only for admins) */}
       {canEdit && <ProjectManagementTabs projectId={id} />}

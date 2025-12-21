@@ -32,13 +32,15 @@ function VerifyOTPPageInner() {
   useEffect(() => {
     // Get email from URL params or sessionStorage
     const emailParam = searchParams.get('email')
+    const type = searchParams.get('type')
     const storedEmail = typeof window !== 'undefined' ? sessionStorage.getItem('pendingVerificationEmail') : null
-    const userEmail = emailParam || storedEmail || ''
+    const storedPasswordResetEmail = typeof window !== 'undefined' ? sessionStorage.getItem('pendingPasswordResetEmail') : null
+    const userEmail = emailParam || storedEmail || storedPasswordResetEmail || ''
     
     if (userEmail) {
       setEmail(userEmail)
     } else {
-      toast.error('No email found. Please register or login again.')
+      toast.error('No email found. Please try again.')
       router.push('/login')
     }
   }, [searchParams, router])
@@ -114,13 +116,6 @@ function VerifyOTPPageInner() {
           throw new Error('Session not created. Please try again.')
         }
 
-        // Get user profile to determine redirect
-        const { data: profile, error: profileError } = await supabase
-          .from('profiles')
-          .select('role')
-          .eq('id', data.user.id)
-          .single()
-
         // Wait a moment for session to be fully established
         await new Promise(resolve => setTimeout(resolve, 100))
         
@@ -130,6 +125,23 @@ function VerifyOTPPageInner() {
           toast.error('Session not established. Please try again.')
           return
         }
+
+        // Check if this is a password reset flow
+        const type = searchParams.get('type')
+        if (type === 'password-reset') {
+          // Clear session storage
+          sessionStorage.removeItem('pendingPasswordResetEmail')
+          toast.success('Verification successful! You can now reset your password.')
+          router.replace('/reset-password')
+          return
+        }
+
+        // Get user profile to determine redirect
+        const { data: profile, error: profileError } = await supabase
+          .from('profiles')
+          .select('role')
+          .eq('id', data.user.id)
+          .single()
 
         // Clear session storage
         sessionStorage.removeItem('pendingVerificationEmail')
@@ -172,6 +184,7 @@ function VerifyOTPPageInner() {
 
     setResending(true)
     try {
+      const type = searchParams.get('type')
       const { error } = await supabase.auth.signInWithOtp({
         email,
         options: {
@@ -225,7 +238,9 @@ function VerifyOTPPageInner() {
     <div className="flex min-h-[calc(100vh-8rem)] items-center justify-center px-4 py-12">
       <Card className="w-full max-w-md">
         <CardHeader>
-          <CardTitle className="text-2xl">Verify Your Email</CardTitle>
+          <CardTitle className="text-2xl">
+            {searchParams.get('type') === 'password-reset' ? 'Verify Password Reset' : 'Verify Your Email'}
+          </CardTitle>
           <CardDescription>
             Enter the 6-digit code sent to {email || 'your email'}
           </CardDescription>

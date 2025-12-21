@@ -58,12 +58,12 @@ export default function ContactPage() {
                   <div>
                     <h3 className="font-semibold text-gray-900 dark:text-white">Email</h3>
                     <div className="mt-1 space-y-1">
-                      <a
-                        href="mailto:info@akristal.com"
+                    <a
+                      href="mailto:info@akristal.com"
                         className="block text-sm text-blue-600 hover:underline dark:text-blue-400"
-                      >
-                        info@akristal.com
-                      </a>
+                    >
+                      info@akristal.com
+                    </a>
                       <a
                         href="mailto:theakristalgroup@gmail.com"
                         className="block text-sm text-blue-600 hover:underline dark:text-blue-400"

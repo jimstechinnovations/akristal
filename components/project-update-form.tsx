@@ -153,13 +153,13 @@ export function ProjectUpdateForm({ projectId }: { projectId: string }) {
                 {mediaPreviews.map((preview, index) => (
                   <div key={index} className="relative">
                     <div className="relative aspect-video w-full overflow-hidden rounded-lg bg-black">
-                      {preview.startsWith('data:image') ? (
-                        <img
-                          src={preview}
-                          alt={`Preview ${index + 1}`}
+                    {preview.startsWith('data:image') ? (
+                      <img
+                        src={preview}
+                        alt={`Preview ${index + 1}`}
                           className="h-full w-full object-cover"
-                        />
-                      ) : (
+                      />
+                    ) : (
                         <video 
                           src={preview} 
                           controls
@@ -168,7 +168,7 @@ export function ProjectUpdateForm({ projectId }: { projectId: string }) {
                         >
                           Your browser does not support the video tag.
                         </video>
-                      )}
+                    )}
                     </div>
                     <button
                       type="button"
