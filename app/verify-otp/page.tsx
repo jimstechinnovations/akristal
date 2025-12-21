@@ -100,11 +100,15 @@ function VerifyOTPPageInner() {
     setLoading(true)
 
     try {
+      // Check if this is a password reset flow
+      const type = searchParams.get('type')
+      const otpType = type === 'password-reset' ? 'recovery' : 'email'
+      
       // Verify OTP - this will create a session automatically
       const { data, error } = await supabase.auth.verifyOtp({
         email,
         token: otpCode,
-        type: 'email',
+        type: otpType as 'email' | 'recovery',
       })
 
       if (error) throw error
@@ -127,7 +131,6 @@ function VerifyOTPPageInner() {
         }
 
         // Check if this is a password reset flow
-        const type = searchParams.get('type')
         if (type === 'password-reset') {
           // Clear session storage
           sessionStorage.removeItem('pendingPasswordResetEmail')
@@ -185,33 +188,54 @@ function VerifyOTPPageInner() {
     setResending(true)
     try {
       const type = searchParams.get('type')
-      const { error } = await supabase.auth.signInWithOtp({
-        email,
-        options: {
-          shouldCreateUser: false,
-        },
-      })
-
-      if (error) {
-        // If user doesn't exist, they might need to register first
-        if (error.message?.includes('User not found') || error.message?.includes('user_not_found')) {
-          toast.error('No account found with this email. Please register first.')
-          router.push('/register')
-          return
+      
+      // Use resetPasswordForEmail for password reset, signInWithOtp for other flows
+      if (type === 'password-reset') {
+        const { error } = await supabase.auth.resetPasswordForEmail(email, {
+          redirectTo: `${window.location.origin}/reset-password`,
+        })
+        
+        if (error) {
+          // Handle rate limiting
+          const errorMessage = (error.message || '').toLowerCase()
+          const extra = error as unknown as { statusCode?: unknown }
+          const errorStatus = error.status || (typeof extra.statusCode === 'number' ? extra.statusCode : 0)
+          if (errorStatus === 429 || errorMessage.includes('too many requests') || errorMessage.includes('rate limit')) {
+            toast.error('Too many verification requests. Please wait a few minutes before requesting another code.')
+            setCountdown(300) // Set countdown to 5 minutes (300 seconds) for rate limit
+            return
+          }
+          throw error
         }
+      } else {
+        const { error } = await supabase.auth.signInWithOtp({
+          email,
+          options: {
+            shouldCreateUser: false,
+          },
+        })
         
-        // Handle rate limiting (429 Too Many Requests)
-        const extra = error as unknown as { statusCode?: unknown }
-        const errorStatus = error.status || (typeof extra.statusCode === 'number' ? extra.statusCode : 0)
-        const errorMessage = (error.message || '').toLowerCase()
-        
-        if (errorStatus === 429 || errorMessage.includes('too many requests') || errorMessage.includes('rate limit')) {
-          toast.error('Too many verification requests. Please wait a few minutes before requesting another code.')
-          setCountdown(300) // Set countdown to 5 minutes (300 seconds) for rate limit
-          return
+        if (error) {
+          // Check if user doesn't exist
+          if (error.message?.includes('User not found') || error.message?.includes('user_not_found')) {
+            toast.error('No account found with this email. Please register first.')
+            router.push('/register')
+            return
+          }
+          
+          // Handle rate limiting (429 Too Many Requests)
+          const extra = error as unknown as { statusCode?: unknown }
+          const errorStatus = error.status || (typeof extra.statusCode === 'number' ? extra.statusCode : 0)
+          const errorMessage = (error.message || '').toLowerCase()
+          
+          if (errorStatus === 429 || errorMessage.includes('too many requests') || errorMessage.includes('rate limit')) {
+            toast.error('Too many verification requests. Please wait a few minutes before requesting another code.')
+            setCountdown(300) // Set countdown to 5 minutes (300 seconds) for rate limit
+            return
+          }
+          
+          throw error
         }
-        
-        throw error
       }
 
       toast.success('Verification code sent! Please check your email.')

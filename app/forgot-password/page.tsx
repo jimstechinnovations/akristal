@@ -21,23 +21,18 @@ export default function ForgotPasswordPage() {
     setLoading(true)
 
     try {
-      // Send OTP for password reset
-      const { error } = await supabase.auth.signInWithOtp({
-        email,
-        options: {
-          shouldCreateUser: false,
-        },
+      // Send password reset email with OTP
+      const { error } = await supabase.auth.resetPasswordForEmail(email, {
+        redirectTo: `${window.location.origin}/reset-password`,
       })
 
       if (error) {
-        // Check if user doesn't exist
-        const errorMessage = (error.message || '').toLowerCase()
-        if (errorMessage.includes('user not found') || errorMessage.includes('user_not_found')) {
-          toast.error('No account found with this email. Please check and try again.')
-          return
-        }
+        // Don't reveal if email exists or not for security
+        // Supabase will return success even if email doesn't exist
+        console.error('Password reset error:', error)
         
         // Handle rate limiting
+        const errorMessage = (error.message || '').toLowerCase()
         const extra = error as unknown as { statusCode?: unknown }
         const errorStatus = error.status || (typeof extra.statusCode === 'number' ? extra.statusCode : 0)
         if (errorStatus === 429 || errorMessage.includes('too many requests') || errorMessage.includes('rate limit')) {
@@ -45,8 +40,7 @@ export default function ForgotPasswordPage() {
           return
         }
         
-        console.error('Password reset OTP error:', error)
-        toast.error('Failed to send verification code. Please try again.')
+        toast.error('Failed to send reset email. Please try again.')
         return
       }
 
