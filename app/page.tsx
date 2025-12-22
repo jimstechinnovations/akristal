@@ -489,7 +489,7 @@ export default async function HomePage() {
         <div className="absolute inset-0 z-0">
           {featuredProperties && featuredProperties.length > 0 && featuredProperties[0].cover_image_url ? (
             <Image
-              src={featuredProperties[0].cover_image_url}
+              src="/akristal-img-bg.jpg"
               alt="Property background"
               fill
               className="object-cover"
