@@ -6,7 +6,7 @@ import { Plus } from 'lucide-react'
 import { getCurrentUser } from '@/lib/auth'
 import { formatCurrency } from '@/lib/utils'
 
-type ProjectStatus = 'draft' | 'active' | 'completed' | 'archived' | 'sold_off'
+type ProjectStatus = 'draft' | 'active' | 'completed' | 'archived' | 'sold_out'
 
 type ProjectRow = {
   id: string
@@ -144,7 +144,7 @@ export default async function ProjectsPage() {
                           ? 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200'
                           : project.status === 'completed'
                             ? 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200'
-                            : project.status === 'sold_off'
+                            : project.status === 'sold_out'
                               ? 'bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-200'
                               : 'bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-200'
                       }`}

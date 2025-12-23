@@ -709,7 +709,7 @@ ON CONFLICT (slug) DO NOTHING;
 
 -- Project Status Enum
 DO $$ BEGIN
-  CREATE TYPE project_status AS ENUM ('draft', 'active', 'completed', 'archived', 'sold_off');
+  CREATE TYPE project_status AS ENUM ('draft', 'active', 'completed', 'archived', 'sold_out');
 EXCEPTION
   WHEN duplicate_object THEN null;
 END $$;

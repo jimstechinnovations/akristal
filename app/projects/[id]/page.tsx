@@ -12,7 +12,7 @@ import { ProjectMediaGallery } from '@/components/project-media-gallery'
 import { ProjectMediaItem } from '@/components/project-media-item'
 import { formatCurrency } from '@/lib/utils'
 
-type ProjectStatus = 'draft' | 'active' | 'completed' | 'archived' | 'sold_off'
+type ProjectStatus = 'draft' | 'active' | 'completed' | 'archived' | 'sold_out'
 type ScheduleVisibility = 'immediate' | 'scheduled' | 'hidden'
 
 type ProjectRow = {
@@ -226,7 +226,7 @@ export default async function ProjectPage({
                   ? 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200'
                   : typedProject.status === 'completed'
                     ? 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200'
-                    : typedProject.status === 'sold_off'
+                    : typedProject.status === 'sold_out'
                       ? 'bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-200'
                       : 'bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-200'
               }`}

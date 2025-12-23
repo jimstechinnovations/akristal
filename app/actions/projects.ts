@@ -6,7 +6,7 @@ import { revalidatePath } from 'next/cache'
 import { getErrorMessage } from '@/lib/utils'
 
 // Project types (until database types are regenerated)
-type ProjectStatus = 'draft' | 'active' | 'completed' | 'archived' | 'sold_off'
+type ProjectStatus = 'draft' | 'active' | 'completed' | 'archived' | 'sold_out'
 type ScheduleVisibility = 'immediate' | 'scheduled' | 'hidden'
 
 type ProjectType = 'bungalow' | 'duplex' | 'terraces' | 'town_house' | 'apartment' | 'high_rising' | 'condominiums' | 'commercial_spaces'
@@ -112,7 +112,7 @@ export async function createProject(formData: FormData) {
       description: (formData.get('description') as string) || null,
       media_urls: mediaUrls.length > 0 ? mediaUrls : undefined,
       created_by: user.id,
-      status: (formData.get('status') as 'draft' | 'active' | 'completed' | 'archived' | 'sold_off') || 'draft',
+      status: (formData.get('status') as 'draft' | 'active' | 'completed' | 'archived' | 'sold_out') || 'draft',
       type: typeValue && typeValue !== '' ? (typeValue as ProjectType) : null,
       pre_selling_price: preSellingPrice && preSellingPrice !== '' ? parseFloat(preSellingPrice as string) : null,
       pre_selling_currency: formData.get('pre_selling_currency') as string || null,
@@ -201,7 +201,7 @@ export async function updateProject(id: string, formData: FormData) {
 
     const status = formData.get('status')
     if (typeof status === 'string') {
-      updateData.status = status as 'draft' | 'active' | 'completed' | 'archived' | 'sold_off'
+      updateData.status = status as 'draft' | 'active' | 'completed' | 'archived' | 'sold_out'
     }
 
     const type = formData.get('type')

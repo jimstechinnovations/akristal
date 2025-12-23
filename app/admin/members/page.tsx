@@ -34,7 +34,7 @@ export default async function AdminMembersPage() {
       <div className="mx-auto max-w-7xl px-4 py-6 sm:px-6 lg:px-8">
         <div className="mb-6 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
           <div>
-            <h1 className="text-2xl sm:text-3xl font-bold text-[#0d233e] dark:text-white">Member Management</h1>
+            <h1 className="text-2xl sm:text-3xl font-bold text-[#0d233e] dark:text-white">Members</h1>
             <p className="mt-1 sm:mt-2 text-sm sm:text-base text-gray-600 dark:text-gray-400">
               Manage team members displayed on the members page
             </p>
