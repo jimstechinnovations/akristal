@@ -77,11 +77,12 @@ export default async function HomePage() {
     .order('created_at', { ascending: false })
     .limit(6)
 
-  // Fetch projects with videos
+  // Fetch projects with videos (exclude draft and archived)
   const { data: projectsWithVideosData } = await supabase
     .from('projects')
     .select('id, title, status, type, pre_selling_price, pre_selling_currency, main_price, main_currency, media_urls')
-    .eq('status', 'active')
+    .not('status', 'eq', 'draft')
+    .not('status', 'eq', 'archived')
     .not('media_urls', 'is', null)
     .order('created_at', { ascending: false })
     .limit(6)

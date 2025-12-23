@@ -709,7 +709,7 @@ ON CONFLICT (slug) DO NOTHING;
 
 -- Project Status Enum
 DO $$ BEGIN
-  CREATE TYPE project_status AS ENUM ('draft', 'active', 'completed', 'archived');
+  CREATE TYPE project_status AS ENUM ('draft', 'active', 'completed', 'archived', 'sold_off');
 EXCEPTION
   WHEN duplicate_object THEN null;
 END $$;
@@ -835,10 +835,13 @@ ALTER TABLE public.project_offers ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.project_events ENABLE ROW LEVEL SECURITY;
 
 -- RLS Policies for Projects
--- Anyone can view active projects
-CREATE POLICY "Anyone can view active projects"
+-- Anyone can view valid projects (all statuses except draft and archived)
+CREATE POLICY "Anyone can view valid projects"
   ON public.projects FOR SELECT
-  USING (status = 'active');
+  USING (
+    (status <> 'draft'::project_status) AND 
+    (status <> 'archived'::project_status)
+  );
 
 -- Admins can view all projects
 CREATE POLICY "Admins can view all projects"

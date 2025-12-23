@@ -14,7 +14,7 @@ import { X } from 'lucide-react'
 import Image from 'next/image'
 import { ImagePreviewModal } from '@/components/image-preview-modal'
 
-type ProjectStatus = 'draft' | 'active' | 'completed' | 'archived'
+type ProjectStatus = 'draft' | 'active' | 'completed' | 'archived' | 'sold_off'
 type ProjectType = 'bungalow' | 'duplex' | 'terraces' | 'town_house' | 'apartment' | 'high_rising' | 'condominiums' | 'commercial_spaces'
 
 type ProjectRow = {
@@ -232,7 +232,7 @@ export function ProjectForm({ project }: { project?: ProjectRow }) {
               onChange={(e) =>
                 setFormData({
                   ...formData,
-                  status: e.target.value as 'draft' | 'active' | 'completed' | 'archived',
+                  status: e.target.value as 'draft' | 'active' | 'completed' | 'archived' | 'sold_off',
                 })
               }
               required
@@ -240,6 +240,7 @@ export function ProjectForm({ project }: { project?: ProjectRow }) {
               <option value="draft">Draft</option>
               <option value="active">Active</option>
               <option value="completed">Completed</option>
+              <option value="sold_off">Sold off</option>
               <option value="archived">Archived</option>
             </select>
           </div>

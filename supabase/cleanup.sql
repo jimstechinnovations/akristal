@@ -105,7 +105,7 @@ DROP POLICY IF EXISTS "Admins can update members" ON public.members;
 DROP POLICY IF EXISTS "Admins can delete members" ON public.members;
 
 -- Project management policies
-DROP POLICY IF EXISTS "Anyone can view active projects" ON public.projects;
+DROP POLICY IF EXISTS "Anyone can view valid projects" ON public.projects;
 DROP POLICY IF EXISTS "Users can view own projects" ON public.projects;
 DROP POLICY IF EXISTS "Admins can view all projects" ON public.projects;
 DROP POLICY IF EXISTS "Sellers, agents, and admins can create projects" ON public.projects;

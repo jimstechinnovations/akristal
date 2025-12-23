@@ -3,7 +3,7 @@ import { requireAdmin } from '@/lib/auth'
 import { notFound } from 'next/navigation'
 import { ProjectForm } from '@/components/project-form'
 
-type ProjectStatus = 'draft' | 'active' | 'completed' | 'archived'
+type ProjectStatus = 'draft' | 'active' | 'completed' | 'archived' | 'sold_off'
 type ProjectType = 'bungalow' | 'duplex' | 'terraces' | 'town_house' | 'apartment' | 'high_rising' | 'condominiums' | 'commercial_spaces'
 
 type ProjectRow = {
