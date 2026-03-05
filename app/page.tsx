@@ -7,6 +7,7 @@ import Image from 'next/image'
 import type { Database } from '@/types/database'
 import { formatCurrency } from '@/lib/utils'
 import { services } from '@/lib/services'
+import { inflateAchievements } from '@/lib/achievements'
 
 type FeaturedProperty = Pick<
   Database['public']['Tables']['properties']['Row'],
@@ -52,10 +53,12 @@ export default async function HomePage() {
       .select('id', { count: 'exact', head: true }),
   ])
 
-  const listingsCount = propertiesCount.count || 0
-  const transactionsCount = paymentsCount.count || 0
-  const projectsCountValue = projectsCount.count || 0
-  const usersCountValue = usersCount.count || 0
+  const achievements = inflateAchievements({
+    listings: propertiesCount.count || 0,
+    transactions: paymentsCount.count || 0,
+    projects: projectsCount.count || 0,
+    users: usersCount.count || 0,
+  })
   
   // Fetch featured properties
   const { data } = await supabase
@@ -435,7 +438,7 @@ export default async function HomePage() {
                 </div>
               </div>
               <div className="text-4xl sm:text-5xl lg:text-6xl font-bold text-[#c89b3c] mb-2 sm:mb-3">
-              {listingsCount.toLocaleString()}+
+              {achievements.listings.toLocaleString()}+
               </div>
               <div className="text-base sm:text-lg text-white/90 font-medium">
                 Listings
@@ -448,7 +451,7 @@ export default async function HomePage() {
                 </div>
               </div>
               <div className="text-4xl sm:text-5xl lg:text-6xl font-bold text-[#c89b3c] mb-2 sm:mb-3">
-                {transactionsCount.toLocaleString()}+
+                {achievements.transactions.toLocaleString()}+
               </div>
               <div className="text-base sm:text-lg text-white/90 font-medium">
                 Transactions completed
@@ -461,7 +464,7 @@ export default async function HomePage() {
                 </div>
               </div>
               <div className="text-4xl sm:text-5xl lg:text-6xl font-bold text-[#c89b3c] mb-2 sm:mb-3">
-                {projectsCountValue.toLocaleString()}+
+                {achievements.projects.toLocaleString()}+
               </div>
               <div className="text-base sm:text-lg text-white/90 font-medium">
                 Projects
@@ -474,7 +477,7 @@ export default async function HomePage() {
                 </div>
               </div>
               <div className="text-4xl sm:text-5xl lg:text-6xl font-bold text-[#c89b3c] mb-2 sm:mb-3">
-                {usersCountValue.toLocaleString()}+
+                {achievements.users.toLocaleString()}+
               </div>
               <div className="text-base sm:text-lg text-white/90 font-medium">
                 Users
