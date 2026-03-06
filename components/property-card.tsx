@@ -94,7 +94,7 @@ export function PropertyCard({ property }: PropertyCardProps) {
             {formatCurrency(property.price, property.currency)}
           </p>
           <span className="mt-2 inline-block rounded-full bg-blue-100 px-2 py-1 text-xs text-blue-800 dark:bg-blue-900 dark:text-blue-200">
-            {property.property_type}
+            {property.listing_type === 'rent' ? 'For Rent' : 'For Sale'}
           </span>
         </CardContent>
       </Card>

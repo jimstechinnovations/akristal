@@ -7,7 +7,7 @@ export type Json =
   | Json[]
 
 export type UserRole = 'buyer' | 'seller' | 'agent' | 'admin'
-export type PropertyType = 'residential' | 'commercial' | 'land' | 'rental'
+export type ListingType = 'sale' | 'rent'
 export type PropertyStatus = 'available' | 'sold' | 'rented' | 'pending' | 'suspended'
 export type ListingStatus = 'draft' | 'pending_approval' | 'approved' | 'rejected' | 'suspended'
 export type PaymentStatus = 'pending' | 'processing' | 'completed' | 'failed' | 'refunded'
@@ -16,6 +16,45 @@ export type PaymentMethod = 'bank_transfer' | 'card' | 'mobile_money' | 'other'
 export interface Database {
   public: {
     Tables: {
+      property_types: {
+        Row: {
+          id: string
+          name: string
+          slug: string
+          description: string | null
+          icon: string | null
+          display_order: number
+          is_active: boolean
+          created_by: string | null
+          created_at: string
+          updated_at: string
+        }
+        Insert: {
+          id?: string
+          name: string
+          slug: string
+          description?: string | null
+          icon?: string | null
+          display_order?: number
+          is_active?: boolean
+          created_by?: string | null
+          created_at?: string
+          updated_at?: string
+        }
+        Update: {
+          id?: string
+          name?: string
+          slug?: string
+          description?: string | null
+          icon?: string | null
+          display_order?: number
+          is_active?: boolean
+          created_by?: string | null
+          created_at?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       categories: {
         Row: {
           id: string
@@ -116,7 +155,8 @@ export interface Database {
           agent_id: string | null
           title: string
           description: string | null
-          property_type: PropertyType
+          property_type_id: string | null
+          listing_type: ListingType | null
           category_id: string | null
           status: PropertyStatus
           listing_status: ListingStatus
@@ -155,7 +195,8 @@ export interface Database {
           agent_id?: string | null
           title: string
           description?: string | null
-          property_type: PropertyType
+          property_type_id?: string | null
+          listing_type?: ListingType | null
           category_id?: string | null
           status?: PropertyStatus
           listing_status?: ListingStatus
@@ -194,7 +235,8 @@ export interface Database {
           agent_id?: string | null
           title?: string
           description?: string | null
-          property_type?: PropertyType
+          property_type_id?: string | null
+          listing_type?: ListingType | null
           category_id?: string | null
           status?: PropertyStatus
           listing_status?: ListingStatus
@@ -506,7 +548,7 @@ export interface Database {
     }
     Enums: {
       user_role: UserRole
-      property_type: PropertyType
+      listing_type: ListingType
       property_status: PropertyStatus
       listing_status: ListingStatus
       payment_status: PaymentStatus

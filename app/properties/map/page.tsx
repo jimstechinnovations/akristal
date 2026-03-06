@@ -6,7 +6,7 @@ import { createClient } from '@/lib/supabase/client'
 import { PropertyMap } from '@/components/property-map'
 import { Card, CardContent } from '@/components/ui/card'
 import { Suspense } from 'react'
-import type { Database, PropertyType } from '@/types/database'
+import type { Database } from '@/types/database'
 
 type PropertyRow = Database['public']['Tables']['properties']['Row']
 
@@ -32,7 +32,7 @@ function MapViewContent() {
         const minPrice = searchParams.get('minPrice')
         const maxPrice = searchParams.get('maxPrice')
 
-        if (type) query = query.eq('property_type', type as PropertyType)
+        if (type) query = query.eq('property_type_id', type)
         if (city) query = query.eq('city', city)
         if (minPrice) query = query.gte('price', parseFloat(minPrice))
         if (maxPrice) query = query.lte('price', parseFloat(maxPrice))

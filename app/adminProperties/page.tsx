@@ -39,6 +39,13 @@ export default async function AdminPropertiesBrowsePage({
   // Next.js 16: searchParams is a Promise
   const params = await searchParams
 
+  // Fetch property types
+  const { data: propertyTypes } = await supabase
+    .from('property_types')
+    .select('*')
+    .eq('is_active', true)
+    .order('display_order', { ascending: true })
+
   let query = supabase
     .from('properties')
     .select('*, profiles:seller_id(role)')
@@ -48,7 +55,7 @@ export default async function AdminPropertiesBrowsePage({
 
   // Apply filters
   if (params?.type) {
-    query = query.eq('property_type', params.type)
+    query = query.eq('property_type_id', params.type)
   }
   if (params?.city) {
     query = query.eq('city', params.city)
@@ -102,7 +109,7 @@ export default async function AdminPropertiesBrowsePage({
         {/* Mobile: Filters as Drawer/Modal, Desktop: Sidebar */}
         <div className="mb-4 lg:hidden">
           <Suspense fallback={<div className="h-20 bg-white dark:bg-gray-800 rounded-lg animate-pulse" />}>
-            <PropertySearch cities={uniqueCities} searchParams={params} />
+            <PropertySearch cities={uniqueCities} propertyTypes={propertyTypes || []} searchParams={params} />
           </Suspense>
         </div>
 
@@ -110,7 +117,7 @@ export default async function AdminPropertiesBrowsePage({
           {/* Desktop Sidebar */}
           <aside className="hidden lg:block lg:col-span-1">
             <Suspense fallback={<div className="h-96 bg-white dark:bg-gray-800 rounded-lg animate-pulse" />}>
-              <PropertySearch cities={uniqueCities} searchParams={params} />
+              <PropertySearch cities={uniqueCities} propertyTypes={propertyTypes || []} searchParams={params} />
             </Suspense>
           </aside>
 

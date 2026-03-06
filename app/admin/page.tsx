@@ -48,9 +48,14 @@ export default async function AdminDashboard() {
             </p>
           </div>
           <div className="flex gap-2">
+            <Link href="/admin/property-types">
+              <Button className="bg-[#0d233e] hover:bg-[#0a1a2e] text-white">
+                Property Types
+              </Button>
+            </Link>
             <Link href="/admin/categories">
               <Button className="bg-[#0d233e] hover:bg-[#0a1a2e] text-white">
-                Manage Categories
+                Categories
               </Button>
             </Link>
           </div>

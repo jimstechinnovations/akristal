@@ -11,7 +11,7 @@ import { inflateAchievements } from '@/lib/achievements'
 
 type FeaturedProperty = Pick<
   Database['public']['Tables']['properties']['Row'],
-  'id' | 'title' | 'price' | 'currency' | 'cover_image_url' | 'city' | 'address' | 'property_type'
+  'id' | 'title' | 'price' | 'currency' | 'cover_image_url' | 'city' | 'address' | 'property_type_id'
 >
 
 type FeaturedVideoItem = {

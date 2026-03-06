@@ -6,6 +6,7 @@
 -- Run this before applying schema.sql to ensure a clean slate.
 
 -- Drop all triggers first
+DROP TRIGGER IF EXISTS update_property_types_updated_at ON public.property_types;
 DROP TRIGGER IF EXISTS update_profiles_updated_at ON public.profiles;
 DROP TRIGGER IF EXISTS update_categories_updated_at ON public.categories;
 DROP TRIGGER IF EXISTS update_properties_updated_at ON public.properties;
@@ -37,6 +38,10 @@ DROP FUNCTION IF EXISTS public.handle_new_user();
 DROP FUNCTION IF EXISTS update_property_location_point();
 
 -- Drop all policies
+DROP POLICY IF EXISTS "Anyone can view active property types" ON public.property_types;
+DROP POLICY IF EXISTS "Admins can view all property types" ON public.property_types;
+DROP POLICY IF EXISTS "Admins can manage property types" ON public.property_types;
+
 DROP POLICY IF EXISTS "Users can view all profiles" ON public.profiles;
 DROP POLICY IF EXISTS "Users can update own profile" ON public.profiles;
 DROP POLICY IF EXISTS "Users can insert own profile" ON public.profiles;
@@ -138,10 +143,15 @@ DROP POLICY IF EXISTS "Users can update own events or admin can update any" ON p
 DROP POLICY IF EXISTS "Users can delete own events or admin can delete any" ON public.project_events;
 
 -- Drop all indexes
+DROP INDEX IF EXISTS idx_property_types_slug;
+DROP INDEX IF EXISTS idx_property_types_display_order;
+DROP INDEX IF EXISTS idx_property_types_is_active;
+
 DROP INDEX IF EXISTS idx_properties_seller_id;
 DROP INDEX IF EXISTS idx_properties_agent_id;
 DROP INDEX IF EXISTS idx_properties_category_id;
-DROP INDEX IF EXISTS idx_properties_type;
+DROP INDEX IF EXISTS idx_properties_property_type_id;
+DROP INDEX IF EXISTS idx_properties_listing_type;
 DROP INDEX IF EXISTS idx_properties_status;
 DROP INDEX IF EXISTS idx_properties_listing_status;
 DROP INDEX IF EXISTS idx_properties_city;
@@ -196,6 +206,7 @@ DROP INDEX IF EXISTS idx_project_events_end_datetime;
 DROP INDEX IF EXISTS idx_project_events_schedule_visibility;
 
 -- Disable RLS on all tables before dropping
+ALTER TABLE IF EXISTS public.property_types DISABLE ROW LEVEL SECURITY;
 ALTER TABLE IF EXISTS public.activity_logs DISABLE ROW LEVEL SECURITY;
 ALTER TABLE IF EXISTS public.site_content DISABLE ROW LEVEL SECURITY;
 ALTER TABLE IF EXISTS public.payments DISABLE ROW LEVEL SECURITY;
@@ -225,6 +236,7 @@ DROP TABLE IF EXISTS public.property_favorites;
 DROP TABLE IF EXISTS public.properties;
 DROP TABLE IF EXISTS public.categories;
 DROP TABLE IF EXISTS public.profiles;
+DROP TABLE IF EXISTS public.property_types;
 -- Project management tables
 DROP TABLE IF EXISTS public.project_events;
 DROP TABLE IF EXISTS public.project_offers;
@@ -232,11 +244,11 @@ DROP TABLE IF EXISTS public.project_updates;
 DROP TABLE IF EXISTS public.projects;
 
 -- Drop custom types
+DROP TYPE IF EXISTS listing_type;
 DROP TYPE IF EXISTS payment_method;
 DROP TYPE IF EXISTS payment_status;
 DROP TYPE IF EXISTS listing_status;
 DROP TYPE IF EXISTS property_status;
-DROP TYPE IF EXISTS property_type;
 DROP TYPE IF EXISTS user_role;
 -- Project management types
 DROP TYPE IF EXISTS schedule_visibility;

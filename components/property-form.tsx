@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
 import { Button } from '@/components/ui/button'
@@ -8,7 +8,7 @@ import { Input } from '@/components/ui/input'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import toast from 'react-hot-toast'
 import { uploadFile, getPublicUrl } from '@/lib/storage'
-import type { Database, PropertyType } from '@/types/database'
+import type { Database, ListingType } from '@/types/database'
 import { getErrorMessage } from '@/lib/utils'
 import { ImagePreviewModal } from '@/components/image-preview-modal'
 
@@ -19,7 +19,8 @@ type PropertyUpdate = Database['public']['Tables']['properties']['Update']
 type PropertyFormState = {
   title: string
   description: string
-  property_type: PropertyType
+  property_type_id: string
+  listing_type: ListingType
   address: string
   city: string
   district: string
@@ -51,10 +52,12 @@ function parseList(value: string): string[] {
 export function PropertyForm({ property }: { property?: PropertyRow }) {
   const router = useRouter()
   const [loading, setLoading] = useState(false)
+  const [propertyTypes, setPropertyTypes] = useState<Array<{ id: string; name: string }>>([])
   const [formData, setFormData] = useState<PropertyFormState>({
     title: property?.title || '',
     description: property?.description || '',
-    property_type: property?.property_type || 'residential',
+    property_type_id: property?.property_type_id || '',
+    listing_type: property?.listing_type || 'sale',
     address: property?.address || '',
     city: property?.city || '',
     district: property?.district || '',
@@ -101,6 +104,19 @@ export function PropertyForm({ property }: { property?: PropertyRow }) {
     })) || []
   )
   const supabase = createClient()
+
+  useEffect(() => {
+    async function fetchPropertyTypes() {
+      const { data } = await supabase
+        .from('property_types')
+        .select('id, name')
+        .eq('is_active', true)
+        .order('display_order', { ascending: true })
+      
+      if (data) setPropertyTypes(data as Array<{ id: string; name: string }>)
+    }
+    fetchPropertyTypes()
+  }, [supabase])
 
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = Array.from(e.target.files || [])
@@ -254,7 +270,8 @@ export function PropertyForm({ property }: { property?: PropertyRow }) {
           seller_id: user.id,
           title: formData.title,
           description: formData.description,
-          property_type: formData.property_type,
+          property_type_id: formData.property_type_id || null,
+          listing_type: formData.listing_type,
           address: formData.address,
           city: formData.city,
           district: formData.district || null,
@@ -292,7 +309,8 @@ export function PropertyForm({ property }: { property?: PropertyRow }) {
           seller_id: user.id,
           title: formData.title,
           description: formData.description,
-          property_type: formData.property_type,
+          property_type_id: formData.property_type_id || null,
+          listing_type: formData.listing_type,
           address: formData.address,
           city: formData.city,
           district: formData.district || null,
@@ -372,17 +390,32 @@ export function PropertyForm({ property }: { property?: PropertyRow }) {
           </div>
 
           <div>
+            <label className="block text-sm font-medium mb-1 text-gray-900 dark:text-white">Listing Type *</label>
+            <select
+              className="flex h-10 w-full rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm text-gray-900 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-100"
+              value={formData.listing_type}
+              onChange={(e) => setFormData({ ...formData, listing_type: e.target.value as ListingType })}
+              required
+            >
+              <option value="sale">For Sale</option>
+              <option value="rent">For Rent</option>
+            </select>
+          </div>
+
+          <div>
             <label className="block text-sm font-medium mb-1 text-gray-900 dark:text-white">Property Type *</label>
             <select
               className="flex h-10 w-full rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm text-gray-900 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-100"
-              value={formData.property_type}
-              onChange={(e) => setFormData({ ...formData, property_type: e.target.value as PropertyType })}
+              value={formData.property_type_id}
+              onChange={(e) => setFormData({ ...formData, property_type_id: e.target.value })}
               required
             >
-              <option value="residential">Residential</option>
-              <option value="commercial">Commercial</option>
-              <option value="land">Land</option>
-              <option value="rental">Rental</option>
+              <option value="">Select Property Type</option>
+              {propertyTypes.map((type) => (
+                <option key={type.id} value={type.id}>
+                  {type.name}
+                </option>
+              ))}
             </select>
           </div>
 

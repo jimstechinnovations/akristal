@@ -29,8 +29,8 @@ CREATE EXTENSION IF NOT EXISTS "postgis"; -- For spatial/geographic data types
 -- User Roles Enum
 CREATE TYPE user_role AS ENUM ('buyer', 'seller', 'agent', 'admin');
 
--- Property Types Enum
-CREATE TYPE property_type AS ENUM ('residential', 'commercial', 'land', 'rental');
+-- Listing Type Enum (rent or sale)
+CREATE TYPE listing_type AS ENUM ('sale', 'rent');
 
 -- Property Status Enum
 CREATE TYPE property_status AS ENUM ('available', 'sold', 'rented', 'pending', 'suspended');
@@ -43,6 +43,20 @@ CREATE TYPE payment_status AS ENUM ('pending', 'processing', 'completed', 'faile
 
 -- Payment Method Enum
 CREATE TYPE payment_method AS ENUM ('bank_transfer', 'card', 'mobile_money', 'other');
+
+-- Property Types table (dynamic property types managed by admin)
+CREATE TABLE IF NOT EXISTS public.property_types (
+  id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+  name VARCHAR(100) NOT NULL UNIQUE,
+  slug VARCHAR(100) NOT NULL UNIQUE,
+  description TEXT,
+  icon TEXT,
+  display_order INTEGER DEFAULT 0,
+  is_active BOOLEAN DEFAULT true,
+  created_by UUID REFERENCES auth.users(id) ON DELETE SET NULL,
+  created_at TIMESTAMP WITH TIME ZONE DEFAULT TIMEZONE('utc', NOW()),
+  updated_at TIMESTAMP WITH TIME ZONE DEFAULT TIMEZONE('utc', NOW())
+);
 
 -- Users table (extends Supabase auth.users)
 -- Must be created before categories since categories references profiles
@@ -85,7 +99,8 @@ CREATE TABLE IF NOT EXISTS public.properties (
   agent_id UUID REFERENCES public.profiles(id) ON DELETE SET NULL, -- Optional agent
   title TEXT NOT NULL,
   description TEXT,
-  property_type property_type NOT NULL,
+  property_type_id UUID REFERENCES public.property_types(id) ON DELETE SET NULL,
+  listing_type listing_type,
   category_id UUID REFERENCES public.categories(id) ON DELETE SET NULL, -- Link to category
   status property_status NOT NULL DEFAULT 'available',
   listing_status listing_status NOT NULL DEFAULT 'draft',
@@ -242,10 +257,15 @@ CREATE TABLE IF NOT EXISTS public.members (
 );
 
 -- Indexes for performance
+CREATE INDEX IF NOT EXISTS idx_property_types_slug ON public.property_types(slug);
+CREATE INDEX IF NOT EXISTS idx_property_types_display_order ON public.property_types(display_order);
+CREATE INDEX IF NOT EXISTS idx_property_types_is_active ON public.property_types(is_active);
+
 CREATE INDEX IF NOT EXISTS idx_properties_seller_id ON public.properties(seller_id);
 CREATE INDEX IF NOT EXISTS idx_properties_agent_id ON public.properties(agent_id);
 CREATE INDEX IF NOT EXISTS idx_properties_category_id ON public.properties(category_id);
-CREATE INDEX IF NOT EXISTS idx_properties_type ON public.properties(property_type);
+CREATE INDEX IF NOT EXISTS idx_properties_property_type_id ON public.properties(property_type_id);
+CREATE INDEX IF NOT EXISTS idx_properties_listing_type ON public.properties(listing_type);
 CREATE INDEX IF NOT EXISTS idx_properties_status ON public.properties(status);
 CREATE INDEX IF NOT EXISTS idx_properties_listing_status ON public.properties(listing_status);
 CREATE INDEX IF NOT EXISTS idx_properties_city ON public.properties(city);
@@ -291,6 +311,7 @@ CREATE INDEX IF NOT EXISTS idx_members_is_active ON public.members(is_active);
 -- Row Level Security (RLS) Policies
 
 -- Enable RLS on all tables
+ALTER TABLE public.property_types ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.profiles ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.categories ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.properties ENABLE ROW LEVEL SECURITY;
@@ -302,6 +323,15 @@ ALTER TABLE public.payments ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.site_content ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.activity_logs ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.members ENABLE ROW LEVEL SECURITY;
+
+-- Property Types policies
+CREATE POLICY "Anyone can view active property types" ON public.property_types FOR SELECT USING (is_active = true);
+CREATE POLICY "Admins can view all property types" ON public.property_types FOR SELECT USING (
+  EXISTS (SELECT 1 FROM public.profiles WHERE id = auth.uid() AND role = 'admin')
+);
+CREATE POLICY "Admins can manage property types" ON public.property_types FOR ALL USING (
+  EXISTS (SELECT 1 FROM public.profiles WHERE id = auth.uid() AND role = 'admin')
+);
 
 -- Profiles policies
 CREATE POLICY "Users can view all profiles" ON public.profiles FOR SELECT USING (true);
@@ -544,6 +574,9 @@ END;
 $$ LANGUAGE plpgsql;
 
 -- Triggers for updated_at
+CREATE TRIGGER update_property_types_updated_at BEFORE UPDATE ON public.property_types
+  FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
+
 CREATE TRIGGER update_profiles_updated_at BEFORE UPDATE ON public.profiles
   FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
 
@@ -694,6 +727,14 @@ CREATE TRIGGER update_location_point
   FOR EACH ROW
   WHEN (NEW.latitude IS NOT NULL AND NEW.longitude IS NOT NULL)
   EXECUTE FUNCTION update_property_location_point();
+
+-- Insert default property types
+INSERT INTO public.property_types (name, slug, description, display_order, is_active) VALUES
+  ('House', 'house', 'Single-family houses and villas', 1, true),
+  ('Apartment', 'apartment', 'Apartments and condos', 2, true),
+  ('Commercial', 'commercial', 'Office spaces, retail, and commercial buildings', 3, true),
+  ('Land', 'land', 'Vacant land and plots', 4, true)
+ON CONFLICT (slug) DO NOTHING;
 
 -- Insert default categories
 INSERT INTO public.categories (name, slug, description, display_order, is_active) VALUES

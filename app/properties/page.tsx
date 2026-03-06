@@ -12,6 +12,7 @@ type Property = Database['public']['Tables']['properties']['Row']
 type SearchParams = Record<string, string | undefined> & {
   search?: string
   type?: string
+  listing_type?: string
   city?: string
   minPrice?: string
   maxPrice?: string
@@ -33,6 +34,13 @@ export default async function PropertiesPage({
   // Next.js 16: searchParams is a Promise
   const params = await searchParams
 
+  // Fetch property types for filtering
+  const { data: propertyTypes } = await supabase
+    .from('property_types')
+    .select('*')
+    .eq('is_active', true)
+    .order('display_order', { ascending: true })
+
   let query = supabase
     .from('properties')
     .select('*')
@@ -41,7 +49,10 @@ export default async function PropertiesPage({
 
   // Apply filters
   if (params?.type) {
-    query = query.eq('property_type', params.type)
+    query = query.eq('property_type_id', params.type)
+  }
+  if (params?.listing_type) {
+    query = query.eq('listing_type', params.listing_type)
   }
   if (params?.city) {
     query = query.eq('city', params.city)
@@ -124,7 +135,8 @@ export default async function PropertiesPage({
         <div className="mb-4 lg:hidden">
           <Suspense fallback={<div className="h-20 bg-white dark:bg-gray-800 rounded-lg animate-pulse" />}>
             <PropertySearch 
-              cities={uniqueCities} 
+              cities={uniqueCities}
+              propertyTypes={propertyTypes || []}
               searchParams={params}
             />
           </Suspense>
@@ -135,7 +147,8 @@ export default async function PropertiesPage({
           <aside className="hidden lg:block lg:col-span-1">
             <Suspense fallback={<div className="h-96 bg-white dark:bg-gray-800 rounded-lg animate-pulse" />}>
               <PropertySearch 
-                cities={uniqueCities} 
+                cities={uniqueCities}
+                propertyTypes={propertyTypes || []}
                 searchParams={params}
               />
             </Suspense>

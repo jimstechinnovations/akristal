@@ -9,15 +9,17 @@ import { MapPin } from 'lucide-react'
 
 interface PropertySearchProps {
   cities: string[]
+  propertyTypes: Array<{ id: string; name: string; slug: string }>
   searchParams: Record<string, string | undefined>
   onLocationSelect?: (lat: number, lng: number, radius: number) => void
 }
 
-export function PropertySearch({ cities, searchParams, onLocationSelect }: PropertySearchProps) {
+export function PropertySearch({ cities, propertyTypes, searchParams, onLocationSelect }: PropertySearchProps) {
   const router = useRouter()
   const [filters, setFilters] = useState({
     search: searchParams.search || '',
     type: searchParams.type || '',
+    listing_type: searchParams.listing_type || '',
     city: searchParams.city || '',
     minPrice: searchParams.minPrice || '',
     maxPrice: searchParams.maxPrice || '',
@@ -51,6 +53,7 @@ export function PropertySearch({ cities, searchParams, onLocationSelect }: Prope
     setFilters({
       search: '',
       type: '',
+      listing_type: '',
       city: '',
       minPrice: '',
       maxPrice: '',
@@ -79,6 +82,19 @@ export function PropertySearch({ cities, searchParams, onLocationSelect }: Prope
         </div>
 
         <div>
+          <label className="block text-sm font-medium mb-1 text-gray-900 dark:text-white">Listing Type</label>
+          <select
+            className="flex h-10 w-full rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm text-gray-900 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-100"
+            value={filters.listing_type}
+            onChange={(e) => handleFilterChange('listing_type', e.target.value)}
+          >
+            <option value="">All Listings</option>
+            <option value="sale">For Sale</option>
+            <option value="rent">For Rent</option>
+          </select>
+        </div>
+
+        <div>
           <label className="block text-sm font-medium mb-1 text-gray-900 dark:text-white">Property Type</label>
           <select
             className="flex h-10 w-full rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm text-gray-900 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-100"
@@ -86,10 +102,11 @@ export function PropertySearch({ cities, searchParams, onLocationSelect }: Prope
             onChange={(e) => handleFilterChange('type', e.target.value)}
           >
             <option value="">All Types</option>
-            <option value="residential">Residential</option>
-            <option value="commercial">Commercial</option>
-            <option value="land">Land</option>
-            <option value="rental">Rental</option>
+            {propertyTypes?.map((type) => (
+              <option key={type.id} value={type.id}>
+                {type.name}
+              </option>
+            ))}
           </select>
         </div>
 

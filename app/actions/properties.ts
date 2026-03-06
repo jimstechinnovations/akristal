@@ -3,7 +3,7 @@
 import { createClient } from '@/lib/supabase/server'
 import { requireAuth, requireRole } from '@/lib/auth'
 import { revalidatePath } from 'next/cache'
-import type { Database, PropertyType } from '@/types/database'
+import type { Database } from '@/types/database'
 import { getErrorMessage } from '@/lib/utils'
 
 type PropertyInsert = Database['public']['Tables']['properties']['Insert']
@@ -20,7 +20,8 @@ export async function createProperty(formData: FormData) {
       seller_id: user.id,
       title: formData.get('title') as string,
       description: formData.get('description') as string,
-      property_type: formData.get('property_type') as PropertyType,
+      property_type_id: formData.get('property_type_id') as string,
+      listing_type: formData.get('listing_type') as 'sale' | 'rent',
       address: formData.get('address') as string,
       city: formData.get('city') as string,
       district: formData.get('district') as string,
@@ -119,8 +120,11 @@ export async function updateProperty(id: string, formData: FormData) {
     const description = formData.get('description')
     if (typeof description === 'string') updateData.description = description
 
-    const propertyType = formData.get('property_type')
-    if (typeof propertyType === 'string') updateData.property_type = propertyType as PropertyType
+    const propertyType = formData.get('property_type_id')
+    if (typeof propertyType === 'string') updateData.property_type_id = propertyType
+
+    const listingType = formData.get('listing_type')
+    if (typeof listingType === 'string') updateData.listing_type = listingType as 'sale' | 'rent'
 
     const address = formData.get('address')
     if (typeof address === 'string') updateData.address = address
