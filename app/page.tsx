@@ -1,3 +1,5 @@
+import fs from 'fs'
+import path from 'path'
 import Link from 'next/link'
 import { createClient } from '@/lib/supabase/server'
 import { Button } from '@/components/ui/button'
@@ -32,7 +34,19 @@ type FeaturedVideoItem = {
   main_currency?: string | null
 }
 
+function getPartnerImages(): string[] {
+  try {
+    const dir = path.join(process.cwd(), 'public', 'partners')
+    return fs.readdirSync(dir)
+      .filter(f => /\.(jpe?g|png|webp|svg|gif)$/i.test(f))
+      .map(f => `/partners/${f}`)
+  } catch {
+    return []
+  }
+}
+
 export default async function HomePage() {
+  const partnerImages = getPartnerImages()
   const supabase = await createClient()
   
   // Fetch counts for achievements
@@ -486,6 +500,33 @@ export default async function HomePage() {
           </div>
         </div>
       </section>
+
+      {/* Partners Section */}
+      {partnerImages.length > 0 && (
+        <section className="px-4 py-8 sm:py-12 bg-white dark:bg-[#0f172a]">
+          <div className="mx-auto max-w-7xl">
+            <div className="text-center mb-6 sm:mb-8">
+              <p className="text-xs sm:text-sm font-semibold uppercase tracking-wider text-[#c89b3c] mb-2">PARTNERS</p>
+              <h2 className="text-xl sm:text-2xl font-bold text-[#0d233e] dark:text-white">Trusted By Our Partners</h2>
+            </div>
+            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4 sm:gap-6">
+              {partnerImages.map((src) => (
+                <div
+                  key={src}
+                  className="relative h-28 sm:h-32 md:h-36 overflow-hidden rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-[#1e293b] shadow-sm"
+                >
+                  <Image
+                    src={src}
+                    alt="Partner logo"
+                    fill
+                    className="object-cover object-center"
+                  />
+                </div>
+              ))}
+            </div>
+          </div>
+        </section>
+      )}
 
       {/* CTA Section */}
       <section className="relative text-white py-16 sm:py-24 px-4 my-8 sm:my-12 overflow-hidden w-full">
