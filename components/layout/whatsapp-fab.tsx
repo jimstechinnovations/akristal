@@ -11,16 +11,16 @@ const HIDDEN_PREFIXES = ['/admin', '/agent/', '/buyer', '/seller', '/messages', 
 export function WhatsAppFab() {
   const pathname = usePathname() ?? '/'
   if (HIDDEN_PREFIXES.some((p) => pathname.startsWith(p))) return null
-  // Property pages have a sticky action bar on mobile; sit above it.
-  const raised = /^\/properties\/[^/]+$/.test(pathname)
+  // Property pages have their own WhatsApp action in the mobile sticky bar.
+  const onProperty = /^\/properties\/[^/]+$/.test(pathname)
 
   return (
     <a
       href={whatsappLink('Hello Akristal, I would like some help.')}
       aria-label="Chat with Akristal on WhatsApp"
       className={cn(
-        'fixed right-4 z-40 inline-flex size-14 items-center justify-center rounded-full bg-[#1f6f4a] text-white shadow-pop transition-transform hover:scale-105 active:scale-95 sm:right-6',
-        raised ? 'bottom-24 lg:bottom-6' : 'bottom-4 sm:bottom-6'
+        'fixed bottom-4 right-4 z-40 size-14 items-center justify-center rounded-full bg-[#1f6f4a] text-white shadow-pop transition-transform hover:scale-105 active:scale-95 sm:bottom-6 sm:right-6',
+        onProperty ? 'hidden lg:inline-flex' : 'inline-flex'
       )}
     >
       <MessageCircle aria-hidden className="size-6" />

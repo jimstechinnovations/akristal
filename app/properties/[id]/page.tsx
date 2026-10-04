@@ -135,7 +135,7 @@ export default async function PropertyPage({ params }: PageProps) {
             <li className="flex min-w-0 items-center gap-1">
               <ChevronRight aria-hidden className="size-3.5" />
               <span aria-current="page" className="truncate">
-                {listing.area || listing.title}
+                {listing.area && listing.area !== listing.market?.name ? listing.area : listing.title}
               </span>
             </li>
           </ol>
