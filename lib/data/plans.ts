@@ -33,3 +33,21 @@ export const getInstallmentPlans = cache(async (): Promise<InstallmentPlan[]> =>
     placeholder: false,
   }))
 })
+
+export type Lender = { id: string; name: string; logoUrl: string | null; countries: string[]; rateFrom: number | null; maxTermYears: number | null; maxLtvPct: number | null; notes: string | null; websiteUrl: string | null }
+
+/** Published partner lenders. Empty until Akristal confirms partnerships (no placeholder banks are invented). */
+export const getLenders = cache(async (): Promise<Lender[]> => {
+  const { data } = await createPublicClient().from('lenders').select('*').eq('is_published', true).order('display_order')
+  return (data ?? []).map((l) => ({
+    id: l.id,
+    name: l.name,
+    logoUrl: l.logo_url,
+    countries: l.countries ?? [],
+    rateFrom: l.rate_from_pct != null ? Number(l.rate_from_pct) : null,
+    maxTermYears: l.max_term_years,
+    maxLtvPct: l.max_ltv_pct != null ? Number(l.max_ltv_pct) : null,
+    notes: l.notes,
+    websiteUrl: l.website_url,
+  }))
+})
