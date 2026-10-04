@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useTransition } from 'react'
+import { useId, useState, useTransition } from 'react'
 import { useRouter } from 'next/navigation'
 import { LayoutGrid, Loader2, Map as MapIcon, Search, SlidersHorizontal } from 'lucide-react'
 import { currencies } from '@/config/site'
@@ -33,17 +33,21 @@ const chevron = {
 }
 
 function Select({ label, value, options, onChange, className }: { label: string; value: string; options: Option[]; onChange: (v: string) => void; className?: string }) {
+  // Explicit label/id pairing: wrapping the <select> in its <label> would fold the selected option into the accessible name.
+  const id = useId()
   return (
-    <label className={cn('grid gap-1.5', className)}>
-      <span className="text-xs text-muted">{label}</span>
-      <select value={value} onChange={(e) => onChange(e.target.value)} className={selectClass} style={chevron}>
+    <div className={cn('grid gap-1.5', className)}>
+      <label htmlFor={id} className="text-xs text-muted">
+        {label}
+      </label>
+      <select id={id} value={value} onChange={(e) => onChange(e.target.value)} className={selectClass} style={chevron}>
         {options.map((o) => (
           <option key={o.value} value={o.value}>
             {o.label}
           </option>
         ))}
       </select>
-    </label>
+    </div>
   )
 }
 

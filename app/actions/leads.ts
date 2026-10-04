@@ -6,7 +6,8 @@ import { sendEmail } from '@/lib/email'
 import { CORE_FIELDS, LEAD_LABELS, LEAD_TYPES, leadSchema, type LeadContext, type LeadState, type LeadType } from '@/lib/leads'
 import { createPublicClient } from '@/lib/supabase/public'
 
-const MIN_FILL_MS = 2500
+// Humans can't complete a form this fast; bots usually do. Checked after validation so people always get feedback.
+const MIN_FILL_MS = 1500
 const escape = (s: string) => s.replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' })[c]!)
 
 /**
@@ -16,11 +17,8 @@ const escape = (s: string) => s.replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': 
 export async function submitLead(type: LeadType, context: LeadContext, _prev: LeadState, formData: FormData): Promise<LeadState> {
   if (!LEAD_TYPES.includes(type)) return { status: 'error', message: 'This form is not set up correctly.' }
 
-  // Bots fill hidden fields and submit instantly. Pretend success so they don't retry.
-  const startedAt = Number(formData.get('started_at'))
-  if (formData.get('company_website') || (startedAt && Date.now() - startedAt < MIN_FILL_MS)) {
-    return { status: 'success' }
-  }
+  // Hidden honeypot field: only bots fill it. Pretend success so they don't retry.
+  if (formData.get('company_website')) return { status: 'success' }
 
   const parsed = leadSchema.safeParse({
     name: formData.get('name') ?? '',
@@ -33,6 +31,9 @@ export async function submitLead(type: LeadType, context: LeadContext, _prev: Le
     for (const issue of parsed.error.issues) fieldErrors[String(issue.path[0])] ??= issue.message
     return { status: 'error', message: 'Check the highlighted fields.', fieldErrors }
   }
+
+  const startedAt = Number(formData.get('started_at'))
+  if (startedAt && Date.now() - startedAt < MIN_FILL_MS) return { status: 'success' }
 
   const payload: Record<string, string> = {}
   for (const [key, value] of formData.entries()) {
