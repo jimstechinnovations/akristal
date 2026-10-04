@@ -1,4 +1,4 @@
-// Generated from the live schema via the Supabase Management API. Do not edit by hand.
+// Generated from the live schema by `npm run db:types`. Do not edit by hand.
 export type Json =
   | string
   | number
@@ -1201,6 +1201,7 @@ export type Database = {
           main_currency: string | null
           main_price: number | null
           media_urls: string[] | null
+          name: string | null
           pay_small_small: boolean
           pre_selling_currency: string | null
           pre_selling_price: number | null
@@ -1232,6 +1233,7 @@ export type Database = {
           main_currency?: string | null
           main_price?: number | null
           media_urls?: string[] | null
+          name?: string | null
           pay_small_small?: boolean
           pre_selling_currency?: string | null
           pre_selling_price?: number | null
@@ -1263,6 +1265,7 @@ export type Database = {
           main_currency?: string | null
           main_price?: number | null
           media_urls?: string[] | null
+          name?: string | null
           pay_small_small?: boolean
           pre_selling_currency?: string | null
           pre_selling_price?: number | null

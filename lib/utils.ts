@@ -1,5 +1,11 @@
 import { type ClassValue, clsx } from 'clsx'
-import { twMerge } from 'tailwind-merge'
+import { extendTailwindMerge } from 'tailwind-merge'
+
+// Teach tailwind-merge our custom font sizes, otherwise it treats `text-display-m`
+// as a colour and drops it whenever a `text-<colour>` class is also present.
+const twMerge = extendTailwindMerge({
+  extend: { classGroups: { 'font-size': [{ text: ['display-xl', 'display-l', 'display-m', 'display-s'] }] } },
+})
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs))

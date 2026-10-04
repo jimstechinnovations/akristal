@@ -2,8 +2,8 @@
 
 const formatters = new Map<string, Intl.NumberFormat>()
 
-function getFormatter(currency: string, compact: boolean) {
-  const key = `${currency}|${compact}`
+function getFormatter(currency: string, compact: boolean, whole: boolean) {
+  const key = `${currency}|${compact}|${whole}`
   let f = formatters.get(key)
   if (!f) {
     f = new Intl.NumberFormat('en', {
@@ -11,7 +11,7 @@ function getFormatter(currency: string, compact: boolean) {
       currency,
       currencyDisplay: 'code',
       notation: compact ? 'compact' : 'standard',
-      maximumFractionDigits: compact ? 1 : minorUnits(currency),
+      maximumFractionDigits: compact ? 1 : whole ? 0 : minorUnits(currency),
       minimumFractionDigits: 0,
     })
     formatters.set(key, f)
@@ -38,7 +38,8 @@ export function formatMoney(
   if (amount == null || Number.isNaN(amount)) return 'Price on request'
   const code = (currency || 'RWF').toUpperCase()
   try {
-    return getFormatter(code, !!opts.compact).format(amount)
+    // Cents are noise on property prices; keep them only for small amounts.
+    return getFormatter(code, !!opts.compact, Math.abs(amount) >= 1000).format(amount)
   } catch {
     return `${code} ${Math.round(amount).toLocaleString('en')}`
   }

@@ -133,3 +133,41 @@ export const financeDefaults: Record<
 
 // Share of gross monthly income that can go to housing debt in the affordability estimate.
 export const affordabilityDebtToIncome = 0.35
+
+// "Luxury" quick filter: minimum asking price per currency.
+export const luxuryFrom: Record<CurrencyCode, number> = {
+  RWF: 500_000_000,
+  NGN: 1_000_000_000,
+  USD: 500_000,
+  ZAR: 10_000_000,
+  AED: 2_000_000,
+  UGX: 2_000_000_000,
+}
+
+// Hero "Price" menu. Each band searches within one currency.
+export const priceBands: { currency: CurrencyCode; bands: { label: string; min?: number; max?: number }[] }[] = [
+  {
+    currency: 'RWF',
+    bands: [
+      { label: 'Under RWF 100M', max: 100_000_000 },
+      { label: 'RWF 100M to 300M', min: 100_000_000, max: 300_000_000 },
+      { label: 'Over RWF 300M', min: 300_000_000 },
+    ],
+  },
+  {
+    currency: 'USD',
+    bands: [
+      { label: 'Under USD 250k', max: 250_000 },
+      { label: 'USD 250k to 750k', min: 250_000, max: 750_000 },
+      { label: 'Over USD 750k', min: 750_000 },
+    ],
+  },
+  {
+    currency: 'NGN',
+    bands: [
+      { label: 'Under NGN 500M', max: 500_000_000 },
+      { label: 'NGN 500M to 2B', min: 500_000_000, max: 2_000_000_000 },
+      { label: 'Over NGN 2B', min: 2_000_000_000 },
+    ],
+  },
+]
