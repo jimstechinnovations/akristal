@@ -15,7 +15,7 @@ function priceLabel(item: FurnitureItem) {
   return item.price ? formatMoney(item.price.amount, item.price.currency) : 'Price on request'
 }
 
-export function Catalogue({ items, placeholder }: { items: FurnitureItem[]; placeholder: boolean }) {
+export function Catalogue({ items }: { items: FurnitureItem[] }) {
   const [category, setCategory] = useState<string>('all')
   const [selected, setSelected] = useState<FurnitureItem | null>(null)
   const categories = FURNITURE_CATEGORIES.filter((c) => items.some((i) => i.category === c.value))
@@ -60,12 +60,12 @@ export function Catalogue({ items, placeholder }: { items: FurnitureItem[]; plac
         </AnimatePresence>
       </motion.ul>
 
-      <ProductDialog item={selected} onClose={() => setSelected(null)} placeholder={placeholder} />
+      <ProductDialog item={selected} onClose={() => setSelected(null)} />
     </>
   )
 }
 
-function ProductDialog({ item, onClose, placeholder }: { item: FurnitureItem | null; onClose: () => void; placeholder: boolean }) {
+function ProductDialog({ item, onClose }: { item: FurnitureItem | null; onClose: () => void }) {
   const ref = useRef<HTMLDivElement>(null)
   useFocusTrap(ref, !!item, onClose)
   const [colour, setColour] = useState<string | null>(null)
@@ -110,7 +110,6 @@ function ProductDialog({ item, onClose, placeholder }: { item: FurnitureItem | n
                   {item.name}
                 </h2>
                 <p className="tabular mt-2 text-lg">{priceLabel(item)}</p>
-                {placeholder && <p className="mt-2 text-xs text-muted">Sample item: our full catalogue is being photographed.</p>}
               </div>
               {item.description && <p className="text-[0.9375rem] leading-relaxed text-muted">{item.description}</p>}
               <dl className="grid gap-2 text-[0.9375rem]">

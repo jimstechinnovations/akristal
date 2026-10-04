@@ -14,7 +14,7 @@ export const metadata: Metadata = pageMetadata({
 })
 
 export default async function FurniturePage() {
-  const { items, placeholder } = await getFurniture()
+  const items = await getFurniture()
   return (
     <>
       <header className="page-x-wide pb-8 pt-10 sm:pt-14">
@@ -29,15 +29,14 @@ export default async function FurniturePage() {
             <MessageCircle aria-hidden className="size-4" /> Ask about something else
           </a>
         </div>
-        {placeholder && (
-          <p className="mt-6 rounded-sm bg-page-alt px-4 py-3 text-sm text-muted">
-            This is a sample of the range while we photograph our full catalogue. Prices are given on request.
-          </p>
-        )}
       </header>
 
       <section aria-label="Catalogue" className="page-x-wide pb-20">
-        <Catalogue items={items} placeholder={placeholder} />
+        {items.length ? (
+          <Catalogue items={items} />
+        ) : (
+          <p className="rounded-md bg-page-alt px-6 py-10 text-center text-muted">The catalogue is being updated. Message us on WhatsApp for current pieces.</p>
+        )}
       </section>
 
       <section aria-labelledby="whole-home" className="bg-brand text-white">

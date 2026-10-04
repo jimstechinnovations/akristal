@@ -68,6 +68,7 @@ export type Database = {
       }
       agent_applications: {
         Row: {
+          admin_notes: string | null
           areas: string | null
           city: string | null
           created_at: string
@@ -86,6 +87,7 @@ export type Database = {
           years_experience: number | null
         }
         Insert: {
+          admin_notes?: string | null
           areas?: string | null
           city?: string | null
           created_at?: string
@@ -104,6 +106,7 @@ export type Database = {
           years_experience?: number | null
         }
         Update: {
+          admin_notes?: string | null
           areas?: string | null
           city?: string | null
           created_at?: string
@@ -563,6 +566,7 @@ export type Database = {
       }
       leads: {
         Row: {
+          admin_notes: string | null
           agent_id: string | null
           assigned_to: string | null
           created_at: string
@@ -580,6 +584,7 @@ export type Database = {
           updated_at: string
         }
         Insert: {
+          admin_notes?: string | null
           agent_id?: string | null
           assigned_to?: string | null
           created_at?: string
@@ -597,6 +602,7 @@ export type Database = {
           updated_at?: string
         }
         Update: {
+          admin_notes?: string | null
           agent_id?: string | null
           assigned_to?: string | null
           created_at?: string
@@ -1620,6 +1626,42 @@ export type Database = {
           },
           {
             foreignKeyName: "site_content_updated_by_fkey"
+            columns: ["updated_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      site_settings: {
+        Row: {
+          key: string
+          updated_at: string
+          updated_by: string | null
+          value: Json
+        }
+        Insert: {
+          key: string
+          updated_at?: string
+          updated_by?: string | null
+          value: Json
+        }
+        Update: {
+          key?: string
+          updated_at?: string
+          updated_by?: string | null
+          value?: Json
+        }
+        Relationships: [
+          {
+            foreignKeyName: "site_settings_updated_by_fkey"
+            columns: ["updated_by"]
+            isOneToOne: false
+            referencedRelation: "agent_directory"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "site_settings_updated_by_fkey"
             columns: ["updated_by"]
             isOneToOne: false
             referencedRelation: "profiles"

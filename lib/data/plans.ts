@@ -1,7 +1,6 @@
 import 'server-only'
 import { cache } from 'react'
 import { createPublicClient } from '@/lib/supabase/public'
-import { placeholderPlan } from '@/content/placeholder-data'
 
 export type InstallmentPlan = {
   id: string
@@ -12,16 +11,13 @@ export type InstallmentPlan = {
   premiumByTenure: Record<string, number>
   eligibility: string[]
   termsUrl: string | null
-  /** True while terms come from the placeholder file, not the database */
-  placeholder: boolean
 }
 
-/** Active Pay Small Small plans from the database, or the placeholder plan until the client publishes real terms. */
+/** Active Pay Small Small plans, managed in Admin → Pay Small Small plans. */
 export const getInstallmentPlans = cache(async (): Promise<InstallmentPlan[]> => {
   const supabase = createPublicClient()
   const { data } = await supabase.from('installment_plans').select('*').eq('is_active', true).order('display_order')
-  if (!data?.length) return [placeholderPlan]
-  return data.map((p) => ({
+  return (data ?? []).map((p) => ({
     id: p.id,
     name: p.name,
     description: p.description,
@@ -30,7 +26,6 @@ export const getInstallmentPlans = cache(async (): Promise<InstallmentPlan[]> =>
     premiumByTenure: (p.premium_pct_by_tenure as Record<string, number> | null) ?? {},
     eligibility: p.eligibility ?? [],
     termsUrl: p.terms_url,
-    placeholder: false,
   }))
 })
 

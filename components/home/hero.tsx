@@ -6,13 +6,15 @@ import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { motion, type Variants } from 'framer-motion'
 import { Building2, Home, Map, MapPin, Search } from 'lucide-react'
-import { luxuryFrom, priceBands, site } from '@/config/site'
-import { images } from '@/content/images'
+import { luxuryFrom, priceBands } from '@/config/site'
 import { formatMoney } from '@/lib/format'
 import { cn } from '@/lib/utils'
 import { LinkMenu, type LinkMenuGroup } from '@/components/ui/link-menu'
 
 type Props = {
+  title: string
+  tagline: string
+  image: { src: string; alt: string }
   markets: { slug: string; name: string; count: number }[]
   areaSuggestions: string[]
   propertyTypes: { id: string; name: string }[]
@@ -23,11 +25,10 @@ const rise: Variants = {
   show: (i: number) => ({ opacity: 1, y: 0, transition: { duration: 0.6, delay: 0.12 + i * 0.12, ease: [0.2, 0.7, 0.2, 1] } }),
 }
 
-export function Hero({ markets, areaSuggestions, propertyTypes }: Props) {
+export function Hero({ title, tagline, image, markets, areaSuggestions, propertyTypes }: Props) {
   const router = useRouter()
   const [mode, setMode] = useState<'sale' | 'rent'>('sale')
   const [query, setQuery] = useState('')
-  const hero = images.heroKigaliAerial
 
   function submit(e: React.FormEvent) {
     e.preventDefault()
@@ -76,7 +77,7 @@ export function Hero({ markets, areaSuggestions, propertyTypes }: Props) {
   return (
     <section aria-labelledby="hero-title" className="relative isolate flex min-h-[100svh] flex-col text-white">
       <div className="absolute inset-0 -z-10 overflow-hidden bg-[#2b1a14]">
-        <Image src={hero.src} alt={hero.alt} fill priority quality={75} sizes="100vw" className="object-cover" />
+        <Image src={image.src} alt={image.alt} fill priority quality={75} sizes="100vw" className="object-cover" />
         {/* Even scrim for the headline, deeper at the bottom for the filter rail. */}
         <div className="absolute inset-0 bg-[rgb(20_12_10/0.38)]" />
         <div className="absolute inset-x-0 bottom-0 h-2/5 bg-gradient-to-t from-[rgb(20_12_10/0.7)] to-transparent" />
@@ -91,7 +92,7 @@ export function Hero({ markets, areaSuggestions, propertyTypes }: Props) {
           custom={0}
           className="font-display text-display-xl font-medium uppercase tracking-[0.06em] [text-shadow:0_2px_24px_rgb(0_0_0/0.25)]"
         >
-          {site.heroTitle}
+          {title}
         </motion.h1>
         <motion.p
           variants={rise}
@@ -100,7 +101,7 @@ export function Hero({ markets, areaSuggestions, propertyTypes }: Props) {
           custom={1}
           className="mt-4 max-w-xs text-balance text-xs font-medium uppercase leading-relaxed tracking-[0.24em] text-white/90 sm:max-w-none sm:text-sm sm:tracking-[0.32em]"
         >
-          {site.tagline}
+          {tagline}
         </motion.p>
 
         <motion.div variants={rise} initial="hidden" animate="show" custom={2} className="mt-10 w-full max-w-2xl">

@@ -7,7 +7,7 @@ import { AnimatedNumber } from '@/components/motion/animated-number'
 
 type Tier = { name: string; share: number; requirement: string }
 
-export function EarningsEstimator({ commissionPct, tiers, placeholder }: { commissionPct: number; tiers: Tier[]; placeholder: boolean }) {
+export function EarningsEstimator({ commissionPct, tiers }: { commissionPct: number; tiers: Tier[] }) {
   const [sales, setSales] = useState(6)
   const [price, setPrice] = useState(120_000_000)
   const [tier, setTier] = useState(0)
@@ -56,7 +56,7 @@ export function EarningsEstimator({ commissionPct, tiers, placeholder }: { commi
           {sales} sales × {formatMoney(price, 'RWF', { compact: true })} × {commissionPct}% commission × your {tiers[tier].share}% share.
         </p>
         <p className="mt-4 text-xs text-muted">
-          {placeholder ? 'Sample figures for illustration. ' : ''}Your agent agreement sets the actual commission and split.
+          Illustration only. Your agent agreement sets the actual commission and split.
         </p>
       </div>
     </div>

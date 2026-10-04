@@ -19,7 +19,9 @@ type PageProps = { searchParams: Promise<{ price?: string; currency?: string; de
 
 export default async function PaySmallSmallPage({ searchParams }: PageProps) {
   const sp = await searchParams
-  const [plan] = await getInstallmentPlans()
+  const [activePlan] = await getInstallmentPlans()
+  // No active plan (switched off in the admin): keep the page, explain, and still take applications.
+  const plan = activePlan ?? { id: '', name: 'Pay Small Small', description: null, minDepositPct: 30, tenures: [6, 12, 18, 24], premiumByTenure: {}, eligibility: [], termsUrl: null }
   const price = Number(sp.price) > 0 ? Number(sp.price) : undefined
   const currency = sp.currency && /^[A-Z]{3}$/.test(sp.currency) ? sp.currency : 'RWF'
   const longest = Math.max(...plan.tenures)
@@ -36,7 +38,7 @@ export default async function PaySmallSmallPage({ searchParams }: PageProps) {
     { q: 'Which homes can I buy with Pay Small Small?', a: 'Selected listings and units in Akristal developments. Ask your agent, or look for "Pay Small Small available" on a development.' },
     { q: 'Can I pay faster than the schedule?', a: 'Tell us when you apply. Your agreement sets out how early payments work.' },
     { q: 'What if I miss a payment?', a: 'Contact us straight away. Your agreement explains what happens with late or missed payments, so read it carefully before you sign.' },
-    { q: 'Is there extra cost for paying in instalments?', a: plan.placeholder ? 'Plan terms are being finalised. Any premium for longer plans will be shown in the calculator and stated in your agreement.' : 'Any premium for longer plans is shown in the calculator above and stated in your agreement.' },
+    { q: 'Is there extra cost for paying in instalments?', a: 'Any premium for longer plans is shown in the calculator above and stated in your agreement.' },
   ]
 
   return (
@@ -77,11 +79,6 @@ export default async function PaySmallSmallPage({ searchParams }: PageProps) {
         </div>
       </section>
 
-      {plan.placeholder && (
-        <p className="border-b border-line bg-page-alt py-3 text-center text-sm text-muted">
-          <span className="page-x block">Plan terms shown here are a guide while Akristal finalises them. Your agreement confirms the final terms.</span>
-        </p>
-      )}
 
       <section aria-labelledby="pss-how" className="page-x section-y">
         <h2 id="pss-how" className="font-display text-display-m font-medium">

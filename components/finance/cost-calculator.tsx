@@ -38,7 +38,11 @@ function Range({ label, value, min, max, step, onChange, display }: { label: str
   )
 }
 
-export function CostCalculator({ price, currency, plan, className }: { price: number; currency: string; plan: InstallmentPlan; className?: string }) {
+const NO_PLAN: InstallmentPlan = { id: '', name: '', description: null, minDepositPct: 30, tenures: [12], premiumByTenure: {}, eligibility: [], termsUrl: null }
+
+export function CostCalculator({ price, currency, plan: activePlan, className }: { price: number; currency: string; plan?: InstallmentPlan; className?: string }) {
+  // Without an active Pay Small Small plan, only the mortgage tab is shown.
+  const plan = activePlan ?? NO_PLAN
   const defaults = financeDefaults[(currency as CurrencyCode) in financeDefaults ? (currency as CurrencyCode) : 'USD']
   const [tab, setTab] = useState<Tab>('mortgage')
   const [depositPct, setDepositPct] = useState(defaults.depositPct)
@@ -68,7 +72,7 @@ export function CostCalculator({ price, currency, plan, className }: { price: nu
           {(
             [
               ['mortgage', 'Mortgage'],
-              ['plan', 'Pay Small Small'],
+              ...(activePlan ? ([['plan', 'Pay Small Small']] as const) : []),
             ] as const
           ).map(([value, label]) => (
             <button
@@ -199,7 +203,7 @@ export function CostCalculator({ price, currency, plan, className }: { price: nu
       </div>
       <p className="border-t border-line px-5 py-3 text-xs text-muted sm:px-6">
         Estimate only, not a loan offer.{' '}
-        {tab === 'plan' && plan.placeholder ? 'Pay Small Small terms are being finalised and will be confirmed in your agreement.' : 'Your lender or plan agreement sets the final figures.'}
+        Your lender or Pay Small Small agreement sets the final figures.
       </p>
     </section>
   )

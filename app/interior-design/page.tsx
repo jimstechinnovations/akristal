@@ -33,7 +33,7 @@ const process = [
 ]
 
 export default async function InteriorDesignPage() {
-  const { items, placeholder } = await getInteriorProjects()
+  const items = await getInteriorProjects()
   const pairs = items.flatMap((p) => p.beforeAfter.map((b) => ({ ...b, caption: b.caption ?? p.title })))
   const hero = images.interiorsLivingWarm
 
@@ -78,14 +78,8 @@ export default async function InteriorDesignPage() {
           <h2 id="portfolio-title" className="font-display text-display-m font-medium">
             Portfolio
           </h2>
-          {placeholder ? (
-            <p className="mb-8 mt-3 max-w-2xl text-[0.9375rem] text-muted">
-              Sample images showing the style we work in. Photos of our completed interiors will be added here.
-            </p>
-          ) : (
-            <p className="mb-8 mt-3 max-w-2xl text-[0.9375rem] text-muted">A selection of homes and spaces we have designed and furnished.</p>
-          )}
-          <Portfolio projects={items} />
+          <p className="mb-8 mt-3 max-w-2xl text-[0.9375rem] text-muted">A selection of homes and spaces we have designed and furnished.</p>
+          {items.length ? <Portfolio projects={items} /> : <p className="text-muted">New projects are being added. Book a consultation to see more of our work.</p>}
         </div>
       </section>
 

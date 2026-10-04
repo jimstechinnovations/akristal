@@ -115,9 +115,7 @@ export function InstallmentPlanner({
           </dl>
           <p className="mt-6 text-xs leading-relaxed text-white/70">
             <strong className="font-medium text-white">Estimate only.</strong>{' '}
-            {plan.placeholder
-              ? 'Pay Small Small terms are being finalised; your signed agreement sets the final amounts and dates.'
-              : 'Your signed agreement sets the final amounts and dates.'}
+            Your signed agreement sets the final amounts and dates.
           </p>
         </div>
       </div>

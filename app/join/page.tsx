@@ -1,7 +1,7 @@
 import type { Metadata } from 'next'
 import Image from 'next/image'
 import { images } from '@/content/images'
-import { agentProgramme } from '@/content/placeholder-data'
+import { getSettings } from '@/lib/data/settings'
 import { pageMetadata } from '@/lib/seo'
 import { buttonClasses } from '@/components/ui/button'
 import { Faq } from '@/components/ui/faq'
@@ -48,7 +48,10 @@ const steps = [
   { title: 'Your first listing', text: 'Start with an Akristal development or bring your own client.' },
 ]
 
-export default function JoinPage() {
+export const revalidate = 300
+
+export default async function JoinPage() {
+  const { agent_programme: agentProgramme } = await getSettings()
   const hero = images.placesKigaliHillside
   return (
     <>
@@ -118,9 +121,11 @@ export default function JoinPage() {
               </tbody>
             </table>
           </div>
+          {agentProgramme.tiers.length > 0 && (
           <div className="mt-10">
-            <EarningsEstimator commissionPct={agentProgramme.commissionPct} tiers={agentProgramme.tiers} placeholder={agentProgramme.placeholder} />
+            <EarningsEstimator commissionPct={agentProgramme.commissionPct} tiers={agentProgramme.tiers} />
           </div>
+          )}
         </div>
       </section>
 
@@ -155,12 +160,14 @@ export default function JoinPage() {
         </div>
       </section>
 
-      <section aria-labelledby="faq-title" className="page-x pb-20">
-        <h2 id="faq-title" className="mb-8 font-display text-display-m font-medium">
-          Questions agents ask
-        </h2>
-        <Faq items={agentProgramme.faqs} />
-      </section>
+      {agentProgramme.faqs.length > 0 && (
+        <section aria-labelledby="faq-title" className="page-x pb-20">
+          <h2 id="faq-title" className="mb-8 font-display text-display-m font-medium">
+            Questions agents ask
+          </h2>
+          <Faq items={agentProgramme.faqs} />
+        </section>
+      )}
 
       <section id="apply" aria-labelledby="apply-title" className="scroll-mt-20 border-t border-line bg-page-alt section-y">
         <div className="page-x grid gap-12 lg:grid-cols-[1fr_1.4fr]">

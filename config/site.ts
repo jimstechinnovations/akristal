@@ -8,8 +8,6 @@ export const site = {
   url: process.env.NEXT_PUBLIC_APP_URL && !process.env.NEXT_PUBLIC_APP_URL.includes('localhost')
     ? process.env.NEXT_PUBLIC_APP_URL
     : 'https://akristal.com',
-  heroTitle: 'Kigali & beyond',
-  tagline: 'Homes we build, furnish and hand over',
   description:
     'The Akristal Group builds, sells and furnishes homes in Kigali and across Africa. Browse our own developments, homes listed with our agents, and Pay Small Small plans.',
   email: 'info@akristal.com',

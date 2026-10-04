@@ -3,6 +3,7 @@ import { site } from '@/config/site'
 import { getAllListings, getFeaturedListings, getMarketCounts, getPropertyTypes } from '@/lib/data/listings'
 import { getFeaturedProjects, getProjects } from '@/lib/data/projects'
 import { getAgents, getTeam } from '@/lib/data/people'
+import { getSettings } from '@/lib/data/settings'
 import { Hero } from '@/components/home/hero'
 import { Developments, type Stat } from '@/components/home/developments'
 import { FeaturedHomes } from '@/components/home/featured-homes'
@@ -22,7 +23,7 @@ export const metadata: Metadata = {
 }
 
 export default async function HomePage() {
-  const [allProjects, featuredProjects, listings, featured, marketCounts, propertyTypes, agents, team] = await Promise.all([
+  const [allProjects, featuredProjects, listings, featured, marketCounts, propertyTypes, agents, team, settings] = await Promise.all([
     getProjects(),
     getFeaturedProjects(3),
     getAllListings(),
@@ -31,6 +32,7 @@ export default async function HomePage() {
     getPropertyTypes(),
     getAgents(),
     getTeam(),
+    getSettings(),
   ])
 
   // Every figure below is counted from live data; nothing is estimated or padded.
@@ -55,6 +57,9 @@ export default async function HomePage() {
   return (
     <>
       <Hero
+        title={settings.home.heroTitle}
+        tagline={settings.home.tagline}
+        image={{ src: settings.home.heroImageUrl, alt: settings.home.heroImageAlt }}
         markets={marketCounts.map((m) => ({ slug: m.market.slug, name: m.market.name, count: m.count }))}
         areaSuggestions={areaSuggestions}
         propertyTypes={propertyTypes}
