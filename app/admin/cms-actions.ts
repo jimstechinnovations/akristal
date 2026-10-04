@@ -84,6 +84,8 @@ function validate(fields: Field[], values: Record<string, unknown>) {
 }
 
 function friendly(message: string) {
+  const notNull = message.match(/null value in column "([^"]+)"/)
+  if (notNull) return `${notNull[1].replace(/_/g, ' ')} is required.`
   if (/duplicate key.*slug/i.test(message)) return 'That web address is already used. Choose another.'
   if (/duplicate key/i.test(message)) return 'A record with the same unique value already exists.'
   if (/consent/i.test(message) || /check constraint/i.test(message)) return 'One of the values is not allowed. For testimonials, consent is required before publishing.'
@@ -117,6 +119,8 @@ export async function saveRecord(resourceKey: string, id: string | null, values:
     data.moderated_at = new Date().toISOString()
   }
   if (resource.key === 'furniture' && !data.currency) data.currency = 'RWF'
+  // An empty "Order" means first (0); the column is NOT NULL.
+  if ('display_order' in data && data.display_order == null) data.display_order = 0
 
   let result
   if (id) {
@@ -126,7 +130,9 @@ export async function saveRecord(resourceKey: string, id: string | null, values:
   } else {
     if (!resource.canCreate) return { ok: false, error: 'New records cannot be created here.' }
     const extra = resource.key === 'developments' ? { created_by: admin.id } : {}
-    result = await db.from(resource.table).insert({ ...data, ...extra }).select('id').single()
+    // Leave empty values out on create so database defaults apply.
+    const row = Object.fromEntries(Object.entries({ ...data, ...extra }).filter(([, v]) => v !== null))
+    result = await db.from(resource.table).insert(row).select('id').single()
   }
   if (result.error) return { ok: false, error: friendly(result.error.message) }
 

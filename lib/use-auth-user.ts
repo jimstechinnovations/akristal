@@ -35,7 +35,11 @@ export function useAuthUser() {
     }
 
     load()
-    const { data } = supabase.auth.onAuthStateChange(() => load())
+    // Never await Supabase calls inside this callback: it runs while the auth lock is held, and a nested
+    // call deadlocks every later request in the tab (uploads included). Defer to the next tick instead.
+    const { data } = supabase.auth.onAuthStateChange(() => {
+      setTimeout(load, 0)
+    })
     return () => {
       active = false
       data.subscription.unsubscribe()
