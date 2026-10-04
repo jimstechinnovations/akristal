@@ -159,7 +159,7 @@ export default async function SellerDashboard() {
                       </div>
                     )}
                     <div className="mt-2 text-xs text-gray-500">
-                      {new Date(inquiry.created_at).toLocaleString()}
+                      {new Date(inquiry.created_at ?? Date.now()).toLocaleString()}
                     </div>
                   </div>
                 ))}
@@ -186,7 +186,7 @@ export default async function SellerDashboard() {
                       {conv.properties?.title || 'Property Conversation'}
                     </div>
                     <div className="text-sm text-gray-600 dark:text-gray-400">
-                      Last message: {new Date(conv.last_message_at).toLocaleDateString()}
+                      Last message: {new Date(conv.last_message_at ?? Date.now()).toLocaleDateString()}
                     </div>
                   </Link>
                 ))}

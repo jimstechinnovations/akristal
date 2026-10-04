@@ -5,16 +5,17 @@ export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs))
 }
 
-export function formatCurrency(amount: number, currency: string = 'RWF'): string {
+export function formatCurrency(amount: number, currency: string | null = 'RWF'): string {
   return new Intl.NumberFormat('en', {
     style: 'currency',
-    currency: currency,
+    currency: currency || 'RWF',
     minimumFractionDigits: 0,
     maximumFractionDigits: 0,
   }).format(amount)
 }
 
-export function formatDate(date: string | Date): string {
+export function formatDate(date: string | Date | null): string {
+  if (!date) return ''
   return new Intl.DateTimeFormat('en-US', {
     year: 'numeric',
     month: 'long',
@@ -22,7 +23,8 @@ export function formatDate(date: string | Date): string {
   }).format(new Date(date))
 }
 
-export function formatRelativeTime(date: string | Date): string {
+export function formatRelativeTime(date: string | Date | null): string {
+  if (!date) return ''
   const now = new Date()
   const then = new Date(date)
   const diffInSeconds = Math.floor((now.getTime() - then.getTime()) / 1000)

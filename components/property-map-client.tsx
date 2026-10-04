@@ -30,7 +30,7 @@ interface Property {
   id: string
   title: string
   price: number
-  currency: string
+  currency: string | null
   address: string
   city: string
   cover_image_url?: string | null
