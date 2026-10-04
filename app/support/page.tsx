@@ -1,162 +1,75 @@
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
-import { HelpCircle, MessageSquare, FileText, Mail } from 'lucide-react'
+import type { Metadata } from 'next'
 import Link from 'next/link'
-import { Button } from '@/components/ui/button'
+import { site } from '@/config/site'
+import { pageMetadata } from '@/lib/seo'
+import { whatsappLink } from '@/lib/whatsapp'
+import { buttonClasses } from '@/components/ui/button'
+import { Faq } from '@/components/ui/faq'
 
-export const metadata = {
-  title: 'Support & Help Center - TheAkristalGroup',
-  description: 'Get help and support for using TheAkristalGroup real estate marketplace',
-}
+export const metadata: Metadata = pageMetadata({
+  title: 'Help',
+  description: 'Answers to common questions about listing, buying, saving homes, payments and accounts on the Akristal website.',
+  path: '/support',
+})
 
-const faqs = [
+// Carried over from the previous help page and updated for the new site.
+const groups: { title: string; items: { q: string; a: string }[] }[] = [
   {
-    question: 'How do I create a property listing?',
-    answer:
-      'Sign up as a seller or agent, then navigate to your dashboard and click "Create New Listing". Fill in all the required details, upload images, and submit for approval.',
+    title: 'Buying and renting',
+    items: [
+      { q: 'How do I contact a seller or agent?', a: 'Open any home and use WhatsApp, Call or Book a viewing. Signed-in buyers can also message the seller from their account.' },
+      { q: 'How do I save homes?', a: 'Tap the heart on any home. Saved homes are kept on this device; see them any time on the Saved homes page.' },
+      { q: 'Are the monthly figures exact?', a: 'No. Mortgage and Pay Small Small figures are estimates to help you plan. Your lender or Pay Small Small agreement sets the final amounts.' },
+    ],
   },
   {
-    question: 'How long does property approval take?',
-    answer:
-      'Property listings are typically reviewed within 24-48 hours. You will receive an email notification once your listing is approved or if any changes are needed.',
+    title: 'Selling and listing',
+    items: [
+      { q: 'How do I list a property?', a: 'Create an account as a seller or agent, open your dashboard and choose New listing. Add the details and photos, then submit it for approval. Or ask us for a valuation and an agent will list it for you.' },
+      { q: 'How long does approval take?', a: 'Listings are reviewed by our team before they go live, typically within 24 to 48 hours. You get an email when a listing is approved or needs changes.' },
+      { q: 'Can I edit a listing after it is live?', a: 'Yes, from your seller or agent dashboard. Significant changes may need approval again.' },
+    ],
   },
   {
-    question: 'How do I contact a seller?',
-    answer:
-      'Browse properties and click on any listing to view details. Use the "Contact Seller" button to send a message or inquiry directly to the seller.',
-  },
-  {
-    question: 'What payment methods are accepted?',
-    answer:
-      'Currently, we support bank transfers. You can attach your bank statement as proof of payment. Additional payment methods (cards, mobile money) are coming soon.',
-  },
-  {
-    question: 'How do I save favorite properties?',
-    answer:
-      'While browsing properties, click the heart icon on any property card to save it to your favorites. Access your favorites from your buyer dashboard.',
-  },
-  {
-    question: 'Can I edit my property listing after submission?',
-    answer:
-      'Yes, sellers can edit their own listings from the seller dashboard. Note that significant changes may require re-approval from our admin team.',
-  },
-  {
-    question: 'How do I verify my account?',
-    answer:
-      'Account verification is handled by our admin team. Complete your profile with accurate information to expedite the verification process.',
-  },
-  {
-    question: 'What should I do if I encounter a problem?',
-    answer:
-      'Contact our support team via email at info@akristal.com or theakristalgroup@gmail.com, or call us on any of these numbers: Primary: +250791900316, West Africa: +2348132383836, East Africa: +250788357819, WhatsApp: +250734994909, South Africa: +27 67 684 6945. We aim to respond within 24 hours.',
+    title: 'Payments and accounts',
+    items: [
+      { q: 'What payment methods are accepted?', a: 'Bank transfer, with your bank statement attached as proof of payment. Other methods are planned.' },
+      { q: 'How is my account verified?', a: 'Our team verifies accounts. Complete your profile with accurate details to speed this up.' },
+    ],
   },
 ]
 
 export default function SupportPage() {
   return (
-    <div className="mx-auto max-w-4xl px-4 py-12 sm:px-6 lg:px-8">
-      <div className="mb-12 text-center">
-        <h1 className="text-4xl font-bold text-gray-900 dark:text-white">Help & Support</h1>
-        <p className="mt-4 text-lg text-gray-600 dark:text-gray-400">
-          Find answers to common questions or contact our support team
-        </p>
-      </div>
-
-      <div className="mb-8 grid grid-cols-1 gap-4 md:grid-cols-2">
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center">
-              <MessageSquare className="mr-2 h-5 w-5" />
-              Contact Support
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <p className="mb-4 text-sm text-gray-600 dark:text-gray-400">
-              Need personalized assistance? Reach out to our support team.
-            </p>
-            <Link href="/contact">
-              <Button>Contact Us</Button>
-            </Link>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center">
-              <Mail className="mr-2 h-5 w-5" />
-              Email Support
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <p className="mb-4 text-sm text-gray-600 dark:text-gray-400">
-              Send us an email and we'll respond within 24 hours.
-            </p>
-            <div className="space-y-2">
-              <a href="mailto:info@akristal.com" className="block">
-                <Button variant="outline" className="w-full">info@akristal.com</Button>
+    <>
+      <header className="page-x pb-6 pt-10 sm:pt-14">
+        <h1 className="font-display text-display-l font-medium">Help</h1>
+        <p className="mt-3 max-w-xl text-base text-muted">Quick answers to the questions we hear most. Can&apos;t find yours? Message us.</p>
+      </header>
+      <div className="page-x grid gap-14 pb-20 pt-6">
+        {groups.map((g) => (
+          <section key={g.title} aria-labelledby={`h-${g.title}`}>
+            <h2 id={`h-${g.title}`} className="mb-4 font-display text-display-s font-medium">
+              {g.title}
+            </h2>
+            <Faq items={g.items} />
+          </section>
+        ))}
+        <section className="rounded-md bg-page-alt p-6 sm:p-8">
+          <h2 className="text-lg font-semibold">Still need help?</h2>
+          <p className="mt-1 text-[0.9375rem] text-muted">
+            Email {site.email} or theakristalgroup@gmail.com, or call {site.phone.label}.
+          </p>
+          <div className="mt-5 flex flex-wrap gap-3">
+            <a href={whatsappLink('Hello Akristal, I need help with the website.')} className={buttonClasses()}>
+              WhatsApp us
             </a>
-              <a href="mailto:theakristalgroup@gmail.com" className="block">
-                <Button variant="outline" className="w-full">theakristalgroup@gmail.com</Button>
-              </a>
-            </div>
-          </CardContent>
-        </Card>
+            <Link href="/contact" className={buttonClasses({ variant: 'outline' })}>
+              All contact details
+            </Link>
+          </div>
+        </section>
       </div>
-
-      <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center">
-            <HelpCircle className="mr-2 h-5 w-5" />
-            Frequently Asked Questions
-          </CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="space-y-6">
-            {faqs.map((faq, index) => (
-              <div key={index} className="border-b border-gray-200 pb-6 last:border-0 dark:border-gray-700">
-                <h3 className="mb-2 font-semibold text-gray-900 dark:text-white">{faq.question}</h3>
-                <p className="text-sm text-gray-600 dark:text-gray-400">{faq.answer}</p>
-              </div>
-            ))}
-          </div>
-        </CardContent>
-      </Card>
-
-      <Card className="mt-8">
-        <CardHeader>
-          <CardTitle className="flex items-center">
-            <FileText className="mr-2 h-5 w-5" />
-            Additional Resources
-          </CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="space-y-4">
-            <div>
-              <h3 className="mb-2 font-semibold text-gray-900 dark:text-white">Getting Started</h3>
-              <p className="text-sm text-gray-600 dark:text-gray-400">
-                New to TheAkristalGroup? Learn how to create an account, browse properties, and make your
-                first inquiry.
-              </p>
-            </div>
-            <div>
-              <h3 className="mb-2 font-semibold text-gray-900 dark:text-white">
-                For Sellers & Agents
-              </h3>
-              <p className="text-sm text-gray-600 dark:text-gray-400">
-                Learn how to create compelling listings, manage inquiries, and maximize your
-                property visibility.
-              </p>
-            </div>
-            <div>
-              <h3 className="mb-2 font-semibold text-gray-900 dark:text-white">For Buyers</h3>
-              <p className="text-sm text-gray-600 dark:text-gray-400">
-                Discover how to search effectively, save favorites, contact sellers, and complete
-                transactions securely.
-              </p>
-            </div>
-          </div>
-        </CardContent>
-      </Card>
-    </div>
+    </>
   )
 }
-

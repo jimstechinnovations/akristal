@@ -1,45 +1,44 @@
-import { Card, CardContent } from '@/components/ui/card'
+import type { Metadata } from 'next'
+import { pageMetadata } from '@/lib/seo'
+import { LegalHeader, Prose } from '@/components/ui/prose'
 
-export const metadata = {
-  title: 'Privacy Policy - TheAkristalGroup',
-  description: 'Privacy policy for TheAkristalGroup real estate marketplace',
-}
+export const metadata: Metadata = pageMetadata({
+  title: 'Privacy policy',
+  description: 'How The Akristal Group collects, uses and protects your personal information.',
+  path: '/privacy',
+})
 
-export default function PrivacyPage() {
+// Update this date whenever the text below changes. Have the final text reviewed by Akristal's lawyer.
+const UPDATED = '2026-10-04'
+
+export default function Page() {
   return (
-    <div className="mx-auto max-w-4xl px-4 py-12 sm:px-6 lg:px-8">
-      <div className="mb-12 text-center">
-        <h1 className="text-4xl font-bold text-gray-900 dark:text-white">Privacy Policy</h1>
-        <p className="mt-4 text-lg text-gray-600 dark:text-gray-400">
-          Last updated: {new Date().toLocaleDateString()}
-        </p>
-      </div>
+    <div className="page-x py-12 sm:py-16">
+      <LegalHeader title="Privacy policy" updated={UPDATED} />
+      <Prose className="mt-10">
 
-      <Card>
-        <CardContent className="pt-6">
-          <div className="prose prose-gray max-w-none dark:prose-invert">
-            <section className="mb-8">
-              <h2 className="mb-4 text-2xl font-semibold text-gray-900 dark:text-white">
+            <section>
+              <h2>
                 1. Introduction
               </h2>
-              <p className="mb-4 text-gray-600 dark:text-gray-400">
-                TheAkristalGroup ("we," "our," or "us") is committed to protecting your
+              <p>
+                The Akristal Group (“” “” or “”) is committed to protecting your
                 privacy. This Privacy Policy explains how we collect, use, disclose, and safeguard
                 your information when you use our real estate marketplace platform.
               </p>
             </section>
 
-            <section className="mb-8">
-              <h2 className="mb-4 text-2xl font-semibold text-gray-900 dark:text-white">
+            <section>
+              <h2>
                 2. Information We Collect
               </h2>
-              <h3 className="mb-2 text-xl font-semibold text-gray-900 dark:text-white">
+              <h3>
                 2.1 Personal Information
               </h3>
-              <p className="mb-4 text-gray-600 dark:text-gray-400">
+              <p>
                 We collect information that you provide directly to us, including:
               </p>
-              <ul className="mb-4 list-disc space-y-2 pl-6 text-gray-600 dark:text-gray-400">
+              <ul>
                 <li>Name, email address, and phone number</li>
                 <li>Account credentials and profile information</li>
                 <li>Property listings and associated media</li>
@@ -47,13 +46,13 @@ export default function PrivacyPage() {
                 <li>Messages and communications with other users</li>
               </ul>
 
-              <h3 className="mb-2 text-xl font-semibold text-gray-900 dark:text-white">
+              <h3>
                 2.2 Automatically Collected Information
               </h3>
-              <p className="mb-4 text-gray-600 dark:text-gray-400">
+              <p>
                 We automatically collect certain information when you use our platform:
               </p>
-              <ul className="mb-4 list-disc space-y-2 pl-6 text-gray-600 dark:text-gray-400">
+              <ul>
                 <li>Device information and IP address</li>
                 <li>Browser type and version</li>
                 <li>Usage data and interaction patterns</li>
@@ -61,12 +60,12 @@ export default function PrivacyPage() {
               </ul>
             </section>
 
-            <section className="mb-8">
-              <h2 className="mb-4 text-2xl font-semibold text-gray-900 dark:text-white">
+            <section>
+              <h2>
                 3. How We Use Your Information
               </h2>
-              <p className="mb-4 text-gray-600 dark:text-gray-400">We use collected information to:</p>
-              <ul className="mb-4 list-disc space-y-2 pl-6 text-gray-600 dark:text-gray-400">
+              <p>We use collected information to:</p>
+              <ul>
                 <li>Provide, maintain, and improve our services</li>
                 <li>Process transactions and manage payments</li>
                 <li>Facilitate communication between users</li>
@@ -77,15 +76,15 @@ export default function PrivacyPage() {
               </ul>
             </section>
 
-            <section className="mb-8">
-              <h2 className="mb-4 text-2xl font-semibold text-gray-900 dark:text-white">
+            <section>
+              <h2>
                 4. Information Sharing and Disclosure
               </h2>
-              <p className="mb-4 text-gray-600 dark:text-gray-400">
+              <p>
                 We do not sell your personal information. We may share your information in the
                 following circumstances:
               </p>
-              <ul className="mb-4 list-disc space-y-2 pl-6 text-gray-600 dark:text-gray-400">
+              <ul>
                 <li>
                   <strong>With other users:</strong> Property listings and profile information are
                   visible to other platform users as intended
@@ -105,23 +104,23 @@ export default function PrivacyPage() {
               </ul>
             </section>
 
-            <section className="mb-8">
-              <h2 className="mb-4 text-2xl font-semibold text-gray-900 dark:text-white">
+            <section>
+              <h2>
                 5. Data Security
               </h2>
-              <p className="mb-4 text-gray-600 dark:text-gray-400">
+              <p>
                 We implement appropriate technical and organizational measures to protect your
                 personal information against unauthorized access, alteration, disclosure, or
                 destruction. However, no method of transmission over the internet is 100% secure.
               </p>
             </section>
 
-            <section className="mb-8">
-              <h2 className="mb-4 text-2xl font-semibold text-gray-900 dark:text-white">
+            <section>
+              <h2>
                 6. Your Rights
               </h2>
-              <p className="mb-4 text-gray-600 dark:text-gray-400">You have the right to:</p>
-              <ul className="mb-4 list-disc space-y-2 pl-6 text-gray-600 dark:text-gray-400">
+              <p>You have the right to:</p>
+              <ul>
                 <li>Access and update your personal information</li>
                 <li>Delete your account and associated data</li>
                 <li>Opt-out of certain communications</li>
@@ -130,46 +129,46 @@ export default function PrivacyPage() {
               </ul>
             </section>
 
-            <section className="mb-8">
-              <h2 className="mb-4 text-2xl font-semibold text-gray-900 dark:text-white">
+            <section>
+              <h2>
                 7. Cookies and Tracking
               </h2>
-              <p className="mb-4 text-gray-600 dark:text-gray-400">
+              <p>
                 We use cookies and similar tracking technologies to enhance your experience, analyze
                 usage, and assist with marketing efforts. You can control cookie preferences through
                 your browser settings.
               </p>
             </section>
 
-            <section className="mb-8">
-              <h2 className="mb-4 text-2xl font-semibold text-gray-900 dark:text-white">
-                8. Children's Privacy
+            <section>
+              <h2>
+                8. Children’s Privacy
               </h2>
-              <p className="mb-4 text-gray-600 dark:text-gray-400">
+              <p>
                 Our platform is not intended for users under the age of 18. We do not knowingly
                 collect personal information from children.
               </p>
             </section>
 
-            <section className="mb-8">
-              <h2 className="mb-4 text-2xl font-semibold text-gray-900 dark:text-white">
+            <section>
+              <h2>
                 9. Changes to This Policy
               </h2>
-              <p className="mb-4 text-gray-600 dark:text-gray-400">
+              <p>
                 We may update this Privacy Policy from time to time. We will notify you of any
-                changes by posting the new policy on this page and updating the "Last updated"
+                changes by posting the new policy on this page and updating the “”
                 date.
               </p>
             </section>
 
-            <section className="mb-8">
-              <h2 className="mb-4 text-2xl font-semibold text-gray-900 dark:text-white">
+            <section>
+              <h2>
                 10. Contact Us
               </h2>
-              <p className="mb-4 text-gray-600 dark:text-gray-400">
+              <p>
                 If you have questions about this Privacy Policy, please contact us:
               </p>
-              <div className="text-gray-600 dark:text-gray-400">
+              <div>
                 <p>
                   <strong>Email:</strong> info@akristal.com, theakristalgroup@gmail.com
                 </p>
@@ -181,10 +180,24 @@ export default function PrivacyPage() {
                 </p>
               </div>
             </section>
-          </div>
-        </CardContent>
-      </Card>
+            <section>
+              <h2>Forms, WhatsApp and saved homes</h2>
+              <p>
+                When you request a viewing, a valuation, a consultation, a Pay Small Small plan or a mortgage call-back, or when you
+                message an agent, we store the details you enter so our team can reply. When you write an agent review, we store your
+                name, rating and comments; your phone or email is never shown. When you apply to become an agent, we store your
+                application to assess it.
+              </p>
+              <p>
+                Links marked WhatsApp open WhatsApp with a message ready for you to send. Anything you send there is handled under
+                WhatsApp&apos;s own terms. Homes you save with the heart are stored only in your browser on this device.
+              </p>
+              <p>
+                To ask what we hold about you, or to have it corrected or deleted, email <a href="mailto:info@akristal.com">info@akristal.com</a>.
+              </p>
+            </section>
+
+      </Prose>
     </div>
   )
 }
-

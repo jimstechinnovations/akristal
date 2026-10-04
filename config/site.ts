@@ -68,6 +68,7 @@ export const menuGroups: NavGroup[] = [
       { href: '/properties?listing_type=rent', label: 'Homes for rent' },
       { href: '/properties?view=map', label: 'Map search' },
       { href: '/projects', label: 'Our developments' },
+      { href: '/saved', label: 'Saved homes' },
     ],
   },
   {

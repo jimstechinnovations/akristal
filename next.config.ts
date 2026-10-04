@@ -16,7 +16,12 @@ const nextConfig: NextConfig = {
     resolveAlias: { canvas: './lib/canvas-stub.js' },
   },
   async redirects() {
-    return [{ source: '/properties/map', destination: '/properties?view=map', permanent: true }]
+    return [
+      { source: '/properties/map', destination: '/properties?view=map', permanent: true },
+      // Retired pages: their content now lives on About.
+      { source: '/services', destination: '/about', permanent: true },
+      { source: '/members', destination: '/about#team', permanent: true },
+    ]
   },
 }
 

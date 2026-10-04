@@ -1,321 +1,175 @@
-import { Card, CardContent } from '@/components/ui/card'
-import { Building2, Users, MapPin, Award, Youtube, Instagram, Facebook, Twitter, Image, Music } from 'lucide-react'
+import type { Metadata } from 'next'
+import Image from 'next/image'
+import Link from 'next/link'
+import { site } from '@/config/site'
+import { images } from '@/content/images'
+import { getAllListings } from '@/lib/data/listings'
+import { getProjects } from '@/lib/data/projects'
+import { getTeam } from '@/lib/data/people'
+import { pageMetadata } from '@/lib/seo'
+import { buttonClasses } from '@/components/ui/button'
+import { CountUp } from '@/components/motion/count-up'
 
-export const metadata = {
-  title: 'About Us - TheAkristalGroup',
+export const revalidate = 600
+
+export const metadata: Metadata = pageMetadata({
+  title: 'About us',
   description:
-    'Learn about Akristal Group Limited, a multifaceted leader in real estate, construction, home automation, financing, design, events, transport and consulting services.',
-}
+    'The Akristal Group Limited builds, sells, finances and furnishes homes, with its head office in Kigali and teams across Africa. Meet the people behind it.',
+  path: '/about',
+})
 
-export default function AboutPage() {
+// From the company's own description of its services, grouped for readability.
+const groups = [
+  { title: 'Build', items: ['Real estate development', 'Construction', 'Architectural design', 'Infrastructure'] },
+  { title: 'Sell and let', items: ['Residential property, local and international', 'Commercial property, local and international', 'Lease and rental services', 'Property management'] },
+  { title: 'Finance', items: ['In-house financing, including Pay Small Small', 'F.Y.L. Company (Fund Your Lifestyle)'] },
+  { title: 'Finish', items: ['Interior and exterior decoration', 'Home automation', 'Furniture'] },
+  { title: 'And more', items: ['Outsourcing management', 'Consulting for manufacturing companies', 'Event planning', 'Transport and car hire'] },
+]
+
+const values = [
+  { title: 'Transparency', text: 'Clear prices, clear terms and honest advice in every transaction.' },
+  { title: 'Security', text: 'Your documents, payments and personal data handled with care.' },
+  { title: 'Excellence', text: 'Quality in what we build, what we list and how we finish it.' },
+  { title: 'Customer focus', text: 'We start from what you need, not from what we have to sell.' },
+]
+
+export default async function AboutPage() {
+  const [team, projects, listings] = await Promise.all([getTeam(), getProjects(), getAllListings()])
+  const available = listings.filter((l) => l.status === 'available')
+  const stats = [
+    { value: new Set(projects.map((p) => p.name.split(':')[0].trim())).size, label: 'Akristal developments' },
+    { value: projects.filter((p) => p.soldOut).reduce((n, p) => n + (p.totalUnits ?? 0), 0), label: 'homes sold at Valid Dreams Estate' },
+    { value: available.length, label: 'homes listed today' },
+    { value: new Set([...available.map((l) => l.market?.country), ...projects.map((p) => p.country)].filter(Boolean)).size, label: 'countries' },
+  ].filter((s) => s.value > 0)
+  const hero = images.placesKigali
+
   return (
-    <div className="mx-auto max-w-4xl px-4 py-12 sm:px-6 lg:px-8">
-      <div className="mb-12 text-center">
-        <h1 className="text-4xl font-bold text-gray-900 dark:text-white">
-          About Akristal Group Limited
-        </h1>
-        <p className="mt-4 text-lg text-gray-600 dark:text-gray-400">
-          A multifaceted leader in real estate and lifestyle services
-        </p>
-      </div>
-
-      <div className="space-y-8">
-        <Card>
-          <CardContent className="pt-6">
-            <h2 className="mb-4 text-2xl font-semibold text-gray-900 dark:text-white">
-              Who We Are
-            </h2>
-            <p className="mb-4 text-gray-600 dark:text-gray-400">
-              The Akristal Group Limited is a multifaceted leader in the real estate and lifestyle
-              sectors. We specialize in comprehensive services including Real Estate Development,
-              Construction, and cutting-edge Home Automation solutions that elevate modern living.
-            </p>
-            <p className="text-gray-600 dark:text-gray-400">
-              Our offerings extend to Local &amp; International Commercial and Residential
-              Properties, flexible Lease/Rentals and in-house Financing. Beyond real estate, we
-              provide Outsourcing Management, Interior &amp; Exterior Decorations, Architectural
-              Design, Event Planning, Micro Pawn/Loan activities, Transport/Car Hire services, and
-              Consulting Services for Manufacturing Companies, and we are proud owners of F.Y.L.
-              Company (Fund Your Lifestyle).
-            </p>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardContent className="pt-6">
-            <h2 className="mb-4 text-2xl font-semibold text-gray-900 dark:text-white">
-              Our Services
-            </h2>
-            <p className="mb-4 text-gray-600 dark:text-gray-400">
-              We offer a comprehensive portfolio of services across real estate, lifestyle, and
-              support sectors:
-            </p>
-            <ul className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-gray-600 dark:text-gray-400">
-              <li className="flex items-start">
-                <span className="mr-2 text-blue-600 dark:text-blue-400">•</span>
-                <span>Real Estate Development</span>
-              </li>
-              <li className="flex items-start">
-                <span className="mr-2 text-blue-600 dark:text-blue-400">•</span>
-                <span>Construction</span>
-              </li>
-              <li className="flex items-start">
-                <span className="mr-2 text-blue-600 dark:text-blue-400">•</span>
-                <span>Home Automation</span>
-              </li>
-              <li className="flex items-start">
-                <span className="mr-2 text-blue-600 dark:text-blue-400">•</span>
-                <span>Local &amp; International Commercial Properties</span>
-              </li>
-              <li className="flex items-start">
-                <span className="mr-2 text-blue-600 dark:text-blue-400">•</span>
-                <span>Local &amp; International Residential Properties</span>
-              </li>
-              <li className="flex items-start">
-                <span className="mr-2 text-blue-600 dark:text-blue-400">•</span>
-                <span>Lease &amp; Rental Services</span>
-              </li>
-              <li className="flex items-start">
-                <span className="mr-2 text-blue-600 dark:text-blue-400">•</span>
-                <span>In-house Financing</span>
-              </li>
-              <li className="flex items-start">
-                <span className="mr-2 text-blue-600 dark:text-blue-400">•</span>
-                <span>Outsourcing Management</span>
-              </li>
-              <li className="flex items-start">
-                <span className="mr-2 text-blue-600 dark:text-blue-400">•</span>
-                <span>Interior &amp; Exterior Decorations</span>
-              </li>
-              <li className="flex items-start">
-                <span className="mr-2 text-blue-600 dark:text-blue-400">•</span>
-                <span>Architectural Design</span>
-              </li>
-              <li className="flex items-start">
-                <span className="mr-2 text-blue-600 dark:text-blue-400">•</span>
-                <span>Event Planning</span>
-              </li>
-              <li className="flex items-start">
-                <span className="mr-2 text-blue-600 dark:text-blue-400">•</span>
-                <span>Micro Pawn/Loan Activities</span>
-              </li>
-              <li className="flex items-start">
-                <span className="mr-2 text-blue-600 dark:text-blue-400">•</span>
-                <span>Transport &amp; Car Hire Services</span>
-              </li>
-              <li className="flex items-start">
-                <span className="mr-2 text-blue-600 dark:text-blue-400">•</span>
-                <span>Consulting Services for Manufacturing Companies</span>
-              </li>
-              <li className="flex items-start">
-                <span className="mr-2 text-blue-600 dark:text-blue-400">•</span>
-                <span>F.Y.L. Company (Fund Your Lifestyle)</span>
-              </li>
-            </ul>
-          </CardContent>
-        </Card>
-
-        <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
-          <Card>
-            <CardContent className="pt-6">
-              <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-lg bg-blue-100 dark:bg-blue-900">
-                <Building2 className="h-6 w-6 text-blue-600 dark:text-blue-400" />
-              </div>
-              <h3 className="mb-2 text-xl font-semibold text-gray-900 dark:text-white">
-                Wide Property Selection
-              </h3>
-              <p className="text-gray-600 dark:text-gray-400">
-                Browse thousands of verified properties including homes, commercial spaces, land,
-                and rental units across major cities and regions.
-              </p>
-            </CardContent>
-          </Card>
-
-          <Card>
-            <CardContent className="pt-6">
-              <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-lg bg-blue-100 dark:bg-blue-900">
-                <Users className="h-6 w-6 text-blue-600 dark:text-blue-400" />
-              </div>
-              <h3 className="mb-2 text-xl font-semibold text-gray-900 dark:text-white">
-                Trusted Network
-              </h3>
-              <p className="text-gray-600 dark:text-gray-400">
-                Connect with verified sellers, professional agents, and reliable buyers in a secure
-                marketplace environment.
-              </p>
-            </CardContent>
-          </Card>
-
-          <Card>
-            <CardContent className="pt-6">
-              <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-lg bg-blue-100 dark:bg-blue-900">
-                <MapPin className="h-6 w-6 text-blue-600 dark:text-blue-400" />
-              </div>
-              <h3 className="mb-2 text-xl font-semibold text-gray-900 dark:text-white">
-                Prime Locations
-              </h3>
-              <p className="text-gray-600 dark:text-gray-400">
-                Properties in the best neighborhoods and prime locations across Africa and beyond.
-              </p>
-            </CardContent>
-          </Card>
-
-          <Card>
-            <CardContent className="pt-6">
-              <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-lg bg-blue-100 dark:bg-blue-900">
-                <Award className="h-6 w-6 text-blue-600 dark:text-blue-400" />
-              </div>
-              <h3 className="mb-2 text-xl font-semibold text-gray-900 dark:text-white">
-                Verified Listings
-              </h3>
-              <p className="text-gray-600 dark:text-gray-400">
-                All properties go through our verification process to ensure accuracy, quality, and
-                authenticity.
-              </p>
-            </CardContent>
-          </Card>
+    <>
+      <section className="relative isolate flex min-h-[60svh] items-end text-white">
+        <Image src={hero.src} alt={hero.alt} fill priority sizes="100vw" className="-z-10 object-cover" />
+        <div className="absolute inset-0 -z-10 bg-gradient-to-t from-[rgb(20_12_10/0.85)] via-[rgb(20_12_10/0.35)] to-transparent" />
+        <div className="page-x pb-14 pt-28">
+          <h1 className="max-w-3xl font-display text-display-xl font-medium">We build, sell and finish homes</h1>
+          <p className="mt-5 max-w-2xl text-lg text-white/85">
+            The Akristal Group Limited is a real estate and lifestyle company with its head office in Kigali. We develop new neighbourhoods,
+            sell and let homes across Africa and the Gulf, finance them with our own Pay Small Small plans, and furnish them.
+          </p>
         </div>
+      </section>
 
-        <Card>
-          <CardContent className="pt-6">
-            <h2 className="mb-4 text-2xl font-semibold text-gray-900 dark:text-white">
-              Our Values
-            </h2>
-            <ul className="space-y-3 text-gray-600 dark:text-gray-400">
-              <li className="flex items-start">
-                <span className="mr-2 text-blue-600 dark:text-blue-400">✓</span>
-                <span>
-                  <strong>Transparency:</strong> Clear, honest communication in all transactions
-                </span>
-              </li>
-              <li className="flex items-start">
-                <span className="mr-2 text-blue-600 dark:text-blue-400">✓</span>
-                <span>
-                  <strong>Security:</strong> Protected data and secure payment processing
-                </span>
-              </li>
-              <li className="flex items-start">
-                <span className="mr-2 text-blue-600 dark:text-blue-400">✓</span>
-                <span>
-                  <strong>Excellence:</strong> High-quality service and verified listings
-                </span>
-              </li>
-              <li className="flex items-start">
-                <span className="mr-2 text-blue-600 dark:text-blue-400">✓</span>
-                <span>
-                  <strong>Customer Focus:</strong> Putting our users' needs first
-                </span>
-              </li>
-            </ul>
-          </CardContent>
-        </Card>
+      {stats.length > 0 && (
+        <section aria-label="Akristal in numbers" className="border-b border-line">
+          <dl className="page-x grid grid-cols-2 gap-y-8 py-12 lg:grid-cols-4">
+            {stats.map((s) => (
+              <div key={s.label} className="flex flex-col-reverse">
+                <dt className="mt-2 text-sm text-muted">{s.label}</dt>
+                <dd>
+                  <CountUp value={s.value} className="text-[2.75rem] font-light leading-none tracking-tight" />
+                </dd>
+              </div>
+            ))}
+          </dl>
+        </section>
+      )}
 
-        <Card>
-          <CardContent className="pt-6">
-            <h2 className="mb-4 text-2xl font-semibold text-gray-900 dark:text-white">
-              Contact Information
+      <section aria-labelledby="what-title" className="page-x section-y">
+        <div className="grid gap-12 lg:grid-cols-[1fr_2fr]">
+          <div>
+            <h2 id="what-title" className="font-display text-display-m font-medium">
+              What we do
             </h2>
-            <div className="space-y-3 text-gray-600 dark:text-gray-400">
-              <p>
-                <strong>Email:</strong>{' '}
-                <a
-                  href="mailto:info@akristal.com"
-                  className="text-blue-600 hover:underline dark:text-blue-400"
-                >
-                  info@akristal.com
-                </a>
-                {', '}
-                <a
-                  href="mailto:theakristalgroup@gmail.com"
-                  className="text-blue-600 hover:underline dark:text-blue-400"
-                >
-                  theakristalgroup@gmail.com
-                </a>
-              </p>
-              <p>
-                <strong>Phone:</strong>{' '}
-                <a
-                  href="tel:+250791900316"
-                  className="text-blue-600 hover:underline dark:text-blue-400"
-                >
-                  +250791900316
-                </a>
-              </p>
-              <p>
-                <strong>Address:</strong> KK 15 Rd, Kigali, Rwanda
-              </p>
-            </div>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardContent className="pt-6">
-            <h2 className="mb-4 text-2xl font-semibold text-gray-900 dark:text-white">
-              Follow Us
-            </h2>
-            <p className="mb-4 text-gray-600 dark:text-gray-400">
-              Stay connected with us on social media for the latest property listings, real estate tips, and updates.
+            <p className="mt-4 max-w-sm text-[0.9375rem] leading-relaxed text-muted">
+              Most clients come to us for a home. Many stay for the rest: the loan, the interiors, the furniture and the move.
             </p>
-            <div className="flex flex-wrap gap-4">
-              <a
-                href="http://www.youtube.com/@TheAkristalGroup"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="flex items-center space-x-2 rounded-lg border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-300 dark:hover:bg-gray-700 transition-colors"
-              >
-                <Youtube className="h-5 w-5 text-red-600" />
-                <span>YouTube</span>
-              </a>
-              <a
-                href="http://instagram.com/theakristalgroup"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="flex items-center space-x-2 rounded-lg border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-300 dark:hover:bg-gray-700 transition-colors"
-              >
-                <Instagram className="h-5 w-5 text-pink-600" />
-                <span>Instagram</span>
-              </a>
-              <a
-                href="http://tiktok.com/@akrystalgroupholdings"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="flex items-center space-x-2 rounded-lg border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-300 dark:hover:bg-gray-700 transition-colors"
-              >
-                <Music className="h-5 w-5 text-black dark:text-white" />
-                <span>TikTok</span>
-              </a>
-              <a
-                href="http://twitter.com/TheAkristalGrup"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="flex items-center space-x-2 rounded-lg border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-300 dark:hover:bg-gray-700 transition-colors"
-              >
-                <Twitter className="h-5 w-5 text-blue-400" />
-                <span>Twitter</span>
-              </a>
-              <a
-                href="http://pinterest.com/theakristalgroup"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="flex items-center space-x-2 rounded-lg border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-300 dark:hover:bg-gray-700 transition-colors"
-              >
-                <Image className="h-5 w-5 text-red-600" />
-                <span>Pinterest</span>
-              </a>
-              <a
-                href="http://facebook.com/theakristalgroup"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="flex items-center space-x-2 rounded-lg border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-300 dark:hover:bg-gray-700 transition-colors"
-              >
-                <Facebook className="h-5 w-5 text-blue-600" />
-                <span>Facebook</span>
-              </a>
+            <Link href="/projects" className="mt-6 inline-flex border-b border-line-strong pb-0.5 text-[0.9375rem] font-medium hover:border-ink">
+              See our developments
+            </Link>
+          </div>
+          <div className="grid gap-x-10 gap-y-8 sm:grid-cols-2">
+            {groups.map((g) => (
+              <div key={g.title} className="border-t border-line pt-5">
+                <h3 className="text-lg font-semibold">{g.title}</h3>
+                <ul className="mt-3 grid gap-1.5 text-[0.9375rem] text-muted">
+                  {g.items.map((i) => (
+                    <li key={i}>{i}</li>
+                  ))}
+                </ul>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      <section aria-labelledby="values-title" className="bg-brand text-white section-y">
+        <div className="page-x">
+          <h2 id="values-title" className="font-display text-display-m font-medium">
+            What we stand for
+          </h2>
+          <dl className="mt-10 grid gap-10 sm:grid-cols-2 lg:grid-cols-4">
+            {values.map((v) => (
+              <div key={v.title} className="border-t border-white/20 pt-5">
+                <dt className="font-display text-2xl">{v.title}</dt>
+                <dd className="mt-2 text-[0.9375rem] leading-relaxed text-white/75">{v.text}</dd>
+              </div>
+            ))}
+          </dl>
+        </div>
+      </section>
+
+      {team.length > 0 && (
+        <section id="team" aria-labelledby="team-title" className="scroll-mt-24 page-x-wide section-y">
+          <h2 id="team-title" className="font-display text-display-m font-medium">
+            Our team
+          </h2>
+          <ul className="mt-10 grid grid-cols-2 gap-x-4 gap-y-10 sm:grid-cols-3 lg:grid-cols-4 lg:gap-x-6">
+            {team.map((m) => (
+              <li key={m.id}>
+                <div className="relative aspect-[4/5] overflow-hidden rounded-md bg-page-alt">
+                  {m.imageUrl && <Image src={m.imageUrl} alt={`Portrait of ${m.name}`} fill sizes="(min-width: 1024px) 22vw, (min-width: 640px) 30vw, 46vw" className="object-cover object-top" />}
+                </div>
+                <p className="mt-3 text-[0.9375rem] font-medium leading-snug">{m.name}</p>
+                {m.credentials && <p className="text-xs text-muted">{m.credentials}</p>}
+                <p className="mt-1 text-sm text-muted">{m.role}</p>
+              </li>
+            ))}
+          </ul>
+        </section>
+      )}
+
+      <section aria-labelledby="offices-title" className="border-t border-line bg-page-alt section-y">
+        <div className="page-x grid gap-10 lg:grid-cols-[1fr_2fr]">
+          <div>
+            <h2 id="offices-title" className="font-display text-display-m font-medium">
+              Offices
+            </h2>
+            <div className="mt-6 flex flex-wrap gap-3">
+              <Link href="/contact" className={buttonClasses()}>
+                Contact us
+              </Link>
+              <Link href="/join" className={buttonClasses({ variant: 'outline' })}>
+                Work with us
+              </Link>
             </div>
-          </CardContent>
-        </Card>
-      </div>
-    </div>
+          </div>
+          <div className="grid gap-8 sm:grid-cols-3">
+            {site.offices.map((o) => (
+              <address key={o.region} className="not-italic">
+                <p className="font-display text-2xl">{o.region}</p>
+                <p className="text-sm text-muted">{o.label}</p>
+                <p className="mt-3 text-[0.9375rem]">{o.address}</p>
+                {o.phones.map((p) => (
+                  <a key={p.href} href={p.href} className="tabular mt-1 block text-[0.9375rem] hover:underline">
+                    {p.label}
+                  </a>
+                ))}
+              </address>
+            ))}
+          </div>
+        </div>
+      </section>
+    </>
   )
 }
-
