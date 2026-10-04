@@ -2,6 +2,7 @@ import 'server-only'
 import { cache } from 'react'
 import { createPublicClient } from '@/lib/supabase/public'
 import type { Database } from '@/types/supabase'
+import { tidyTitle } from '@/lib/format'
 import { cleanArea, coordinatesFor, marketFor, type Market } from './markets'
 
 type Row = Database['public']['Tables']['properties']['Row']
@@ -44,7 +45,7 @@ export function toListing(row: ListingRow, typeNames: Map<string, string>): List
   const gallery = [row.cover_image_url, ...(row.image_urls ?? [])].filter((u): u is string => !!u)
   return {
     id: row.id,
-    title: row.title.replace(/\s+/g, ' ').trim(),
+    title: tidyTitle(row.title),
     price: Number(row.price),
     currency: (row.currency || 'RWF').toUpperCase(),
     listingType: row.listing_type === 'rent' ? 'rent' : 'sale',
@@ -126,3 +127,54 @@ export const getMarketCounts = cache(async (): Promise<MarketCount[]> => {
   }
   return [...counts.values()].sort((a, b) => b.count - a.count)
 })
+
+export type ListingDetail = Listing & {
+  description: string
+  amenities: string[]
+  features: string[]
+  yearBuilt: number | null
+  videos: string[]
+  sellerId: string
+  agentId: string | null
+}
+
+const asStrings = (v: unknown) => (Array.isArray(v) ? v.filter((x): x is string => typeof x === 'string' && !!x.trim()).map((x) => x.trim()) : [])
+
+/** One approved listing with everything the detail page needs, or null. */
+export const getListing = cache(async (id: string): Promise<ListingDetail | null> => {
+  if (!/^[0-9a-f-]{36}$/i.test(id)) return null
+  const supabase = createPublicClient()
+  const [{ data }, names] = await Promise.all([
+    supabase
+      .from('properties')
+      .select(`${LISTING_COLUMNS}, description, amenities, features, year_built, seller_id, agent_id`)
+      .eq('id', id)
+      .eq('listing_status', 'approved')
+      .maybeSingle(),
+    typeNameMap(),
+  ])
+  if (!data) return null
+  const row = data as ListingRow & Pick<Row, 'description' | 'amenities' | 'features' | 'year_built' | 'seller_id' | 'agent_id'>
+  return {
+    ...toListing(row, names),
+    // Some descriptions were pasted with stray markdown asterisks.
+    description: (row.description ?? '').replace(/^\s*\*+\s*/gm, '').trim(),
+    amenities: asStrings(row.amenities),
+    features: asStrings(row.features),
+    yearBuilt: row.year_built,
+    videos: (row.video_urls ?? []).filter(Boolean),
+    sellerId: row.seller_id,
+    agentId: row.agent_id,
+  }
+})
+
+/** Same market and sale/rent first, then the same market, nearest in price within the same currency. */
+export async function getSimilarListings(listing: Listing, limit = 3): Promise<Listing[]> {
+  const all = (await getAllListings()).filter((l) => l.id !== listing.id && l.status === 'available')
+  const score = (l: Listing) =>
+    (l.market?.slug === listing.market?.slug ? 4 : 0) +
+    (l.listingType === listing.listingType ? 2 : 0) +
+    (l.propertyTypeId === listing.propertyTypeId ? 1 : 0) +
+    (l.currency === listing.currency ? 1 - Math.min(1, Math.abs(l.price - listing.price) / Math.max(listing.price, 1)) : 0)
+  return all.sort((a, b) => score(b) - score(a)).slice(0, limit)
+}

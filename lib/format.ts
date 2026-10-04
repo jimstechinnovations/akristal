@@ -61,3 +61,24 @@ export function formatDate(date: string | Date, style: 'long' | 'short' = 'long'
     year: 'numeric',
   }).format(new Date(date))
 }
+
+const SMALL_WORDS = new Set(['a', 'an', 'and', 'at', 'by', 'for', 'in', 'of', 'on', 'or', 'the', 'to', 'with'])
+
+/**
+ * Titles typed in ALL CAPS read as shouting; show them in title case.
+ * Mixed-case titles are left exactly as the agent wrote them. Short codes (BQ, DLD, CBD) stay upper case.
+ */
+export function tidyTitle(raw: string) {
+  const title = raw.replace(/\s+/g, ' ').trim()
+  const letters = title.replace(/[^A-Za-z]/g, '')
+  if (letters.length < 8 || letters.replace(/[^A-Z]/g, '').length / letters.length < 0.7) return title
+  return title
+    .toLowerCase()
+    .split(' ')
+    .map((word, i) => {
+      if (/^(bq|dld|cbd|vi|mbr|jvc|ii|iii)$/.test(word)) return word.toUpperCase()
+      if (i > 0 && SMALL_WORDS.has(word)) return word
+      return word.replace(/^([("']?)(\p{L})/u, (_, p, c) => p + c.toUpperCase())
+    })
+    .join(' ')
+}

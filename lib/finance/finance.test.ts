@@ -138,3 +138,15 @@ describe('calculateInstallments (Pay Small Small)', () => {
     expect(r.monthly).toBe(0)
   })
 })
+
+import { tidyTitle } from '@/lib/format'
+
+describe('tidyTitle', () => {
+  it('turns shouting titles into title case and keeps known abbreviations', () => {
+    expect(tidyTitle('BLEXTINS PROPERTY OF 5 BEDROOM DUPLEX FOR SALE ')).toBe('Blextins Property of 5 Bedroom Duplex for Sale')
+    expect(tidyTitle('4 BEDROOM MAISONETTE WITH BQ')).toBe('4 Bedroom Maisonette with BQ')
+  })
+  it('leaves mixed-case titles untouched', () => {
+    expect(tidyTitle('One (1) 3Bedroom PENTHOUSE at Ulus Residences')).toBe('One (1) 3Bedroom PENTHOUSE at Ulus Residences')
+  })
+})

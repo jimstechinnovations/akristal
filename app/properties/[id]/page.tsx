@@ -1,229 +1,286 @@
-import { createClient } from '@/lib/supabase/server'
+import type { Metadata } from 'next'
+import Link from 'next/link'
 import { notFound } from 'next/navigation'
-import { PropertyDetails } from '@/components/property-details'
-import { PropertyContact } from '@/components/property-contact'
-import { PropertySellerActions } from '@/components/property-seller-actions'
-import { PropertyConversations } from '@/components/property-conversations'
-import { PropertyImageGallery } from '@/components/property-image-gallery'
-import { getCurrentUser } from '@/lib/auth'
-import { formatCurrency } from '@/lib/utils'
-import { MapPin, Bed, Bath, Car, Calendar } from 'lucide-react'
-import type { Database } from '@/types/database'
+import { Suspense } from 'react'
+import { Bath, BedDouble, Calendar, Car, Check, ChevronRight, Ruler } from 'lucide-react'
+import { site } from '@/config/site'
+import { getListing, getSimilarListings } from '@/lib/data/listings'
+import { getAgents } from '@/lib/data/people'
+import { getInstallmentPlans } from '@/lib/data/plans'
+import { formatArea, formatMoney } from '@/lib/format'
+import { absoluteUrl, breadcrumbJsonLd } from '@/lib/seo'
+import { whatsappLink } from '@/lib/whatsapp'
+import { JsonLd } from '@/components/seo/json-ld'
+import { Gallery } from '@/components/media/gallery'
+import { ShowMore } from '@/components/ui/show-more'
+import { CostCalculator } from '@/components/finance/cost-calculator'
+import { AgentCard } from '@/components/listings/agent-card'
+import { ViewingForm } from '@/components/listings/viewing-form'
+import { ListingCard } from '@/components/listings/listing-card'
+import { AccountPanel } from '@/components/listings/account-panel'
+import { LocationMap, ShareAndSave, StickyActions } from '@/components/listings/detail-client'
 
-type PropertyRow = Database['public']['Tables']['properties']['Row']
-type SellerProfile = Pick<Database['public']['Tables']['profiles']['Row'], 'full_name' | 'email' | 'phone'>
-type PropertyWithSeller = PropertyRow & { profiles: SellerProfile | SellerProfile[] | null }
-type ConversationRow = Database['public']['Tables']['conversations']['Row']
-type ProfileRow = Database['public']['Tables']['profiles']['Row']
-type MessageRow = Database['public']['Tables']['messages']['Row']
-type ConversationWithBuyer = ConversationRow & {
-  profiles_buyer_id: Pick<ProfileRow, 'full_name' | 'id'> | null
-}
-type ConversationWithParticipants = ConversationRow & {
-  profiles_buyer_id: Pick<ProfileRow, 'full_name' | 'id'> | null
-  profiles_seller_id: Pick<ProfileRow, 'full_name' | 'id'> | null
-  last_message?: Pick<MessageRow, 'content' | 'created_at' | 'sender_id'> | null
-}
+type PageProps = { params: Promise<{ id: string }> }
 
-export default async function PropertyPage({
-  params,
-}: {
-  params: Promise<{ id: string }>
-}) {
-  const resolvedParams = await params
-  const id = resolvedParams.id
-  const supabase = await createClient()
-
-  const { data, error } = await supabase
-    .from('properties')
-    .select('*, profiles:seller_id(full_name, email, phone)')
-    .eq('id', id)
-    .single()
-  const property = data as PropertyWithSeller | null
-
-  if (error || !property) {
-    notFound()
+export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
+  const listing = await getListing((await params).id)
+  if (!listing) return { title: 'Home not found', robots: { index: false } }
+  const place = [listing.area, listing.market?.name].filter(Boolean).join(', ')
+  const title = `${listing.title}${place ? `, ${place}` : ''}`
+  const description = `${formatMoney(listing.price, listing.currency)}${listing.listingType === 'rent' ? ' a month' : ''}. ${[
+    listing.bedrooms != null && `${listing.bedrooms} bedrooms`,
+    listing.bathrooms != null && `${listing.bathrooms} bathrooms`,
+    listing.sizeSqm != null && formatArea(listing.sizeSqm),
+  ]
+    .filter(Boolean)
+    .join(', ')}. ${listing.description.slice(0, 120)}`.trim()
+  const image = listing.images[0]
+  return {
+    title,
+    description,
+    alternates: { canonical: `/properties/${listing.id}` },
+    openGraph: { title, description, url: `/properties/${listing.id}`, type: 'website', images: image ? [{ url: image, alt: listing.title }] : undefined },
+    twitter: { card: 'summary_large_image', title, description, images: image ? [image] : undefined },
   }
+}
 
-  // Ensure video_urls is properly handled (can be null, undefined, or array)
-  const videoUrls: string[] = Array.isArray(property.video_urls)
-    ? property.video_urls.filter((url): url is string => Boolean(url && typeof url === 'string' && url.trim()))
-    : []
+export default async function PropertyPage({ params }: PageProps) {
+  const { id } = await params
+  const listing = await getListing(id)
+  if (!listing) notFound()
 
-  // Increment view count
-  await (supabase as any)
-    .from('properties')
-    .update({ views_count: (property.views_count || 0) + 1 })
-    .eq('id', id)
+  const [similar, agents, plans] = await Promise.all([getSimilarListings(listing), getAgents(), getInstallmentPlans()])
+  const agent = listing.agentId ? agents.find((a) => a.id === listing.agentId) ?? null : null
+  const place = [listing.area, listing.market?.name].filter((v, i, a) => v && a.indexOf(v) === i).join(', ')
+  const url = absoluteUrl(`/properties/${listing.id}`)
+  const enquiry = `Hello Akristal, I'm interested in "${listing.title}" (${formatMoney(listing.price, listing.currency)}). ${url}`
+  const phoneHref = agent?.phone ? `tel:${agent.phone.replace(/[^\d+]/g, '')}` : site.phone.href
 
-  const seller = Array.isArray(property.profiles) ? property.profiles[0] : property.profiles
+  const facts = [
+    listing.bedrooms != null && { icon: BedDouble, value: listing.bedrooms, label: listing.bedrooms === 1 ? 'Bedroom' : 'Bedrooms' },
+    listing.bathrooms != null && { icon: Bath, value: listing.bathrooms, label: listing.bathrooms === 1 ? 'Bathroom' : 'Bathrooms' },
+    listing.sizeSqm != null && { icon: Ruler, value: formatArea(listing.sizeSqm), label: 'Floor area' },
+    listing.parking != null && { icon: Car, value: listing.parking, label: 'Parking' },
+    listing.yearBuilt != null && { icon: Calendar, value: listing.yearBuilt, label: 'Year built' },
+  ].filter(Boolean) as { icon: typeof Bath; value: string | number; label: string }[]
 
-  // Check if current user is the seller
-  const currentUser = await getCurrentUser()
-  const isSeller = currentUser?.id === property.seller_id
+  const details: [string, string][] = (
+    [
+      ['Type', listing.propertyType],
+      ['Listing', listing.listingType === 'rent' ? 'For rent' : 'For sale'],
+      ['Price', `${formatMoney(listing.price, listing.currency)}${listing.listingType === 'rent' ? ' a month' : ''}`],
+      ['Area', place],
+      ['Address', listing.address],
+      ['Reference', listing.id.slice(0, 8).toUpperCase()],
+    ] as [string, string | null][]
+  ).filter((r): r is [string, string] => !!r[1])
 
-  // Fetch conversations for seller (all conversations on this property)
-  let sellerConversations: ConversationWithBuyer[] = []
-  if (isSeller) {
-    const { data: conversationsData } = await supabase
-      .from('conversations')
-      .select('*, profiles_buyer_id:buyer_id(full_name, id)')
-      .eq('property_id', id)
-      .order('last_message_at', { ascending: false })
+  const highlights = [...listing.amenities, ...listing.features]
 
-    sellerConversations = (conversationsData as ConversationWithBuyer[] | null) ?? []
-  }
-
-  // Fetch conversations for current user (if logged in) - shows their conversations on this property
-  let userConversations: ConversationWithParticipants[] = []
-  if (currentUser) {
-    const { data: userConvData } = await supabase
-      .from('conversations')
-      .select(
-        '*, profiles_buyer_id:buyer_id(full_name, id), profiles_seller_id:seller_id(full_name, id)'
-      )
-      .eq('property_id', id)
-      .or(`buyer_id.eq.${currentUser.id},seller_id.eq.${currentUser.id}`)
-      .order('last_message_at', { ascending: false })
-
-    const conversations = (userConvData as ConversationWithParticipants[] | null) ?? []
-
-    // Fetch last message for each conversation
-    for (const conv of conversations) {
-      const { data: lastMsg } = await supabase
-        .from('messages')
-        .select('content, created_at, sender_id')
-        .eq('conversation_id', conv.id)
-        .order('created_at', { ascending: false })
-        .limit(1)
-        .maybeSingle()
-
-      if (lastMsg) {
-        conv.last_message = lastMsg as Pick<MessageRow, 'content' | 'created_at' | 'sender_id'>
-      }
-    }
-
-    userConversations = conversations
+  const jsonLd = {
+    '@context': 'https://schema.org',
+    '@type': 'RealEstateListing',
+    name: listing.title,
+    url,
+    image: listing.images.slice(0, 6),
+    description: listing.description.slice(0, 500),
+    datePosted: listing.createdAt ?? undefined,
+    offers: {
+      '@type': 'Offer',
+      price: listing.price,
+      priceCurrency: listing.currency,
+      businessFunction: listing.listingType === 'rent' ? 'http://purl.org/goodrelations/v1#LeaseOut' : 'http://purl.org/goodrelations/v1#Sell',
+      availability: 'https://schema.org/InStock',
+    },
+    about: {
+      '@type': listing.propertyType === 'Apartment' ? 'Apartment' : 'SingleFamilyResidence',
+      numberOfRooms: listing.bedrooms ?? undefined,
+      numberOfBathroomsTotal: listing.bathrooms ?? undefined,
+      floorSize: listing.sizeSqm ? { '@type': 'QuantitativeValue', value: listing.sizeSqm, unitCode: 'MTK' } : undefined,
+      address: { '@type': 'PostalAddress', streetAddress: listing.address || undefined, addressLocality: listing.area || listing.market?.name, addressCountry: listing.market?.country },
+      geo: listing.coords && !listing.coords.approximate ? { '@type': 'GeoCoordinates', latitude: listing.coords.lat, longitude: listing.coords.lng } : undefined,
+    },
   }
 
   return (
-    <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
-      <div className="mb-6">
-        <h1 className="text-3xl font-bold text-gray-900 dark:text-white">
-          {property.title}
-        </h1>
-        <div className="mt-2 flex items-center text-gray-600 dark:text-gray-400">
-          <MapPin className="mr-1 h-5 w-5" />
-          <span>
-            {property.address}, {property.city}, {property.country}
-          </span>
-        </div>
-      </div>
-
-      <div className="mb-6">
-        <p className="text-3xl font-bold text-blue-600 dark:text-blue-400">
-          {formatCurrency(property.price, property.currency)}
-        </p>
-      </div>
-
-      {/* Image Gallery */}
-      <PropertyImageGallery
-        coverImageUrl={property.cover_image_url}
-        imageUrls={property.image_urls}
-        title={property.title}
+    <article className="pb-24 lg:pb-0">
+      <JsonLd
+        data={[
+          jsonLd,
+          breadcrumbJsonLd([
+            { name: 'Home', path: '/' },
+            { name: 'Homes', path: '/properties' },
+            ...(listing.market ? [{ name: listing.market.name, path: `/properties?market=${listing.market.slug}` }] : []),
+            { name: listing.title, path: `/properties/${listing.id}` },
+          ]),
+        ]}
       />
 
-      {/* Video Gallery */}
-      {videoUrls.length > 0 && (
-        <div className="mb-8">
-          <h2 className="mb-4 text-2xl font-semibold text-gray-900 dark:text-white">Videos</h2>
-          <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
-            {videoUrls.map((url, index) => (
-              <div key={index} className="relative aspect-video w-full overflow-hidden rounded-lg bg-black">
-                <video
-                  src={url}
-                  controls
-                  className="h-full w-full object-contain"
-                  preload="metadata"
-                >
-                  Your browser does not support the video tag.
-                </video>
-              </div>
-            ))}
-          </div>
-        </div>
-      )}
+      <div className="page-x-wide pt-6">
+        <nav aria-label="Breadcrumb" className="mb-5 text-sm text-muted">
+          <ol className="flex flex-wrap items-center gap-1">
+            <li>
+              <Link href="/properties" className="hover:text-ink hover:underline">
+                Homes
+              </Link>
+            </li>
+            {listing.market && (
+              <li className="flex items-center gap-1">
+                <ChevronRight aria-hidden className="size-3.5" />
+                <Link href={`/properties?market=${listing.market.slug}`} className="hover:text-ink hover:underline">
+                  {listing.market.name}
+                </Link>
+              </li>
+            )}
+            <li className="flex min-w-0 items-center gap-1">
+              <ChevronRight aria-hidden className="size-3.5" />
+              <span aria-current="page" className="truncate">
+                {listing.area || listing.title}
+              </span>
+            </li>
+          </ol>
+        </nav>
 
-      <div className="grid grid-cols-1 gap-8 lg:grid-cols-3">
-        <div className="lg:col-span-2">
-          <div className="mb-6">
-            <h2 className="mb-4 text-2xl font-semibold text-gray-900 dark:text-white">Description</h2>
-            <p className="text-gray-700 dark:text-gray-300 whitespace-pre-wrap">
-              {property.description || 'No description provided.'}
-            </p>
-          </div>
+        <Gallery images={listing.images} videos={listing.videos} title={listing.title} />
 
-          <div className="mb-6 grid grid-cols-2 gap-4 sm:grid-cols-4">
-            {property.bedrooms && (
-              <div className="rounded-lg border border-gray-200 p-4 dark:border-gray-700">
-                <Bed className="mb-2 h-6 w-6 text-blue-600 dark:text-blue-400" />
-                <div className="text-sm text-gray-600 dark:text-gray-400">Bedrooms</div>
-                <div className="text-lg font-semibold text-gray-900 dark:text-white">{property.bedrooms}</div>
+        <div className="mt-8 grid gap-12 lg:grid-cols-[minmax(0,1fr)_380px] xl:gap-16">
+          <div className="min-w-0">
+            <header className="flex flex-col gap-4 border-b border-line pb-8 sm:flex-row sm:items-start sm:justify-between">
+              <div className="min-w-0">
+                <p className="text-sm text-muted">
+                  {listing.listingType === 'rent' ? 'For rent' : 'For sale'}
+                  {listing.propertyType && <>, {listing.propertyType.toLowerCase()}</>}
+                </p>
+                <h1 className="mt-1 font-display text-display-m font-medium">{listing.title}</h1>
+                {place && <p className="mt-2 text-[0.9375rem] text-muted">{place}</p>}
+                <p className="tabular mt-5 text-[2rem] font-semibold tracking-tight">
+                  {formatMoney(listing.price, listing.currency)}
+                  {listing.listingType === 'rent' && <span className="text-base font-normal text-muted"> a month</span>}
+                </p>
               </div>
+              <ShareAndSave id={listing.id} title={listing.title} />
+            </header>
+
+            {facts.length > 0 && (
+              <ul className="grid grid-cols-2 gap-px overflow-hidden border-b border-line sm:grid-cols-3 lg:grid-cols-5">
+                {facts.map(({ icon: Icon, value, label }) => (
+                  <li key={label} className="py-6 pr-4">
+                    <Icon aria-hidden className="size-5 text-muted" />
+                    <p className="tabular mt-2 text-xl font-semibold">{value}</p>
+                    <p className="text-sm text-muted">{label}</p>
+                  </li>
+                ))}
+              </ul>
             )}
-            {property.bathrooms && (
-              <div className="rounded-lg border border-gray-200 p-4 dark:border-gray-700">
-                <Bath className="mb-2 h-6 w-6 text-blue-600 dark:text-blue-400" />
-                <div className="text-sm text-gray-600 dark:text-gray-400">Bathrooms</div>
-                <div className="text-lg font-semibold text-gray-900 dark:text-white">{property.bathrooms}</div>
-              </div>
+
+            {listing.description && (
+              <section aria-labelledby="about-title" className="border-b border-line py-10">
+                <h2 id="about-title" className="font-display text-display-s font-medium">
+                  About this home
+                </h2>
+                <ShowMore text={listing.description} className="mt-4 max-w-[70ch]" />
+              </section>
             )}
-            {property.parking_spaces && (
-              <div className="rounded-lg border border-gray-200 p-4 dark:border-gray-700">
-                <Car className="mb-2 h-6 w-6 text-blue-600 dark:text-blue-400" />
-                <div className="text-sm text-gray-600 dark:text-gray-400">Parking</div>
-                <div className="text-lg font-semibold text-gray-900 dark:text-white">{property.parking_spaces}</div>
-              </div>
+
+            {highlights.length > 0 && (
+              <section aria-labelledby="features-title" className="border-b border-line py-10">
+                <h2 id="features-title" className="font-display text-display-s font-medium">
+                  Features
+                </h2>
+                <ul className="mt-5 grid gap-x-8 gap-y-3 sm:grid-cols-2">
+                  {highlights.map((h) => (
+                    <li key={h} className="flex items-start gap-2.5 text-[0.9375rem]">
+                      <Check aria-hidden className="mt-0.5 size-4 shrink-0 text-success" />
+                      <span className="first-letter:uppercase">{h}</span>
+                    </li>
+                  ))}
+                </ul>
+              </section>
             )}
-            {property.size_sqm && (
-              <div className="rounded-lg border border-gray-200 p-4 dark:border-gray-700">
-                <div className="mb-2 text-lg font-semibold text-blue-600 dark:text-blue-400">
-                  {property.size_sqm}
+
+            <section aria-labelledby="details-title" className="border-b border-line py-10">
+              <h2 id="details-title" className="font-display text-display-s font-medium">
+                Details
+              </h2>
+              <dl className="mt-5 grid gap-x-8 sm:grid-cols-2">
+                {details.map(([k, v]) => (
+                  <div key={k} className="flex justify-between gap-4 border-b border-line py-3 text-[0.9375rem]">
+                    <dt className="text-muted">{k}</dt>
+                    <dd className="text-right">{v}</dd>
+                  </div>
+                ))}
+              </dl>
+            </section>
+
+            {listing.coords && (
+              <section aria-labelledby="location-title" className="border-b border-line py-10">
+                <h2 id="location-title" className="font-display text-display-s font-medium">
+                  Location
+                </h2>
+                <p className="mt-2 text-[0.9375rem] text-muted">{place}</p>
+                <div className="mt-5">
+                  <LocationMap
+                    listing={{
+                      id: listing.id,
+                      title: listing.title,
+                      price: listing.price,
+                      currency: listing.currency,
+                      listingType: listing.listingType,
+                      image: listing.images[0] ?? null,
+                      place,
+                      lat: listing.coords.lat,
+                      lng: listing.coords.lng,
+                      approximate: listing.coords.approximate,
+                    }}
+                  />
                 </div>
-                <div className="text-sm text-gray-600 dark:text-gray-400">Square Meters</div>
+              </section>
+            )}
+
+            {listing.listingType === 'sale' && (
+              <div className="py-10">
+                <CostCalculator price={listing.price} currency={listing.currency} plan={plans[0]} />
               </div>
             )}
+
+            <Suspense fallback={null}>
+              <AccountPanel propertyId={listing.id} />
+            </Suspense>
           </div>
 
-          {property.year_built && (
-            <div className="mb-6 flex items-center text-gray-600 dark:text-gray-400">
-              <Calendar className="mr-2 h-5 w-5" />
-              <span>Year Built: {property.year_built}</span>
-            </div>
-          )}
-
-          <PropertyDetails property={property} />
-
-          {/* Show conversations for current user if they have any */}
-          {currentUser && userConversations.length > 0 && (
-            <PropertyConversations
-              conversations={userConversations}
-              currentUserId={currentUser.id}
-              propertyId={id}
-            />
-          )}
-        </div>
-
-        <div className="lg:col-span-1">
-          {isSeller ? (
-            <PropertySellerActions property={property} conversations={sellerConversations} />
-          ) : (
-            <PropertyContact property={property} seller={seller} />
-          )}
+          <aside className="lg:sticky lg:top-24 lg:self-start">
+            <AgentCard agent={agent} enquiry={enquiry} />
+            <section id="book-viewing" aria-labelledby="viewing-title" className="mt-6 scroll-mt-24 rounded-md border border-line p-5">
+              <h2 id="viewing-title" className="text-lg font-semibold">
+                Book a viewing
+              </h2>
+              <p className="mt-1 text-sm text-muted">Pick a day and we will confirm a time with you.</p>
+              <div className="mt-5">
+                <ViewingForm propertyId={listing.id} agentId={listing.agentId} title={listing.title} />
+              </div>
+            </section>
+          </aside>
         </div>
       </div>
-    </div>
+
+      {similar.length > 0 && (
+        <section aria-labelledby="similar-title" className="mt-16 border-t border-line bg-page-alt py-16">
+          <div className="page-x-wide">
+            <h2 id="similar-title" className="font-display text-display-m font-medium">
+              Similar homes
+            </h2>
+            <ul className="mt-10 grid gap-x-6 gap-y-12 sm:grid-cols-2 lg:grid-cols-3">
+              {similar.map((l) => (
+                <li key={l.id}>
+                  <ListingCard listing={l} />
+                </li>
+              ))}
+            </ul>
+          </div>
+        </section>
+      )}
+
+      <StickyActions phoneHref={phoneHref} whatsappHref={whatsappLink(enquiry, agent?.whatsapp ?? site.whatsapp)} />
+    </article>
   )
 }
-
-
