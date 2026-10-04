@@ -36,11 +36,11 @@ export default async function AdminDashboard() {
     ) || 0
 
   return (
-    <div className="min-h-screen bg-white dark:bg-[#0f172a]">
+    <div className="min-h-screen bg-white dark:bg-page">
       <div className="mx-auto max-w-7xl px-4 py-6 sm:px-6 lg:px-8">
         <div className="mb-6 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
           <div>
-            <h1 className="text-2xl sm:text-3xl font-bold text-[#0d233e] dark:text-white">
+            <h1 className="text-2xl sm:text-3xl font-bold text-brand dark:text-white">
               Admin Dashboard
             </h1>
             <p className="mt-1 sm:mt-2 text-sm sm:text-base text-gray-600 dark:text-gray-400">
@@ -49,12 +49,12 @@ export default async function AdminDashboard() {
           </div>
           <div className="flex gap-2">
             <Link href="/admin/property-types">
-              <Button className="bg-[#0d233e] hover:bg-[#0a1a2e] text-white">
+              <Button className="bg-brand hover:bg-brand-hover text-white">
                 Property Types
               </Button>
             </Link>
             <Link href="/admin/categories">
-              <Button className="bg-[#0d233e] hover:bg-[#0a1a2e] text-white">
+              <Button className="bg-brand hover:bg-brand-hover text-white">
                 Categories
               </Button>
             </Link>
@@ -63,7 +63,7 @@ export default async function AdminDashboard() {
 
       {/* Stats */}
       <div className="mb-6 grid grid-cols-2 gap-3 sm:gap-4 lg:grid-cols-4">
-        <Card className="bg-white dark:bg-[#1e293b]">
+        <Card className="bg-white dark:bg-surface">
           <CardHeader className="pb-3">
             <CardTitle className="flex items-center text-xs sm:text-sm font-medium text-gray-600 dark:text-gray-400">
               <Users className="mr-2 h-4 w-4 sm:h-5 sm:w-5" />
@@ -71,11 +71,11 @@ export default async function AdminDashboard() {
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="text-xl sm:text-2xl font-bold text-[#0d233e] dark:text-white">{totalUsers}</div>
+            <div className="text-xl sm:text-2xl font-bold text-brand dark:text-white">{totalUsers}</div>
           </CardContent>
         </Card>
 
-        <Card className="bg-white dark:bg-[#1e293b]">
+        <Card className="bg-white dark:bg-surface">
           <CardHeader className="pb-3">
             <CardTitle className="flex items-center text-xs sm:text-sm font-medium text-gray-600 dark:text-gray-400">
               <FileText className="mr-2 h-4 w-4 sm:h-5 sm:w-5" />
@@ -83,16 +83,16 @@ export default async function AdminDashboard() {
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="text-xl sm:text-2xl font-bold text-[#0d233e] dark:text-white">{totalProperties}</div>
+            <div className="text-xl sm:text-2xl font-bold text-brand dark:text-white">{totalProperties}</div>
             {pendingApprovals > 0 && (
-              <div className="mt-1 sm:mt-2 text-xs sm:text-sm text-[#c89b3c]">
+              <div className="mt-1 sm:mt-2 text-xs sm:text-sm text-accent">
                 {pendingApprovals} pending
               </div>
             )}
           </CardContent>
         </Card>
 
-        <Card className="bg-white dark:bg-[#1e293b]">
+        <Card className="bg-white dark:bg-surface">
           <CardHeader className="pb-3">
             <CardTitle className="flex items-center text-xs sm:text-sm font-medium text-gray-600 dark:text-gray-400">
               <DollarSign className="mr-2 h-4 w-4 sm:h-5 sm:w-5" />
@@ -100,13 +100,13 @@ export default async function AdminDashboard() {
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="text-lg sm:text-2xl font-bold text-[#0d233e] dark:text-white">
+            <div className="text-lg sm:text-2xl font-bold text-brand dark:text-white">
               {formatCurrency(totalRevenue)}
             </div>
           </CardContent>
         </Card>
 
-        <Card className="bg-white dark:bg-[#1e293b]">
+        <Card className="bg-white dark:bg-surface">
           <CardHeader className="pb-3">
             <CardTitle className="flex items-center text-xs sm:text-sm font-medium text-gray-600 dark:text-gray-400">
               <TrendingUp className="mr-2 h-4 w-4 sm:h-5 sm:w-5" />
@@ -114,30 +114,30 @@ export default async function AdminDashboard() {
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="text-xl sm:text-2xl font-bold text-[#0d233e] dark:text-white">{totalPayments}</div>
+            <div className="text-xl sm:text-2xl font-bold text-brand dark:text-white">{totalPayments}</div>
           </CardContent>
         </Card>
       </div>
 
       {/* Quick Actions */}
       <div className="grid grid-cols-1 gap-4 sm:gap-6 sm:grid-cols-2 lg:grid-cols-3">
-        <Card className="bg-white dark:bg-[#1e293b]">
+        <Card className="bg-white dark:bg-surface">
           <CardHeader>
-            <CardTitle className="text-[#0d233e] dark:text-white">Property Approvals</CardTitle>
+            <CardTitle className="text-brand dark:text-white">Property Approvals</CardTitle>
           </CardHeader>
           <CardContent>
             <p className="mb-4 text-sm text-gray-600 dark:text-gray-400">
               Review and approve pending property listings
             </p>
             <Link href="/admin/properties">
-              <Button className="w-full sm:w-auto bg-[#0d233e] hover:bg-[#0a1a2e] text-white">Manage Properties</Button>
+              <Button className="w-full sm:w-auto bg-brand hover:bg-brand-hover text-white">Manage Properties</Button>
             </Link>
           </CardContent>
         </Card>
 
-        <Card className="bg-white dark:bg-[#1e293b]">
+        <Card className="bg-white dark:bg-surface">
           <CardHeader>
-            <CardTitle className="text-[#0d233e] dark:text-white">User Management</CardTitle>
+            <CardTitle className="text-brand dark:text-white">User Management</CardTitle>
           </CardHeader>
           <CardContent>
             <p className="mb-4 text-sm text-gray-600 dark:text-gray-400">
@@ -149,9 +149,9 @@ export default async function AdminDashboard() {
           </CardContent>
         </Card>
 
-        <Card className="bg-white dark:bg-[#1e293b]">
+        <Card className="bg-white dark:bg-surface">
           <CardHeader>
-            <CardTitle className="text-[#0d233e] dark:text-white">Payments</CardTitle>
+            <CardTitle className="text-brand dark:text-white">Payments</CardTitle>
           </CardHeader>
           <CardContent>
             <p className="mb-4 text-sm text-gray-600 dark:text-gray-400">

@@ -159,7 +159,7 @@ export function ProjectOfferForm({ projectId }: { projectId: string }) {
               Description *
             </label>
             <textarea
-              className="flex min-h-[120px] w-full rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm text-gray-900 placeholder:text-gray-500 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-100 dark:placeholder:text-gray-400"
+              className="flex min-h-[120px] w-full rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm text-gray-900 placeholder:text-gray-500 dark:border-line-strong dark:bg-surface dark:text-gray-100 dark:placeholder:text-gray-400"
               value={formData.description}
               onChange={(e) => setFormData({ ...formData, description: e.target.value })}
               required
@@ -200,7 +200,7 @@ export function ProjectOfferForm({ projectId }: { projectId: string }) {
               multiple
               accept="image/*,video/*"
               onChange={handleMediaChange}
-              className="block w-full text-sm text-gray-500 file:mr-4 file:rounded-lg file:border-0 file:bg-blue-50 file:px-4 file:py-2 file:text-sm file:font-semibold file:text-blue-700 hover:file:bg-blue-100 dark:file:bg-blue-900 dark:file:text-blue-200"
+              className="block w-full text-sm text-gray-500 file:mr-4 file:rounded-lg file:border-0 file:bg-page-alt file:px-4 file:py-2 file:text-sm file:font-semibold file:text-primary hover:file:bg-page-alt dark:file:bg-ink dark:file:text-line"
             />
             {mediaPreviews.length > 0 && (
               <div className="mt-4 grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-4">
@@ -242,7 +242,7 @@ export function ProjectOfferForm({ projectId }: { projectId: string }) {
               Schedule Visibility *
             </label>
             <select
-              className="flex h-10 w-full rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm text-gray-900 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-100"
+              className="flex h-10 w-full rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm text-gray-900 dark:border-line-strong dark:bg-surface dark:text-gray-100"
               value={formData.schedule_visibility}
               onChange={(e) =>
                 setFormData({

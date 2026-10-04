@@ -28,11 +28,11 @@ export default async function AgentDashboard() {
   }
 
   return (
-    <div className="min-h-screen bg-white dark:bg-[#0f172a]">
+    <div className="min-h-screen bg-white dark:bg-page">
       <div className="mx-auto max-w-7xl px-4 py-6 sm:px-6 lg:px-8">
         <div className="mb-6 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
           <div>
-            <h1 className="text-2xl sm:text-3xl font-bold text-[#0d233e] dark:text-white">
+            <h1 className="text-2xl sm:text-3xl font-bold text-brand dark:text-white">
               Agent Dashboard
             </h1>
             <p className="mt-1 sm:mt-2 text-sm sm:text-base text-gray-600 dark:text-gray-400">
@@ -41,7 +41,7 @@ export default async function AgentDashboard() {
           </div>
           <div className="flex gap-2">
             <Link href="/seller/properties/new" className="w-full sm:w-auto">
-              <Button className="w-full sm:w-auto bg-[#0d233e] hover:bg-[#0a1a2e] text-white">
+              <Button className="w-full sm:w-auto bg-brand hover:bg-brand-hover text-white">
                 <Plus className="mr-2 h-4 w-4" />
                 New Listing
               </Button>
@@ -56,7 +56,7 @@ export default async function AgentDashboard() {
         </div>
 
         <div className="mb-6 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
-          <Card className="bg-white dark:bg-[#1e293b]">
+          <Card className="bg-white dark:bg-surface">
             <CardHeader>
               <CardTitle className="text-sm font-medium text-gray-600 dark:text-gray-400">
                 Total Listings
@@ -66,7 +66,7 @@ export default async function AgentDashboard() {
               <div className="text-2xl font-bold">{stats.total}</div>
             </CardContent>
           </Card>
-          <Card className="bg-white dark:bg-[#1e293b]">
+          <Card className="bg-white dark:bg-surface">
             <CardHeader>
               <CardTitle className="text-sm font-medium text-gray-600 dark:text-gray-400">
                 Approved
@@ -76,7 +76,7 @@ export default async function AgentDashboard() {
               <div className="text-2xl font-bold text-green-600">{stats.approved}</div>
             </CardContent>
           </Card>
-          <Card className="bg-white dark:bg-[#1e293b]">
+          <Card className="bg-white dark:bg-surface">
             <CardHeader>
               <CardTitle className="text-sm font-medium text-gray-600 dark:text-gray-400">
                 Pending Approval
@@ -90,7 +90,7 @@ export default async function AgentDashboard() {
 
         <div>
           <div className="mb-4 flex items-center justify-between">
-            <h2 className="text-xl sm:text-2xl font-semibold text-[#0d233e] dark:text-white">
+            <h2 className="text-xl sm:text-2xl font-semibold text-brand dark:text-white">
               Recent Listings
             </h2>
             <Link href="/agent/properties">
@@ -107,13 +107,13 @@ export default async function AgentDashboard() {
               ))}
             </div>
           ) : (
-            <Card className="bg-white dark:bg-[#1e293b]">
+            <Card className="bg-white dark:bg-surface">
               <CardContent className="py-12 text-center">
                 <p className="text-gray-600 dark:text-gray-400">
                   No listings found yet.
                 </p>
                 <Link href="/seller/properties/new" className="mt-4 inline-block">
-                  <Button className="bg-[#0d233e] hover:bg-[#0a1a2e] text-white">
+                  <Button className="bg-brand hover:bg-brand-hover text-white">
                     Create a Listing
                   </Button>
                 </Link>

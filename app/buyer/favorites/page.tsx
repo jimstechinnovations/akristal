@@ -24,11 +24,11 @@ export default async function BuyerFavoritesPage() {
     .order('created_at', { ascending: false })
 
   return (
-    <div className="min-h-screen bg-white dark:bg-[#0f172a]">
+    <div className="min-h-screen bg-white dark:bg-page">
       <div className="mx-auto max-w-7xl px-4 py-6 sm:px-6 lg:px-8">
         <div className="mb-6 flex items-center justify-between gap-4">
           <div>
-            <h1 className="text-2xl sm:text-3xl font-bold text-[#0d233e] dark:text-white">
+            <h1 className="text-2xl sm:text-3xl font-bold text-brand dark:text-white">
               Favorites
             </h1>
             <p className="mt-1 sm:mt-2 text-sm sm:text-base text-gray-600 dark:text-gray-400">
@@ -45,7 +45,7 @@ export default async function BuyerFavoritesPage() {
             {(favorites as FavoriteWithProperty[]).map((fav) => (
               <div
                 key={fav.property_id}
-                className="bg-white dark:bg-[#1e293b] rounded-lg overflow-hidden shadow-sm"
+                className="bg-white dark:bg-surface rounded-lg overflow-hidden shadow-sm"
               >
                 {fav.properties ? <PropertyCard property={fav.properties} /> : null}
                 <div className="p-3 sm:p-4 pt-0">
@@ -55,13 +55,13 @@ export default async function BuyerFavoritesPage() {
             ))}
           </div>
         ) : (
-          <Card className="bg-white dark:bg-[#1e293b]">
+          <Card className="bg-white dark:bg-surface">
             <CardContent className="py-12 text-center">
               <p className="text-gray-600 dark:text-gray-400">
                 You haven&apos;t saved any properties yet.
               </p>
               <Link href="/properties" className="mt-4 inline-block">
-                <Button className="bg-[#0d233e] hover:bg-[#0a1a2e] text-white">
+                <Button className="bg-brand hover:bg-brand-hover text-white">
                   Browse Properties
                 </Button>
               </Link>

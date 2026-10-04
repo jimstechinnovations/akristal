@@ -26,9 +26,9 @@ export default async function AdminEditPropertyPage({
 
   if (error || !property) {
     return (
-      <div className="min-h-screen bg-white dark:bg-[#0f172a]">
+      <div className="min-h-screen bg-white dark:bg-page">
         <div className="mx-auto max-w-3xl px-4 py-8 sm:px-6 lg:px-8">
-          <Card className="bg-white dark:bg-[#1e293b]">
+          <Card className="bg-white dark:bg-surface">
             <CardContent className="pt-6">
               <p className="text-red-600 dark:text-red-400">
                 {error?.message || 'Property not found'}
@@ -46,7 +46,7 @@ export default async function AdminEditPropertyPage({
   const typedProperty = property as PropertyRow
 
   return (
-    <div className="min-h-screen bg-white dark:bg-[#0f172a]">
+    <div className="min-h-screen bg-white dark:bg-page">
       <div className="mx-auto max-w-4xl px-4 py-8 sm:px-6 lg:px-8">
         <div className="mb-8">
           <Link

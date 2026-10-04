@@ -122,7 +122,7 @@ export default async function MessagesPage() {
                                 : 'Buyer & Seller'}
                         </p>
                         {unreadCount > 0 && (
-                          <span className="mt-2 inline-block rounded-full bg-blue-600 px-2 py-1 text-xs text-white">
+                          <span className="mt-2 inline-block rounded-full bg-primary px-2 py-1 text-xs text-on-primary">
                             {unreadCount} new
                           </span>
                         )}
@@ -142,7 +142,7 @@ export default async function MessagesPage() {
               No conversations yet. Start browsing properties to connect with sellers!
             </p>
             <Link href="/properties" className="mt-4 inline-block">
-              <button className="rounded-lg bg-blue-600 px-4 py-2 text-white hover:bg-blue-700">
+              <button className="rounded-lg bg-primary px-4 py-2 text-on-primary hover:bg-primary">
                 Browse Properties
               </button>
             </Link>

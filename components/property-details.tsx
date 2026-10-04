@@ -23,7 +23,7 @@ export function PropertyDetails({ property }: PropertyDetailsProps) {
               {amenities.map((amenity, index) => (
                 <span
                   key={index}
-                  className="rounded-full bg-blue-100 px-3 py-1 text-sm text-blue-800 dark:bg-blue-900 dark:text-blue-200"
+                  className="rounded-full bg-page-alt px-3 py-1 text-sm text-ink dark:bg-page-alt dark:text-line"
                 >
                   {typeof amenity === 'string' ? amenity : JSON.stringify(amenity)}
                 </span>
@@ -43,7 +43,7 @@ export function PropertyDetails({ property }: PropertyDetailsProps) {
               {features.map((feature, index) => (
                 <span
                   key={index}
-                  className="rounded-full bg-gray-100 px-3 py-1 text-sm text-gray-800 dark:bg-gray-800 dark:text-gray-200"
+                  className="rounded-full bg-gray-100 px-3 py-1 text-sm text-gray-800 dark:bg-surface dark:text-gray-200"
                 >
                   {typeof feature === 'string' ? feature : JSON.stringify(feature)}
                 </span>

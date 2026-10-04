@@ -40,7 +40,7 @@ export default async function PropertyTypesPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-gray-900 py-8">
+    <div className="min-h-screen bg-gray-50 dark:bg-page py-8">
       <div className="mx-auto max-w-7xl px-4">
         <div className="mb-6 flex items-center justify-between">
           <div className="flex items-center gap-4">
@@ -76,7 +76,7 @@ export default async function PropertyTypesPage() {
                   (propertyTypes as PropertyType[]).map((type) => (
                     <div
                       key={type.id}
-                      className="flex items-center justify-between rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 p-4"
+                      className="flex items-center justify-between rounded-lg border border-gray-200 dark:border-line bg-white dark:bg-surface p-4"
                     >
                       <div className="flex-1">
                         <div className="flex items-center gap-2">

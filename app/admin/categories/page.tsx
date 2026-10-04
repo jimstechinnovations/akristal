@@ -19,17 +19,17 @@ export default async function AdminCategoriesPage() {
     .order('display_order', { ascending: true })
 
   return (
-    <div className="min-h-screen bg-white dark:bg-[#0f172a]">
+    <div className="min-h-screen bg-white dark:bg-page">
       <div className="mx-auto max-w-7xl px-4 py-6 sm:px-6 lg:px-8">
         <div className="mb-6 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
           <div>
-            <h1 className="text-2xl sm:text-3xl font-bold text-[#0d233e] dark:text-white">Category Management</h1>
+            <h1 className="text-2xl sm:text-3xl font-bold text-brand dark:text-white">Category Management</h1>
             <p className="mt-1 sm:mt-2 text-sm sm:text-base text-gray-600 dark:text-gray-400">
               Manage property categories
             </p>
           </div>
           <Link href="/admin/categories/new">
-            <Button className="bg-[#0d233e] hover:bg-[#0a1a2e] text-white w-full sm:w-auto">
+            <Button className="bg-brand hover:bg-brand-hover text-white w-full sm:w-auto">
               <Plus className="h-4 w-4 mr-2" />
               Add Category
             </Button>
@@ -37,7 +37,7 @@ export default async function AdminCategoriesPage() {
         </div>
 
         {error ? (
-          <Card className="bg-white dark:bg-[#1e293b]">
+          <Card className="bg-white dark:bg-surface">
             <CardContent className="pt-6">
               <p className="text-red-600 dark:text-red-400">Error loading categories: {error.message}</p>
             </CardContent>
@@ -45,9 +45,9 @@ export default async function AdminCategoriesPage() {
         ) : categories && categories.length > 0 ? (
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
             {(categories as CategoryRow[]).map((category) => (
-              <Card key={category.id} className="bg-white dark:bg-[#1e293b]">
+              <Card key={category.id} className="bg-white dark:bg-surface">
                 <CardHeader>
-                  <CardTitle className="text-[#0d233e] dark:text-white text-base sm:text-lg">
+                  <CardTitle className="text-brand dark:text-white text-base sm:text-lg">
                     {category.name}
                   </CardTitle>
                 </CardHeader>
@@ -75,7 +75,7 @@ export default async function AdminCategoriesPage() {
             ))}
           </div>
         ) : (
-          <Card className="bg-white dark:bg-[#1e293b]">
+          <Card className="bg-white dark:bg-surface">
             <CardContent className="pt-6 text-center">
               <p className="text-gray-600 dark:text-gray-400">No categories found.</p>
             </CardContent>

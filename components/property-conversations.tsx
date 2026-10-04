@@ -56,7 +56,7 @@ export function PropertyConversations({
               <Link
                 key={conversation.id}
                 href={`/messages/${conversation.id}`}
-                className="block rounded-lg border border-gray-200 p-4 transition-colors hover:bg-gray-50 dark:border-gray-700 dark:hover:bg-gray-800"
+                className="block rounded-lg border border-gray-200 p-4 transition-colors hover:bg-gray-50 dark:border-line dark:hover:bg-gray-800"
               >
                 <div className="flex items-start justify-between">
                   <div className="flex-1 min-w-0">

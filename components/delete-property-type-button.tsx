@@ -47,7 +47,7 @@ export default function DeletePropertyTypeButton({ id, name }: { id: string; nam
 
       {showConfirm && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
-          <div className="w-full max-w-md rounded-lg bg-white dark:bg-gray-800 p-6">
+          <div className="w-full max-w-md rounded-lg bg-white dark:bg-surface p-6">
             <h3 className="mb-4 text-lg font-semibold text-gray-900 dark:text-white">
               Delete Property Type
             </h3>

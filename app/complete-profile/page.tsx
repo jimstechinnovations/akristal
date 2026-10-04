@@ -154,7 +154,7 @@ export default function CompleteProfilePage() {
               </label>
               <select
                 id="role"
-                className="flex h-10 w-full rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm text-gray-900 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-100"
+                className="flex h-10 w-full rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm text-gray-900 dark:border-line-strong dark:bg-surface dark:text-gray-100"
                 value={formData.role}
                 onChange={(e) => setFormData({ ...formData, role: e.target.value as Exclude<UserRole, 'admin'> })}
                 required

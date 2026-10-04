@@ -30,17 +30,17 @@ export default async function AdminMembersPage() {
     .order('created_at', { ascending: false })
 
   return (
-    <div className="min-h-screen bg-white dark:bg-[#0f172a]">
+    <div className="min-h-screen bg-white dark:bg-page">
       <div className="mx-auto max-w-7xl px-4 py-6 sm:px-6 lg:px-8">
         <div className="mb-6 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
           <div>
-            <h1 className="text-2xl sm:text-3xl font-bold text-[#0d233e] dark:text-white">Members</h1>
+            <h1 className="text-2xl sm:text-3xl font-bold text-brand dark:text-white">Members</h1>
             <p className="mt-1 sm:mt-2 text-sm sm:text-base text-gray-600 dark:text-gray-400">
               Manage team members displayed on the members page
             </p>
           </div>
           <Link href="/admin/members/new">
-            <Button className="bg-[#0d233e] hover:bg-[#0a1a2e] text-white w-full sm:w-auto">
+            <Button className="bg-brand hover:bg-brand-hover text-white w-full sm:w-auto">
               <Plus className="h-4 w-4 mr-2" />
               Add Member
             </Button>
@@ -48,7 +48,7 @@ export default async function AdminMembersPage() {
         </div>
 
         {error ? (
-          <Card className="bg-white dark:bg-[#1e293b]">
+          <Card className="bg-white dark:bg-surface">
             <CardContent className="pt-6">
               <p className="text-red-600 dark:text-red-400">Error loading members: {error.message}</p>
             </CardContent>
@@ -56,9 +56,9 @@ export default async function AdminMembersPage() {
         ) : members && members.length > 0 ? (
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
             {(members as MemberRow[]).map((member) => (
-              <Card key={member.id} className="bg-white dark:bg-[#1e293b] overflow-hidden">
+              <Card key={member.id} className="bg-white dark:bg-surface overflow-hidden">
                 {member.image_url && (
-                  <div className="relative w-full aspect-square overflow-hidden bg-gradient-to-br from-blue-50 to-blue-100 dark:from-slate-800 dark:to-slate-900">
+                  <div className="relative w-full aspect-square overflow-hidden bg-gradient-to-br from-page-alt to-page-alt dark:from-slate-800 dark:to-slate-900">
                     <Image
                       src={member.image_url}
                       alt={member.name}
@@ -71,10 +71,10 @@ export default async function AdminMembersPage() {
                 <CardHeader>
                   <div className="flex items-start justify-between">
                     <div className="flex-1">
-                      <CardTitle className="text-[#0d233e] dark:text-white text-base sm:text-lg">
+                      <CardTitle className="text-brand dark:text-white text-base sm:text-lg">
                         {member.name}
                       </CardTitle>
-                      <p className="mt-1 text-sm text-blue-600 dark:text-blue-400">{member.role}</p>
+                      <p className="mt-1 text-sm text-primary dark:text-primary">{member.role}</p>
                     </div>
                     <div className="flex items-center gap-2">
                       <Link href={`/admin/members/${member.id}/edit`}>
@@ -107,11 +107,11 @@ export default async function AdminMembersPage() {
             ))}
           </div>
         ) : (
-          <Card className="bg-white dark:bg-[#1e293b]">
+          <Card className="bg-white dark:bg-surface">
             <CardContent className="py-12 text-center">
               <p className="text-gray-600 dark:text-gray-400 mb-4">No members found.</p>
               <Link href="/admin/members/new">
-                <Button className="bg-[#0d233e] hover:bg-[#0a1a2e] text-white">
+                <Button className="bg-brand hover:bg-brand-hover text-white">
                   <Plus className="h-4 w-4 mr-2" />
                   Add First Member
                 </Button>

@@ -28,7 +28,7 @@ export function ProjectMediaItem({ mediaUrl, alt, className = 'h-32' }: ProjectM
   return (
     <>
       <div
-        className={`relative w-full overflow-hidden rounded-lg bg-gray-100 dark:bg-gray-800 ${
+        className={`relative w-full overflow-hidden rounded-lg bg-gray-100 dark:bg-surface ${
           isImage ? 'cursor-pointer hover:opacity-90 transition-opacity' : ''
         } ${className}`}
         onClick={handleImageClick}

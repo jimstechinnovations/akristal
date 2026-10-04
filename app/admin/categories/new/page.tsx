@@ -7,7 +7,7 @@ export default async function AdminNewCategoryPage() {
   await requireAdmin()
 
   return (
-    <div className="min-h-screen bg-white dark:bg-[#0f172a]">
+    <div className="min-h-screen bg-white dark:bg-page">
       <div className="mx-auto max-w-3xl px-4 py-8 sm:px-6 lg:px-8">
         <div className="mb-6">
           <Link
@@ -17,7 +17,7 @@ export default async function AdminNewCategoryPage() {
             <ArrowLeft className="mr-2 h-4 w-4" />
             Back to Categories
           </Link>
-          <h1 className="text-2xl sm:text-3xl font-bold text-[#0d233e] dark:text-white">
+          <h1 className="text-2xl sm:text-3xl font-bold text-brand dark:text-white">
             Add Category
           </h1>
           <p className="mt-2 text-sm text-gray-600 dark:text-gray-400">

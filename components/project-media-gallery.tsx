@@ -58,7 +58,7 @@ export function ProjectMediaGallery({ mediaUrls, title = 'Project media' }: Proj
           return (
             <div
               key={idx}
-              className={`relative h-64 w-full overflow-hidden rounded-lg bg-gray-100 dark:bg-gray-800 ${
+              className={`relative h-64 w-full overflow-hidden rounded-lg bg-gray-100 dark:bg-surface ${
                 isImage ? 'cursor-pointer hover:opacity-90 transition-opacity' : ''
               }`}
               onClick={() => isImage && handleImageClick(idx)}

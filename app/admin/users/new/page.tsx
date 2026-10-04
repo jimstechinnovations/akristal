@@ -7,11 +7,11 @@ export default async function AdminNewUserPage() {
   await requireAdmin()
 
   return (
-    <div className="min-h-screen bg-white dark:bg-[#0f172a]">
+    <div className="min-h-screen bg-white dark:bg-page">
       <div className="mx-auto max-w-3xl px-4 py-8 sm:px-6 lg:px-8">
-        <Card className="bg-white dark:bg-[#1e293b]">
+        <Card className="bg-white dark:bg-surface">
           <CardHeader>
-            <CardTitle className="text-[#0d233e] dark:text-white">Add User</CardTitle>
+            <CardTitle className="text-brand dark:text-white">Add User</CardTitle>
           </CardHeader>
           <CardContent className="space-y-3">
             <p className="text-sm text-gray-600 dark:text-gray-400">
@@ -23,7 +23,7 @@ export default async function AdminNewUserPage() {
             </ul>
             <div className="flex flex-col sm:flex-row gap-2 pt-2">
               <Link href="/register" className="w-full sm:w-auto">
-                <Button className="w-full sm:w-auto bg-[#0d233e] hover:bg-[#0a1a2e] text-white">
+                <Button className="w-full sm:w-auto bg-brand hover:bg-brand-hover text-white">
                   Go to Register
                 </Button>
               </Link>

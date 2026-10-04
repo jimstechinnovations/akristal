@@ -319,7 +319,7 @@ function VerifyOTPPageInner() {
           </div>
 
           <p className="mt-6 text-center text-sm text-gray-600 dark:text-gray-400">
-            <Link href="/login" className="text-blue-600 hover:underline dark:text-blue-400">
+            <Link href="/login" className="text-primary hover:underline dark:text-primary">
               Back to login
             </Link>
           </p>

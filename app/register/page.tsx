@@ -218,7 +218,7 @@ function RegisterPageInner() {
               </label>
               <select
                 id="role"
-                className="flex h-10 w-full rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm text-gray-900 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-100"
+                className="flex h-10 w-full rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm text-gray-900 dark:border-line-strong dark:bg-surface dark:text-gray-100"
                 value={formData.role}
                 onChange={(e) => setFormData({ ...formData, role: e.target.value as Exclude<UserRole, 'admin'> })}
                 required
@@ -282,7 +282,7 @@ function RegisterPageInner() {
           </form>
           <p className="mt-4 text-center text-sm text-gray-600 dark:text-gray-400">
             Already have an account?{' '}
-            <Link href="/login" className="text-blue-600 hover:underline dark:text-blue-400">
+            <Link href="/login" className="text-primary hover:underline dark:text-primary">
               Sign in
             </Link>
           </p>

@@ -27,11 +27,11 @@ export default async function AdminPropertiesPage() {
   const approvedProperties = typedProperties.filter((p) => p.listing_status === 'approved')
 
   return (
-    <div className="min-h-screen bg-white dark:bg-[#0f172a]">
+    <div className="min-h-screen bg-white dark:bg-page">
       <div className="mx-auto max-w-7xl px-4 py-6 sm:px-6 lg:px-8">
         <div className="mb-6 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
           <div>
-            <h1 className="text-2xl sm:text-3xl font-bold text-[#0d233e] dark:text-white">
+            <h1 className="text-2xl sm:text-3xl font-bold text-brand dark:text-white">
               Property Management
             </h1>
             <p className="mt-1 sm:mt-2 text-sm sm:text-base text-gray-600 dark:text-gray-400">
@@ -39,7 +39,7 @@ export default async function AdminPropertiesPage() {
             </p>
           </div>
           <Link href="/seller/properties/new">
-            <Button className="bg-[#0d233e] hover:bg-[#0a1a2e] text-white w-full sm:w-auto">
+            <Button className="bg-brand hover:bg-brand-hover text-white w-full sm:w-auto">
               + Add Property
             </Button>
           </Link>
@@ -47,19 +47,19 @@ export default async function AdminPropertiesPage() {
 
       {pendingProperties && pendingProperties.length > 0 && (
         <div className="mb-6">
-          <h2 className="mb-3 sm:mb-4 text-xl sm:text-2xl font-semibold text-[#0d233e] dark:text-white">
+          <h2 className="mb-3 sm:mb-4 text-xl sm:text-2xl font-semibold text-brand dark:text-white">
             Pending Approval ({pendingProperties.length})
           </h2>
           <div className="space-y-3 sm:space-y-4">
             {pendingProperties.map((property) => (
-              <Card key={property.id} className="p-4 bg-white dark:bg-[#1e293b]">
+              <Card key={property.id} className="p-4 bg-white dark:bg-surface">
                 <div className="flex flex-col gap-4 sm:flex-row">
                   <div className="flex-1">
-                    <h3 className="text-base sm:text-lg font-semibold text-[#0d233e] dark:text-white">{property.title}</h3>
+                    <h3 className="text-base sm:text-lg font-semibold text-brand dark:text-white">{property.title}</h3>
                     <p className="text-sm sm:text-base text-gray-600 dark:text-gray-400">
                       {property.address}, {property.city}
                     </p>
-                    <p className="text-base sm:text-lg font-bold text-[#c89b3c]">
+                    <p className="text-base sm:text-lg font-bold text-accent">
                       {formatCurrency(property.price, property.currency)}
                     </p>
                     <p className="text-xs sm:text-sm text-gray-500 dark:text-gray-400">
@@ -77,13 +77,13 @@ export default async function AdminPropertiesPage() {
       )}
 
       <div>
-        <h2 className="mb-3 sm:mb-4 text-xl sm:text-2xl font-semibold text-[#0d233e] dark:text-white">
+        <h2 className="mb-3 sm:mb-4 text-xl sm:text-2xl font-semibold text-brand dark:text-white">
           All Properties ({typedProperties.length || 0})
         </h2>
         {typedProperties.length > 0 ? (
           <div className="grid grid-cols-1 gap-4 sm:gap-6 sm:grid-cols-2 lg:grid-cols-3">
             {typedProperties.map((property) => (
-              <div key={property.id} className="bg-white dark:bg-[#1e293b] rounded-lg overflow-hidden shadow-sm">
+              <div key={property.id} className="bg-white dark:bg-surface rounded-lg overflow-hidden shadow-sm">
                 <PropertyCard property={property} />
                 <div className="p-3 sm:p-4 pt-0 flex gap-2">
                   <Link href={`/admin/properties/${property.id}/edit`} className="flex-1">
@@ -99,7 +99,7 @@ export default async function AdminPropertiesPage() {
             ))}
           </div>
         ) : (
-          <Card className="bg-white dark:bg-[#1e293b]">
+          <Card className="bg-white dark:bg-surface">
             <CardContent className="py-12 text-center">
               <p className="text-gray-600 dark:text-gray-400">No properties found.</p>
             </CardContent>

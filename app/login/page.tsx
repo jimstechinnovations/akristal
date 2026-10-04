@@ -289,13 +289,13 @@ export default function LoginPage() {
           </form>
           <div className="mt-4 space-y-2">
             <p className="text-center text-sm">
-              <Link href="/forgot-password" className="text-blue-600 hover:underline dark:text-blue-400">
+              <Link href="/forgot-password" className="text-primary hover:underline dark:text-primary">
                 Forgot your password?
               </Link>
             </p>
             <p className="text-center text-sm text-gray-600 dark:text-gray-400">
               Don't have an account?{' '}
-              <Link href="/register" className="text-blue-600 hover:underline dark:text-blue-400">
+              <Link href="/register" className="text-primary hover:underline dark:text-primary">
                 Sign up
               </Link>
             </p>

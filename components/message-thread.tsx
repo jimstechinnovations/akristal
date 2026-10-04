@@ -118,7 +118,7 @@ export function MessageThread({
           {conversation.properties?.id && (
             <Link
               href={`/properties/${conversation.properties.id}`}
-              className="text-sm text-blue-600 hover:underline dark:text-blue-400"
+              className="text-sm text-primary hover:underline dark:text-primary"
             >
               View property details
             </Link>
@@ -139,8 +139,8 @@ export function MessageThread({
                   <div
                     className={`max-w-[70%] rounded-lg px-4 py-2 ${
                       isOwn
-                        ? 'bg-blue-600 text-white'
-                        : 'bg-gray-100 text-gray-900 dark:bg-gray-800 dark:text-white'
+                        ? 'bg-primary text-on-primary'
+                        : 'bg-gray-100 text-gray-900 dark:bg-surface '
                     }`}
                   >
                     {!isOwn && (
@@ -151,7 +151,7 @@ export function MessageThread({
                     <div className="text-sm">{message.content}</div>
                     <div
                       className={`mt-1 text-xs ${
-                        isOwn ? 'text-blue-100' : 'text-gray-500'
+                        isOwn ? 'text-page-alt' : 'text-gray-500'
                       }`}
                     >
                       {formatRelativeTime(message.created_at)}
@@ -165,7 +165,7 @@ export function MessageThread({
 
           <form
             onSubmit={handleSendMessage}
-            className="border-t border-gray-200 p-4 dark:border-gray-700"
+            className="border-t border-gray-200 p-4 dark:border-line"
           >
             <div className="flex gap-2">
               <Input

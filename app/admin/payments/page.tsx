@@ -40,7 +40,7 @@ export default async function AdminPaymentsPage() {
       case 'failed':
         return 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200'
       case 'processing':
-        return 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200'
+        return 'bg-page-alt text-ink dark:bg-page-alt dark:text-line'
       default:
         return 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200'
     }
@@ -181,7 +181,7 @@ export default async function AdminPaymentsPage() {
                         href={payment.bank_statement_url}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="flex items-center text-sm text-blue-600 hover:underline dark:text-blue-400"
+                        className="flex items-center text-sm text-primary hover:underline dark:text-primary"
                       >
                         <FileText className="mr-1 h-4 w-4" />
                         View Statement

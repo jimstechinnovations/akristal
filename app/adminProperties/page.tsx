@@ -93,10 +93,10 @@ export default async function AdminPropertiesBrowsePage({
   const uniqueCities = Array.from(new Set(cities?.map((c) => c.city) || [])).sort()
 
   return (
-    <div className="min-h-screen bg-white dark:bg-[#0f172a]">
-      <div className="bg-white dark:bg-gray-800 shadow-sm">
+    <div className="min-h-screen bg-white dark:bg-page">
+      <div className="bg-white dark:bg-surface shadow-sm">
         <div className="mx-auto max-w-7xl px-4 py-6 sm:px-6 lg:px-8">
-          <h1 className="text-2xl font-bold text-[#0d233e] dark:text-white">
+          <h1 className="text-2xl font-bold text-brand dark:text-white">
             Admin Properties
           </h1>
           <p className="mt-1 text-sm text-gray-600 dark:text-gray-400">
@@ -108,7 +108,7 @@ export default async function AdminPropertiesBrowsePage({
       <div className="mx-auto max-w-7xl px-4 py-4 sm:px-6 lg:px-8">
         {/* Mobile: Filters as Drawer/Modal, Desktop: Sidebar */}
         <div className="mb-4 lg:hidden">
-          <Suspense fallback={<div className="h-20 bg-white dark:bg-gray-800 rounded-lg animate-pulse" />}>
+          <Suspense fallback={<div className="h-20 bg-white dark:bg-surface rounded-lg animate-pulse" />}>
             <PropertySearch cities={uniqueCities} propertyTypes={propertyTypes || []} searchParams={params} />
           </Suspense>
         </div>
@@ -116,7 +116,7 @@ export default async function AdminPropertiesBrowsePage({
         <div className="grid grid-cols-1 gap-4 lg:grid-cols-4">
           {/* Desktop Sidebar */}
           <aside className="hidden lg:block lg:col-span-1">
-            <Suspense fallback={<div className="h-96 bg-white dark:bg-gray-800 rounded-lg animate-pulse" />}>
+            <Suspense fallback={<div className="h-96 bg-white dark:bg-surface rounded-lg animate-pulse" />}>
               <PropertySearch cities={uniqueCities} propertyTypes={propertyTypes || []} searchParams={params} />
             </Suspense>
           </aside>
@@ -125,7 +125,7 @@ export default async function AdminPropertiesBrowsePage({
           <main className="lg:col-span-3">
             <Tabs defaultValue={params?.view || 'list'} className="w-full">
               <div className="mb-4 flex items-center justify-between">
-                <TabsList className="bg-white dark:bg-gray-800">
+                <TabsList className="bg-white dark:bg-surface">
                   <TabsTrigger value="list" className="flex items-center gap-2">
                     <List className="h-4 w-4" />
                     <span className="hidden sm:inline">List</span>
@@ -154,7 +154,7 @@ export default async function AdminPropertiesBrowsePage({
                     ))}
                   </div>
                 ) : (
-                  <div className="rounded-lg bg-white dark:bg-gray-800 p-8 text-center shadow-sm">
+                  <div className="rounded-lg bg-white dark:bg-surface p-8 text-center shadow-sm">
                     <p className="text-gray-600 dark:text-gray-400">
                       No admin properties found matching your criteria.
                     </p>
@@ -183,7 +183,7 @@ export default async function AdminPropertiesBrowsePage({
                     />
                   </div>
                 ) : (
-                  <div className="rounded-lg bg-white dark:bg-gray-800 p-8 text-center shadow-sm">
+                  <div className="rounded-lg bg-white dark:bg-surface p-8 text-center shadow-sm">
                     <p className="text-gray-600 dark:text-gray-400">
                       No admin properties found matching your criteria.
                     </p>

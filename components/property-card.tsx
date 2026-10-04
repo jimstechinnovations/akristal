@@ -90,10 +90,10 @@ export function PropertyCard({ property }: PropertyCardProps) {
               <span>{property.size_sqm} m²</span>
             )}
           </div>
-          <p className="mt-2 text-lg font-bold text-blue-600 dark:text-blue-400">
+          <p className="mt-2 text-lg font-bold text-primary dark:text-primary">
             {formatCurrency(property.price, property.currency)}
           </p>
-          <span className="mt-2 inline-block rounded-full bg-blue-100 px-2 py-1 text-xs text-blue-800 dark:bg-blue-900 dark:text-blue-200">
+          <span className="mt-2 inline-block rounded-full bg-page-alt px-2 py-1 text-xs text-ink dark:bg-page-alt dark:text-line">
             {property.listing_type === 'rent' ? 'For Rent' : 'For Sale'}
           </span>
         </CardContent>

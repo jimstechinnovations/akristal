@@ -159,7 +159,7 @@ export function MemberForm({ member }: { member?: MemberRow }) {
             {imagePreview ? (
               <div className="relative mb-2">
                 <div 
-                  className="relative h-48 w-full overflow-hidden rounded-lg border border-gray-300 dark:border-gray-600 cursor-pointer hover:opacity-80 transition-opacity"
+                  className="relative h-48 w-full overflow-hidden rounded-lg border border-gray-300 dark:border-line-strong cursor-pointer hover:opacity-80 transition-opacity"
                   onClick={() => setIsPreviewOpen(true)}
                 >
                   <Image
@@ -175,7 +175,7 @@ export function MemberForm({ member }: { member?: MemberRow }) {
                   variant="outline"
                   size="sm"
                   onClick={removeImage}
-                  className="absolute top-2 right-2 bg-white dark:bg-gray-800 z-10"
+                  className="absolute top-2 right-2 bg-white dark:bg-surface z-10"
                 >
                   <X className="h-4 w-4" />
                 </Button>
@@ -184,7 +184,7 @@ export function MemberForm({ member }: { member?: MemberRow }) {
               <div className="mb-2">
                 <label
                   htmlFor="image-upload"
-                  className="flex flex-col items-center justify-center w-full h-32 border-2 border-gray-300 border-dashed rounded-lg cursor-pointer bg-gray-50 dark:bg-gray-800 dark:border-gray-600 hover:bg-gray-100 dark:hover:bg-gray-700"
+                  className="flex flex-col items-center justify-center w-full h-32 border-2 border-gray-300 border-dashed rounded-lg cursor-pointer bg-gray-50 dark:bg-surface dark:border-line-strong hover:bg-gray-100 dark:hover:bg-gray-700"
                 >
                   <div className="flex flex-col items-center justify-center pt-5 pb-6">
                     <Upload className="w-8 h-8 mb-2 text-gray-500 dark:text-gray-400" />
@@ -210,7 +210,7 @@ export function MemberForm({ member }: { member?: MemberRow }) {
               Details *
             </label>
             <textarea
-              className="flex min-h-[200px] w-full rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm text-gray-900 placeholder:text-gray-500 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-100 dark:placeholder:text-gray-400"
+              className="flex min-h-[200px] w-full rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm text-gray-900 placeholder:text-gray-500 dark:border-line-strong dark:bg-surface dark:text-gray-100 dark:placeholder:text-gray-400"
               value={formData.details}
               onChange={(e) => setFormData({ ...formData, details: e.target.value })}
               required
@@ -235,7 +235,7 @@ export function MemberForm({ member }: { member?: MemberRow }) {
                 Status *
               </label>
               <select
-                className="flex h-10 w-full rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm text-gray-900 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-100"
+                className="flex h-10 w-full rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm text-gray-900 dark:border-line-strong dark:bg-surface dark:text-gray-100"
                 value={formData.is_active}
                 onChange={(e) => setFormData({ ...formData, is_active: e.target.value })}
                 required

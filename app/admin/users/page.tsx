@@ -40,7 +40,7 @@ export default async function AdminUsersPage() {
       case 'admin':
         return 'bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-200'
       case 'agent':
-        return 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200'
+        return 'bg-page-alt text-ink dark:bg-page-alt dark:text-line'
       case 'seller':
         return 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200'
       default:
@@ -49,24 +49,24 @@ export default async function AdminUsersPage() {
   }
 
   return (
-    <div className="min-h-screen bg-white dark:bg-[#0f172a]">
+    <div className="min-h-screen bg-white dark:bg-page">
       <div className="mx-auto max-w-7xl px-4 py-6 sm:px-6 lg:px-8">
         <div className="mb-6 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
           <div>
-            <h1 className="text-2xl sm:text-3xl font-bold text-[#0d233e] dark:text-white">User Management</h1>
+            <h1 className="text-2xl sm:text-3xl font-bold text-brand dark:text-white">User Management</h1>
             <p className="mt-1 sm:mt-2 text-sm sm:text-base text-gray-600 dark:text-gray-400">
               View and manage all platform users
             </p>
           </div>
           <Link href="/admin/users/new">
-            <Button className="bg-[#0d233e] hover:bg-[#0a1a2e] text-white w-full sm:w-auto">
+            <Button className="bg-brand hover:bg-brand-hover text-white w-full sm:w-auto">
               + Add User
             </Button>
           </Link>
         </div>
 
       {error ? (
-        <Card className="bg-white dark:bg-[#1e293b]">
+        <Card className="bg-white dark:bg-surface">
           <CardContent className="pt-6">
             <p className="text-red-600 dark:text-red-400">Error loading users: {error.message}</p>
           </CardContent>
@@ -74,15 +74,15 @@ export default async function AdminUsersPage() {
       ) : users.length > 0 ? (
         <div className="space-y-3 sm:space-y-4">
           {users.map((user) => (
-            <Card key={user.id} className="bg-white dark:bg-[#1e293b]">
+            <Card key={user.id} className="bg-white dark:bg-surface">
               <CardContent className="pt-4 sm:pt-6">
                 <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4">
                   <div className="flex items-start space-x-3 sm:space-x-4 flex-1">
-                    <div className="flex h-10 w-10 sm:h-12 sm:w-12 items-center justify-center rounded-full bg-gray-100 dark:bg-gray-800 flex-shrink-0">
+                    <div className="flex h-10 w-10 sm:h-12 sm:w-12 items-center justify-center rounded-full bg-gray-100 dark:bg-surface flex-shrink-0">
                       {getRoleIcon(user.role)}
                     </div>
                     <div className="flex-1 min-w-0">
-                      <h3 className="font-semibold text-[#0d233e] dark:text-white text-sm sm:text-base">
+                      <h3 className="font-semibold text-brand dark:text-white text-sm sm:text-base">
                         {user.full_name || 'No name'}
                       </h3>
                       <p className="text-xs sm:text-sm text-gray-600 dark:text-gray-400 truncate">{user.email}</p>
@@ -131,7 +131,7 @@ export default async function AdminUsersPage() {
           ))}
         </div>
       ) : (
-        <Card className="bg-white dark:bg-[#1e293b]">
+        <Card className="bg-white dark:bg-surface">
           <CardContent className="pt-6 text-center">
             <p className="text-gray-600 dark:text-gray-400">No users found.</p>
           </CardContent>

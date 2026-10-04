@@ -84,7 +84,7 @@ export function PropertySearch({ cities, propertyTypes, searchParams, onLocation
         <div>
           <label className="block text-sm font-medium mb-1 text-gray-900 dark:text-white">Listing Type</label>
           <select
-            className="flex h-10 w-full rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm text-gray-900 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-100"
+            className="flex h-10 w-full rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm text-gray-900 dark:border-line-strong dark:bg-surface dark:text-gray-100"
             value={filters.listing_type}
             onChange={(e) => handleFilterChange('listing_type', e.target.value)}
           >
@@ -97,7 +97,7 @@ export function PropertySearch({ cities, propertyTypes, searchParams, onLocation
         <div>
           <label className="block text-sm font-medium mb-1 text-gray-900 dark:text-white">Property Type</label>
           <select
-            className="flex h-10 w-full rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm text-gray-900 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-100"
+            className="flex h-10 w-full rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm text-gray-900 dark:border-line-strong dark:bg-surface dark:text-gray-100"
             value={filters.type}
             onChange={(e) => handleFilterChange('type', e.target.value)}
           >
@@ -113,7 +113,7 @@ export function PropertySearch({ cities, propertyTypes, searchParams, onLocation
         <div>
           <label className="block text-sm font-medium mb-1 text-gray-900 dark:text-white">City</label>
           <select
-            className="flex h-10 w-full rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm text-gray-900 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-100"
+            className="flex h-10 w-full rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm text-gray-900 dark:border-line-strong dark:bg-surface dark:text-gray-100"
             value={filters.city}
             onChange={(e) => handleFilterChange('city', e.target.value)}
           >
@@ -150,7 +150,7 @@ export function PropertySearch({ cities, propertyTypes, searchParams, onLocation
         <div>
           <label className="block text-sm font-medium mb-1 text-gray-900 dark:text-white">Bedrooms</label>
           <select
-            className="flex h-10 w-full rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm text-gray-900 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-100"
+            className="flex h-10 w-full rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm text-gray-900 dark:border-line-strong dark:bg-surface dark:text-gray-100"
             value={filters.bedrooms}
             onChange={(e) => handleFilterChange('bedrooms', e.target.value)}
           >
@@ -166,7 +166,7 @@ export function PropertySearch({ cities, propertyTypes, searchParams, onLocation
         <div>
           <label className="block text-sm font-medium mb-1 text-gray-900 dark:text-white">Bathrooms</label>
           <select
-            className="flex h-10 w-full rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm text-gray-900 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-100"
+            className="flex h-10 w-full rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm text-gray-900 dark:border-line-strong dark:bg-surface dark:text-gray-100"
             value={filters.bathrooms}
             onChange={(e) => handleFilterChange('bathrooms', e.target.value)}
           >
@@ -179,11 +179,11 @@ export function PropertySearch({ cities, propertyTypes, searchParams, onLocation
         </div>
 
         {onLocationSelect && (filters.lat || filters.lng) && (
-          <div className="rounded-lg border border-blue-200 bg-blue-50 p-3 dark:border-blue-800 dark:bg-blue-900/20">
+          <div className="rounded-lg border border-line bg-page-alt p-3 dark:border-ink dark:bg-page-alt/20">
             <div className="flex items-center justify-between">
               <div className="flex items-center text-sm">
-                <MapPin className="mr-1 h-4 w-4 text-blue-600 dark:text-blue-400" />
-                <span className="text-blue-800 dark:text-blue-200">
+                <MapPin className="mr-1 h-4 w-4 text-primary dark:text-primary" />
+                <span className="text-ink dark:text-line">
                   Location filter active
                   {filters.radius && ` (${filters.radius} km radius)`}
                 </span>

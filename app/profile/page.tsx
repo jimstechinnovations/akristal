@@ -39,7 +39,7 @@ const getRoleColor = (role: string) => {
     case 'admin':
       return 'bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-200'
     case 'agent':
-      return 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200'
+      return 'bg-page-alt text-ink dark:bg-page-alt dark:text-line'
     case 'seller':
       return 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200'
     default:
@@ -99,7 +99,7 @@ export default async function ProfilePage() {
           </CardHeader>
           <CardContent className="space-y-6">
             <div className="flex items-center space-x-4">
-              <div className="flex items-center justify-center h-20 w-20 rounded-full bg-blue-600 text-white text-2xl font-semibold">
+              <div className="flex items-center justify-center h-20 w-20 rounded-full bg-primary text-on-primary text-2xl font-semibold">
                 {getUserInitial()}
               </div>
               <div>

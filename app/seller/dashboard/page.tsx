@@ -108,7 +108,7 @@ export default async function SellerDashboard() {
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold text-blue-600">{stats.sold}</div>
+            <div className="text-2xl font-bold text-primary">{stats.sold}</div>
           </CardContent>
         </Card>
       </div>

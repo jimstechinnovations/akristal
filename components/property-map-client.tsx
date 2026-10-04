@@ -140,7 +140,7 @@ export function PropertyMapClient({ properties, onLocationSelect, selectedLocati
                     <p className="text-xs text-gray-600 dark:text-gray-400 mb-1">
                       {property.address}, {property.city}
                     </p>
-                    <p className="text-sm font-bold text-blue-600 dark:text-blue-400 mb-2">
+                    <p className="text-sm font-bold text-primary dark:text-primary mb-2">
                       {formatCurrency(property.price, property.currency)}
                     </p>
                     <Link href={`/properties/${property.id}`}>
@@ -166,7 +166,7 @@ export function PropertyMapClient({ properties, onLocationSelect, selectedLocati
           </MapContainer>
 
           {onLocationSelect && (
-            <div className="absolute top-4 right-4 z-[1000] bg-white dark:bg-gray-800 rounded-lg shadow-lg p-4 min-w-[200px]">
+            <div className="absolute top-4 right-4 z-[1000] bg-white dark:bg-surface rounded-lg shadow-lg p-4 min-w-[200px]">
               <div className="flex items-center justify-between mb-2">
                 <h3 className="font-semibold text-sm flex items-center">
                   <MapPin className="h-4 w-4 mr-1" />
@@ -221,12 +221,12 @@ export function PropertyMapClient({ properties, onLocationSelect, selectedLocati
           )}
 
           {showLocationPicker && (
-            <div className="absolute top-4 left-4 z-[1000] bg-blue-600 text-white rounded-lg shadow-lg p-3 text-sm">
+            <div className="absolute top-4 left-4 z-[1000] bg-primary text-on-primary rounded-lg shadow-lg p-3 text-sm">
               Click anywhere on the map to set search location
             </div>
           )}
 
-          <div className="absolute bottom-4 left-4 z-[1000] bg-white dark:bg-gray-800 rounded-lg shadow-lg px-3 py-2">
+          <div className="absolute bottom-4 left-4 z-[1000] bg-white dark:bg-surface rounded-lg shadow-lg px-3 py-2">
             <p className="text-xs text-gray-600 dark:text-gray-400">
               {validProperties.length} {validProperties.length === 1 ? 'property' : 'properties'} shown
             </p>

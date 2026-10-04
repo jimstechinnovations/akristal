@@ -383,7 +383,7 @@ export function PropertyForm({ property }: { property?: PropertyRow }) {
           <div>
             <label className="block text-sm font-medium mb-1 text-gray-900 dark:text-white">Description</label>
             <textarea
-              className="flex min-h-[120px] w-full rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm text-gray-900 placeholder:text-gray-500 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-100 dark:placeholder:text-gray-400"
+              className="flex min-h-[120px] w-full rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm text-gray-900 placeholder:text-gray-500 dark:border-line-strong dark:bg-surface dark:text-gray-100 dark:placeholder:text-gray-400"
               value={formData.description}
               onChange={(e) => setFormData({ ...formData, description: e.target.value })}
             />
@@ -392,7 +392,7 @@ export function PropertyForm({ property }: { property?: PropertyRow }) {
           <div>
             <label className="block text-sm font-medium mb-1 text-gray-900 dark:text-white">Listing Type *</label>
             <select
-              className="flex h-10 w-full rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm text-gray-900 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-100"
+              className="flex h-10 w-full rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm text-gray-900 dark:border-line-strong dark:bg-surface dark:text-gray-100"
               value={formData.listing_type}
               onChange={(e) => setFormData({ ...formData, listing_type: e.target.value as ListingType })}
               required
@@ -405,7 +405,7 @@ export function PropertyForm({ property }: { property?: PropertyRow }) {
           <div>
             <label className="block text-sm font-medium mb-1 text-gray-900 dark:text-white">Property Type *</label>
             <select
-              className="flex h-10 w-full rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm text-gray-900 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-100"
+              className="flex h-10 w-full rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm text-gray-900 dark:border-line-strong dark:bg-surface dark:text-gray-100"
               value={formData.property_type_id}
               onChange={(e) => setFormData({ ...formData, property_type_id: e.target.value })}
               required
@@ -433,7 +433,7 @@ export function PropertyForm({ property }: { property?: PropertyRow }) {
             <div>
               <label className="block text-sm font-medium mb-1 text-gray-900 dark:text-white">Currency *</label>
               <select
-                className="flex h-10 w-full rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm text-gray-900 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-100"
+                className="flex h-10 w-full rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm text-gray-900 dark:border-line-strong dark:bg-surface dark:text-gray-100"
                 value={formData.currency}
                 onChange={(e) => setFormData({ ...formData, currency: e.target.value })}
                 required
@@ -550,7 +550,7 @@ export function PropertyForm({ property }: { property?: PropertyRow }) {
           <div>
             <label className="block text-sm font-medium mb-1 text-gray-900 dark:text-white">Year Built</label>
             <select
-              className="flex h-10 w-full rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm text-gray-900 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-100"
+              className="flex h-10 w-full rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm text-gray-900 dark:border-line-strong dark:bg-surface dark:text-gray-100"
               value={formData.year_built}
               onChange={(e) => setFormData({ ...formData, year_built: e.target.value })}
             >
@@ -571,7 +571,7 @@ export function PropertyForm({ property }: { property?: PropertyRow }) {
               Amenities (comma or line separated)
             </label>
             <textarea
-              className="flex min-h-[80px] w-full rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm text-gray-900 placeholder:text-gray-500 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-100 dark:placeholder:text-gray-400"
+              className="flex min-h-[80px] w-full rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm text-gray-900 placeholder:text-gray-500 dark:border-line-strong dark:bg-surface dark:text-gray-100 dark:placeholder:text-gray-400"
               value={formData.amenities}
               onChange={(e) => setFormData({ ...formData, amenities: e.target.value })}
               placeholder="Pool, Gym, Security, Parking"
@@ -583,7 +583,7 @@ export function PropertyForm({ property }: { property?: PropertyRow }) {
               Features (comma or line separated)
             </label>
             <textarea
-              className="flex min-h-[80px] w-full rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm text-gray-900 placeholder:text-gray-500 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-100 dark:placeholder:text-gray-400"
+              className="flex min-h-[80px] w-full rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm text-gray-900 placeholder:text-gray-500 dark:border-line-strong dark:bg-surface dark:text-gray-100 dark:placeholder:text-gray-400"
               value={formData.features}
               onChange={(e) => setFormData({ ...formData, features: e.target.value })}
               placeholder="Furnished, Gated Community, Sea View"
@@ -599,14 +599,14 @@ export function PropertyForm({ property }: { property?: PropertyRow }) {
               multiple
               accept=".pdf,.doc,.docx,.txt,.xls,.xlsx"
               onChange={handleDocumentChange}
-              className="block w-full text-sm text-gray-500 file:mr-4 file:rounded-lg file:border-0 file:bg-blue-50 file:px-4 file:py-2 file:text-sm file:font-semibold file:text-blue-700 hover:file:bg-blue-100 dark:file:bg-blue-900 dark:file:text-blue-200"
+              className="block w-full text-sm text-gray-500 file:mr-4 file:rounded-lg file:border-0 file:bg-page-alt file:px-4 file:py-2 file:text-sm file:font-semibold file:text-primary hover:file:bg-page-alt dark:file:bg-ink dark:file:text-line"
             />
             {documentPreviews.length > 0 && (
               <div className="mt-4 space-y-2">
                 {documentPreviews.map((preview, index) => (
                   <div
                     key={index}
-                    className="flex items-center justify-between rounded-lg border border-gray-300 bg-gray-50 px-3 py-2 dark:border-gray-600 dark:bg-gray-800"
+                    className="flex items-center justify-between rounded-lg border border-gray-300 bg-gray-50 px-3 py-2 dark:border-line-strong dark:bg-surface"
                   >
                     <span className="text-sm text-gray-900 dark:text-gray-100">
                       {preview.name}
@@ -633,7 +633,7 @@ export function PropertyForm({ property }: { property?: PropertyRow }) {
               multiple
               accept="video/*"
               onChange={handleVideoChange}
-              className="block w-full text-sm text-gray-500 file:mr-4 file:rounded-lg file:border-0 file:bg-blue-50 file:px-4 file:py-2 file:text-sm file:font-semibold file:text-blue-700 hover:file:bg-blue-100 dark:file:bg-blue-900 dark:file:text-blue-200"
+              className="block w-full text-sm text-gray-500 file:mr-4 file:rounded-lg file:border-0 file:bg-page-alt file:px-4 file:py-2 file:text-sm file:font-semibold file:text-primary hover:file:bg-page-alt dark:file:bg-ink dark:file:text-line"
             />
             {videoPreviews.length > 0 && (
               <div className="mt-4 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
@@ -669,7 +669,7 @@ export function PropertyForm({ property }: { property?: PropertyRow }) {
               multiple
               accept="image/*"
               onChange={handleImageChange}
-              className="block w-full text-sm text-gray-500 file:mr-4 file:rounded-lg file:border-0 file:bg-blue-50 file:px-4 file:py-2 file:text-sm file:font-semibold file:text-blue-700 hover:file:bg-blue-100"
+              className="block w-full text-sm text-gray-500 file:mr-4 file:rounded-lg file:border-0 file:bg-page-alt file:px-4 file:py-2 file:text-sm file:font-semibold file:text-primary hover:file:bg-page-alt"
             />
             {imagePreviews.length > 0 && (
               <div className="mt-4 grid grid-cols-4 gap-4">

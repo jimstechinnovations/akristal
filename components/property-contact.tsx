@@ -163,7 +163,7 @@ export function PropertyContact({ property, seller }: PropertyContactProps) {
         <div>
           <label className="block text-sm font-medium mb-1 text-gray-900 dark:text-white">Message</label>
           <textarea
-            className="flex min-h-[100px] w-full rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm text-gray-900 placeholder:text-gray-500 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-100 dark:placeholder:text-gray-400"
+            className="flex min-h-[100px] w-full rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm text-gray-900 placeholder:text-gray-500 dark:border-line-strong dark:bg-surface dark:text-gray-100 dark:placeholder:text-gray-400"
             placeholder="I'm interested in this property..."
             value={message}
             onChange={(e) => setMessage(e.target.value)}

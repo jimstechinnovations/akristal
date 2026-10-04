@@ -27,7 +27,7 @@ export function ProjectManagementTabs({ projectId }: ProjectManagementTabsProps)
       <h2 className="mb-4 text-2xl font-semibold text-gray-900 dark:text-white">Manage Content</h2>
       
       {/* Tab Buttons */}
-      <div className="mb-6 flex flex-wrap gap-2 border-b border-gray-200 dark:border-gray-700">
+      <div className="mb-6 flex flex-wrap gap-2 border-b border-gray-200 dark:border-line">
         {tabs.map((tab) => {
           const Icon = tab.icon
           const isActive = activeTab === tab.id
@@ -37,7 +37,7 @@ export function ProjectManagementTabs({ projectId }: ProjectManagementTabsProps)
               onClick={() => setActiveTab(tab.id)}
               className={`flex items-center space-x-2 px-4 py-2 text-sm font-medium transition-colors border-b-2 ${
                 isActive
-                  ? 'border-blue-600 text-blue-600 dark:border-blue-400 dark:text-blue-400'
+                  ? 'border-primary text-primary dark:border-primary dark:text-primary'
                   : 'border-transparent text-gray-600 hover:text-gray-900 hover:border-gray-300 dark:text-gray-400 dark:hover:text-gray-200'
               }`}
             >

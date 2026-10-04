@@ -59,9 +59,9 @@ export function EditUserForm({ user }: { user: Profile }) {
   }
 
   return (
-    <Card className="bg-white dark:bg-[#1e293b]">
+    <Card className="bg-white dark:bg-surface">
       <CardHeader>
-        <CardTitle className="text-[#0d233e] dark:text-white">User Information</CardTitle>
+        <CardTitle className="text-brand dark:text-white">User Information</CardTitle>
       </CardHeader>
       <CardContent>
         <form onSubmit={handleSubmit} className="space-y-4">
@@ -74,7 +74,7 @@ export function EditUserForm({ user }: { user: Profile }) {
               type="email"
               value={formData.email}
               disabled
-              className="bg-gray-100 dark:bg-gray-800"
+              className="bg-gray-100 dark:bg-surface"
             />
             <p className="mt-1 text-xs text-gray-500 dark:text-gray-400">
               Email cannot be changed from this interface
@@ -113,7 +113,7 @@ export function EditUserForm({ user }: { user: Profile }) {
             </label>
             <select
               id="role"
-              className="flex h-10 w-full rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm text-gray-900 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-100"
+              className="flex h-10 w-full rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm text-gray-900 dark:border-line-strong dark:bg-surface dark:text-gray-100"
               value={formData.role}
               onChange={(e) => setFormData({ ...formData, role: e.target.value as Profile['role'] })}
             >
@@ -131,7 +131,7 @@ export function EditUserForm({ user }: { user: Profile }) {
             <textarea
               id="bio"
               rows={4}
-              className="flex w-full rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm text-gray-900 placeholder:text-gray-500 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-100 dark:placeholder:text-gray-400"
+              className="flex w-full rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm text-gray-900 placeholder:text-gray-500 dark:border-line-strong dark:bg-surface dark:text-gray-100 dark:placeholder:text-gray-400"
               value={formData.bio}
               onChange={(e) => setFormData({ ...formData, bio: e.target.value })}
               placeholder="User bio..."
@@ -170,7 +170,7 @@ export function EditUserForm({ user }: { user: Profile }) {
                 type="checkbox"
                 checked={formData.is_verified}
                 onChange={(e) => setFormData({ ...formData, is_verified: e.target.checked })}
-                className="rounded border-gray-300 text-blue-600 focus:ring-blue-500 dark:border-gray-600 dark:bg-gray-800"
+                className="rounded border-gray-300 text-primary focus:ring-primary dark:border-line-strong dark:bg-surface"
               />
               <span className="text-sm font-medium text-gray-900 dark:text-white">Verified</span>
             </label>
@@ -180,14 +180,14 @@ export function EditUserForm({ user }: { user: Profile }) {
                 type="checkbox"
                 checked={formData.is_active}
                 onChange={(e) => setFormData({ ...formData, is_active: e.target.checked })}
-                className="rounded border-gray-300 text-blue-600 focus:ring-blue-500 dark:border-gray-600 dark:bg-gray-800"
+                className="rounded border-gray-300 text-primary focus:ring-primary dark:border-line-strong dark:bg-surface"
               />
               <span className="text-sm font-medium text-gray-900 dark:text-white">Active</span>
             </label>
           </div>
 
           <div className="flex gap-4 pt-4">
-            <Button type="submit" disabled={loading} className="bg-[#0d233e] hover:bg-[#0a1a2e] text-white">
+            <Button type="submit" disabled={loading} className="bg-brand hover:bg-brand-hover text-white">
               {loading ? 'Saving...' : 'Save Changes'}
             </Button>
             <Button

@@ -175,7 +175,7 @@ function NewPaymentPageInner() {
                 </label>
                 <select
                   id="currency"
-                  className="flex h-10 w-full rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm text-gray-900 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-100"
+                  className="flex h-10 w-full rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm text-gray-900 dark:border-line-strong dark:bg-surface dark:text-gray-100"
                   value={formData.currency}
                   onChange={(e) => setFormData({ ...formData, currency: e.target.value })}
                   required
@@ -198,14 +198,14 @@ function NewPaymentPageInner() {
               <textarea
                 id="description"
                 rows={3}
-                className="flex w-full rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm text-gray-900 placeholder:text-gray-500 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-100 dark:placeholder:text-gray-400"
+                className="flex w-full rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm text-gray-900 placeholder:text-gray-500 dark:border-line-strong dark:bg-surface dark:text-gray-100 dark:placeholder:text-gray-400"
                 placeholder="Payment for property purchase, deposit, etc."
                 value={formData.description}
                 onChange={(e) => setFormData({ ...formData, description: e.target.value })}
               />
             </div>
 
-            <div className="rounded-lg border border-gray-200 bg-gray-50 p-4 dark:border-gray-700 dark:bg-gray-800">
+            <div className="rounded-lg border border-gray-200 bg-gray-50 p-4 dark:border-line dark:bg-surface">
               <h3 className="mb-4 font-semibold text-gray-900 dark:text-white">
                 Bank Account Information
               </h3>
@@ -261,7 +261,7 @@ function NewPaymentPageInner() {
                 Bank Statement / Proof of Payment *
               </label>
               <div className="mt-2 flex items-center space-x-4">
-                <label className="flex cursor-pointer items-center space-x-2 rounded-lg border border-gray-300 bg-white px-4 py-2 text-sm hover:bg-gray-50 dark:border-gray-600 dark:bg-gray-800 dark:hover:bg-gray-700">
+                <label className="flex cursor-pointer items-center space-x-2 rounded-lg border border-gray-300 bg-white px-4 py-2 text-sm hover:bg-gray-50 dark:border-line-strong dark:bg-surface dark:hover:bg-gray-700">
                   <Upload className="h-4 w-4" />
                   <span>Choose File</span>
                   <input
@@ -284,10 +284,10 @@ function NewPaymentPageInner() {
               </p>
             </div>
 
-            <div className="rounded-lg border border-blue-200 bg-blue-50 p-4 dark:border-blue-800 dark:bg-blue-900/20">
+            <div className="rounded-lg border border-line bg-page-alt p-4 dark:border-ink dark:bg-page-alt/20">
               <div className="flex items-start space-x-3">
-                <Building2 className="h-5 w-5 text-blue-600 dark:text-blue-400" />
-                <div className="text-sm text-blue-800 dark:text-blue-200">
+                <Building2 className="h-5 w-5 text-primary dark:text-primary" />
+                <div className="text-sm text-ink dark:text-line">
                   <p className="font-semibold">TheAkristalGroup Bank Details</p>
                   <p className="mt-1">Account Name: TheAkristalGroup</p>
                   <p>Account Number: [To be configured]</p>

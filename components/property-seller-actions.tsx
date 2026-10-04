@@ -92,7 +92,7 @@ export function PropertySellerActions({ property, conversations }: PropertySelle
                 <Link
                   key={conversation.id}
                   href={`/messages/${conversation.id}`}
-                  className="block rounded-lg border border-gray-200 p-3 hover:bg-gray-50 dark:border-gray-700 dark:hover:bg-gray-800"
+                  className="block rounded-lg border border-gray-200 p-3 hover:bg-gray-50 dark:border-line dark:hover:bg-gray-800"
                 >
                   <div className="flex items-center justify-between">
                     <div className="flex items-center space-x-2">
