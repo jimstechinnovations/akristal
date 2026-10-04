@@ -150,7 +150,7 @@ export default async function BuyerDashboard() {
                       {conv.properties?.title || 'Property Conversation'}
                     </div>
                     <div className="text-xs sm:text-sm text-gray-600 dark:text-gray-400 mt-1">
-                      Last message: {new Date(conv.last_message_at ?? Date.now()).toLocaleDateString()}
+                      Last message: {(conv.last_message_at ? new Date(conv.last_message_at).toLocaleDateString() : '')}
                     </div>
                   </Link>
                 ))}

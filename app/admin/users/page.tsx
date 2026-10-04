@@ -113,7 +113,7 @@ export default async function AdminUsersPage() {
                         </p>
                       )}
                       <p className="mt-1 text-xs text-gray-500 dark:text-gray-400">
-                        Joined: {new Date(user.created_at ?? Date.now()).toLocaleDateString()}
+                        Joined: {(user.created_at ? new Date(user.created_at).toLocaleDateString() : '')}
                       </p>
                     </div>
                   </div>
