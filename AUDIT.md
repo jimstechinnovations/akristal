@@ -9,7 +9,7 @@ Evidence: screenshots taken with Playwright at 390px and 1440px of akristal.com 
 ## 1. Facts this audit established
 
 | Item | Finding |
-|---|---|
+| --- | --- |
 | Client | The Akristal Group Limited — real estate development, brokerage, interior design, furniture |
 | HQ | KK 15 Rd, Kigali, Rwanda. Phone lines for Rwanda (primary), Nigeria ("West Africa"), South Africa |
 | Markets in live data | Kigali (RWF), Abuja: Maitama, Wuse 2 (NGN), Lagos: Victoria Island (NGN), Dubai (USD), Kampala (USD), South Africa (ZAR). Akristal's own projects are in Rwamagana and Kanzenze (Rwanda), plus a completed estate in Life Camp, Abuja |
@@ -77,7 +77,7 @@ Evidence: screenshots taken with Playwright at 390px and 1440px of akristal.com 
 Studied from code and the live site only. Nothing in `luzonprime/` was modified, and its dev server wasn't started, because `next dev` rewrites `.next` and `next-env.d.ts`.
 
 | Area | What LuzonPrime does well | Take for Akristal |
-|---|---|---|
+| --- | --- | --- |
 | Tokens | Colour roles as CSS variables (`--color-primary/accent/bg/bg-muted/surface/border/text/text-muted/heading`) mapped into Tailwind `@theme inline`. Components reference roles, never hex values | **Adopt the method**, with a different palette |
 | Type | Two families: Playfair Display (headings) + Plus Jakarta Sans (body) via `next/font`, `font-heading` utility | Adopt the two-family method with **different faces** |
 | Hero | `min-h-[100svh]` full-bleed photo, two-direction dark scrim for legibility, slow 24s scale, text parallax, search overlaid | Adopt the scrim and `svh`. Skip parallax and constant zoom (motion budget) |
@@ -136,7 +136,7 @@ Studied from code and the live site only. Nothing in `luzonprime/` was modified,
 ## 5. Brand assets — what exists vs what's missing
 
 | Exists | Missing (client to supply) |
-|---|---|
+| --- | --- |
 | Badge logo, raster-traced SVG, 5 MB | **Original vector logo** (AI/EPS/PDF/SVG), plus a one-colour version and a horizontal wordmark if one exists |
 | One 520×331 background JPG (too small for a hero) | **Hero media:** a drone photo or 15–30s clip of an Akristal project or Kigali skyline, ≥2400px wide |
 | Listing photos in Supabase storage (18 listings) | Project renders/photos per development, construction-stage photos, brochures |

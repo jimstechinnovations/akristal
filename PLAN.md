@@ -1,13 +1,23 @@
 # Akristal — Phase 2 Plan
 
-Status: **awaiting approval.** Nothing will be built, migrated or deployed until this is signed off. Read with `AUDIT.md`.
+Status: **approved 2026-10-04 with the changes in §0.** Read with `AUDIT.md`.
+
+## 0. Decisions from review (2026-10-04)
+
+| Item | Decision | Where it changes the plan |
+| --- | --- | --- |
+| Dark mode | **Keep it** on the public site and dashboards | §3.2 dark tokens; every page is screenshot-reviewed in both themes |
+| Motion library | **Add Framer Motion** | §2, §3.6. The motion budget itself is unchanged (one hero moment + responsive motion) |
+| Backend | **Use real Supabase tables** for leads, reviews, agent applications, agent/project fields, furniture, interior portfolio, plans, lenders | §9. Additive migrations only (`ADD COLUMN IF NOT EXISTS`, `CREATE TABLE IF NOT EXISTS`); no drops or renames |
+| `WGU_Clinical_Schedule_old.docx` | Delete | Already gone from `public/partners/` (it was never tracked in git) |
+| Hero | Follow the Sand Piper reference the client resent: centred place-name headline in large serif capitals, tracked tagline, centred search with Map search / Rentals, and a bottom rail of quick filters with Home valuation | §6 Home. This is the one place display capitals are used |
 
 ---
 
 ## 1. Decisions resolved from the brief (`[[FILL]]` fields)
 
 | Field | Decision | Why |
-|---|---|---|
+| --- | --- | --- |
 | LuzonPrime folder | `luzonprime` | Present in the parent folder; treated as read-only |
 | Market | **Rwanda first (Kigali HQ), with Nigeria (Abuja, Lagos), UAE (Dubai), Uganda (Kampala) and South Africa as secondary markets** | The live listings, the phone lines and the project locations all say so |
 | Currency | **Each listing and project keeps its own currency** (RWF, NGN, USD, ZAR…), formatted with `Intl.NumberFormat`. Standalone calculators default to **RWF** with a currency selector. No automatic FX conversion (see Q2) | One site currency would misprice most of the inventory |
@@ -18,11 +28,11 @@ Status: **awaiting approval.** Nothing will be built, migrated or deployed until
 **Keep** Next.js 16 + Tailwind v4 + Supabase + Leaflet + react-hook-form/zod. Nothing in the brief is blocked by this stack.
 
 | Change | Reason |
-|---|---|
+| --- | --- |
 | Upgrade `next` 16.0.10 → current 16.x patch, aligned `eslint-config-next` | LuzonPrime runs 16.2.x; picks up fixes. Tested before commit |
 | Add `vitest` (dev) | The calculators must be unit-tested pure functions |
 | Add `@playwright/test` (dev) | Screenshot review at 360/390/768/1024/1280/1440 after each page, plus smoke tests |
-| **No Framer Motion** | The motion budget is small (§3.6); CSS transitions + one `IntersectionObserver` hook cover it and save ~40 KB of JS on phones |
+| **Add `framer-motion`** (decision §0) | Hero entrance, the lightbox, filter sheet, menu sheet, tab and calculator transitions. Imported only in client components that animate; `MotionConfig reducedMotion="user"` at the root |
 | Remove `zustand` if unused after refactor | Favourites move to a small context + `localStorage` |
 | Replace the 5 MB logo | Optimised SVG/PNG set from the client's vector. Interim: a 512px PNG export of the badge and a lightweight text wordmark |
 
@@ -40,7 +50,7 @@ Admin, auth, dashboards, messaging and payments **stay as they are** functionall
 ### 3.2 Palette (from the logo, not from LuzonPrime)
 
 | Name | Hex | Role |
-|---|---|---|
+| --- | --- | --- |
 | **Oxblood** | `#3F1712` | Brand. Primary buttons, the "Built by Akristal" band, footer. Taken from the badge disc |
 | Oxblood 600 | `#5C231B` | Hover/active on Oxblood |
 | **Brass** | `#B8924A` | The one accent: the star mark, fine rules and focus rings **on dark surfaces only** (5.4:1 on Oxblood; 2.9:1 on white, so never text on light) |
@@ -52,7 +62,20 @@ Admin, auth, dashboards, messaging and payments **stay as they are** functionall
 
 Status colours (never used decoratively): success Hill `#2E5A45` (7.9:1), error `#B3261E` (6.5:1, always with an icon and text so it can't be confused with Oxblood).
 
-**Dark mode:** recommend **dropping it on the public site.** It is photography-led, and a dark variant doubles the QA for little gain. Dashboards keep their current toggle. (Q11)
+**Dark mode (kept, decision §0):** a warm basalt night palette, not navy and not pure black. In dark mode the primary button becomes Brass with Ink text, because an Oxblood button disappears on a dark page. The Oxblood band stays Oxblood.
+
+| Dark role | Hex | Contrast |
+| --- | --- | --- |
+| Page | `#14100E` | — |
+| Alternate section | `#1C1714` | — |
+| Surface (cards, sheets) | `#221C19` | — |
+| Line | `#3B332E` | — |
+| Text | `#F1EDE8` | 16.2:1 on page |
+| Muted text | `#ABA29B` | 7.5:1 on page, 6.7:1 on surface |
+| Accent / primary button | Brass `#C9A35C`, text `#1F1B19` | 8.0:1 on page; 7.2:1 for button text |
+| Error / success | `#F2867E` / `#7FBF9F` | 7.6:1 / 8.9:1 |
+
+The theme follows the system setting by default, with a toggle in the header and mobile menu (existing `ThemeProvider`, `.dark` class).
 
 ### 3.3 Typography
 - **Display: Cormorant Garamond** (500/600), used only at ≥28px for the hero, section titles and project names. It has the high-contrast, engraved elegance of the Sand Piper reference without being Playfair (LuzonPrime's face).
@@ -66,7 +89,7 @@ Status colours (never used decoratively): success Hill `#2E5A45` (7.9:1), error 
 ### 3.4 How it differs from LuzonPrime
 
 | | LuzonPrime | Akristal |
-|---|---|---|
+| --- | --- | --- |
 | Colour | Navy `#091F46` + gold `#C9A84C`, white/black | **Oxblood + Brass, Ink on White/Mist.** No navy anywhere |
 | Faces | Playfair Display + Plus Jakarta Sans | **Cormorant Garamond + Instrument Sans** |
 | Shape | Pills (`rounded-full`) and `rounded-2xl` cards | **Rectangular:** 4px controls, 6px cards, 0px editorial photos; chips are 4px, not pills |
@@ -371,10 +394,10 @@ SiteStats    { years_operating, units_delivered, … } ← client-supplied real 
 
 ## 9. Backend: what needs it, and the interim
 
-Supabase is already in production and you've authorised Supabase operations. So the recommendation is **real tables, not interim mailto links.** Migrations will be numbered files in `supabase/migrations/`, reviewed in a PR-style diff, and applied only after this plan is approved.
+Supabase is already in production and you've authorised Supabase operations. **Decision §0: real tables, not interim mailto links.** Migrations will be numbered files in `supabase/migrations/`, reviewed in a PR-style diff, and applied only after this plan is approved.
 
 | Feature | Recommended | Interim if migrations are deferred |
-|---|---|---|
+| --- | --- | --- |
 | Lead forms (viewing, valuation, contact, consultation, pre-qual, Pay Small Small, furniture) | Insert into `inquiries` (extended type + `payload`) via server action; email via existing Zoho SMTP | Same server action → email only |
 | Agent applications | New `agent_applications` table + private storage bucket for ID upload | Email + "send ID on WhatsApp" note; upload field disabled |
 | Agent reviews | New `agent_reviews` table, insert-only for public, RLS: public reads `approved` only; moderation in admin | Form → email to moderator; reviews shown from data file |
@@ -406,7 +429,7 @@ Known risks:
 ## 11. Plan review against generic defaults (frontend-design check)
 
 | First instinct | Problem | Revised to |
-|---|---|---|
+| --- | --- | --- |
 | Warm cream background + serif + terracotta accent | The commonest generated-site look | Cool **Mist** grey and white; accent is **Brass from the logo**, on dark surfaces only |
 | Navy + gold "premium" | It's LuzonPrime, and Akristal's current palette | **Oxblood** from the badge as the brand colour |
 | Eyebrow label above every section heading | Template chrome | Titles only; labels only where they carry data |
