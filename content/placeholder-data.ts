@@ -23,3 +23,37 @@ export const placeholderPlan: InstallmentPlan = {
   termsUrl: null,
   placeholder: true,
 }
+
+/** Become an agent: commission model. SAMPLE FIGURES until Akristal confirms its agent agreement. */
+export const agentProgramme = {
+  placeholder: true,
+  /** Typical commission charged on a sale, % of price */
+  commissionPct: 3,
+  tiers: [
+    { name: 'Associate agent', share: 50, requirement: 'Your first year with Akristal' },
+    { name: 'Senior agent', share: 60, requirement: 'Ten or more completed sales' },
+    { name: 'Partner agent', share: 70, requirement: 'By invitation, for top performers' },
+  ],
+  faqs: [
+    {
+      q: 'Do I need a licence to apply?',
+      a: 'Tell us what registration you hold in your country. Where a licence is required by law, you must hold it before you list homes with us.',
+    },
+    {
+      q: 'Can I work part-time?',
+      a: 'Yes. You are paid on completed sales, so you can start part-time and grow from there.',
+    },
+    {
+      q: 'Which areas do you need agents in?',
+      a: 'Kigali first, then Abuja and Lagos. We also take applications for Dubai, Kampala and South Africa.',
+    },
+    {
+      q: 'Will I sell Akristal’s own developments?',
+      a: 'Yes. Agents sell our developments alongside homes listed by private owners.',
+    },
+    {
+      q: 'How long does the application take?',
+      a: 'The form takes about five minutes. Our team reviews each application and contacts shortlisted applicants for an interview.',
+    },
+  ],
+}
