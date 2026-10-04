@@ -28,16 +28,17 @@ export type Listing = {
   isFeatured: boolean
   createdAt: string | null
   coords: { lat: number; lng: number; approximate: boolean } | null
+  agentId: string | null
 }
 
 const LISTING_COLUMNS =
-  'id, title, price, currency, listing_type, status, property_type_id, city, district, address, country, latitude, longitude, bedrooms, bathrooms, size_sqm, parking_spaces, cover_image_url, image_urls, video_urls, is_featured, created_at'
+  'id, title, price, currency, listing_type, status, property_type_id, agent_id, city, district, address, country, latitude, longitude, bedrooms, bathrooms, size_sqm, parking_spaces, cover_image_url, image_urls, video_urls, is_featured, created_at'
 
 type ListingRow = Pick<
   Row,
   | 'id' | 'title' | 'price' | 'currency' | 'listing_type' | 'status' | 'property_type_id' | 'city' | 'district' | 'address'
   | 'country' | 'bedrooms' | 'bathrooms' | 'size_sqm' | 'parking_spaces' | 'cover_image_url' | 'image_urls' | 'video_urls'
-  | 'is_featured' | 'created_at' | 'latitude' | 'longitude'
+  | 'is_featured' | 'created_at' | 'latitude' | 'longitude' | 'agent_id'
 >
 
 export function toListing(row: ListingRow, typeNames: Map<string, string>): Listing {
@@ -64,6 +65,7 @@ export function toListing(row: ListingRow, typeNames: Map<string, string>): List
     isFeatured: row.is_featured,
     createdAt: row.created_at,
     coords: coordinatesFor(row, market, row.id),
+    agentId: row.agent_id,
   }
 }
 
@@ -135,7 +137,6 @@ export type ListingDetail = Listing & {
   yearBuilt: number | null
   videos: string[]
   sellerId: string
-  agentId: string | null
 }
 
 const asStrings = (v: unknown) => (Array.isArray(v) ? v.filter((x): x is string => typeof x === 'string' && !!x.trim()).map((x) => x.trim()) : [])
@@ -147,14 +148,14 @@ export const getListing = cache(async (id: string): Promise<ListingDetail | null
   const [{ data }, names] = await Promise.all([
     supabase
       .from('properties')
-      .select(`${LISTING_COLUMNS}, description, amenities, features, year_built, seller_id, agent_id`)
+      .select(`${LISTING_COLUMNS}, description, amenities, features, year_built, seller_id`)
       .eq('id', id)
       .eq('listing_status', 'approved')
       .maybeSingle(),
     typeNameMap(),
   ])
   if (!data) return null
-  const row = data as ListingRow & Pick<Row, 'description' | 'amenities' | 'features' | 'year_built' | 'seller_id' | 'agent_id'>
+  const row = data as ListingRow & Pick<Row, 'description' | 'amenities' | 'features' | 'year_built' | 'seller_id'>
   return {
     ...toListing(row, names),
     // Some descriptions were pasted with stray markdown asterisks.
@@ -164,7 +165,6 @@ export const getListing = cache(async (id: string): Promise<ListingDetail | null
     yearBuilt: row.year_built,
     videos: (row.video_urls ?? []).filter(Boolean),
     sellerId: row.seller_id,
-    agentId: row.agent_id,
   }
 })
 
@@ -177,4 +177,14 @@ export async function getSimilarListings(listing: Listing, limit = 3): Promise<L
     (l.propertyTypeId === listing.propertyTypeId ? 1 : 0) +
     (l.currency === listing.currency ? 1 - Math.min(1, Math.abs(l.price - listing.price) / Math.max(listing.price, 1)) : 0)
   return all.sort((a, b) => score(b) - score(a)).slice(0, limit)
+}
+
+/** Everything listed with an agent, split the way the profile tabs show it. */
+export async function getAgentListings(agentId: string) {
+  const mine = (await getAllListings()).filter((l) => l.agentId === agentId)
+  return {
+    forSale: mine.filter((l) => l.status === 'available' && l.listingType === 'sale'),
+    forRent: mine.filter((l) => l.status === 'available' && l.listingType === 'rent'),
+    sold: mine.filter((l) => l.status === 'sold' || l.status === 'rented'),
+  }
 }

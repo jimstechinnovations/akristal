@@ -27,6 +27,7 @@ function listing(over: Partial<Listing>): Listing {
     isFeatured: false,
     createdAt: '2026-01-01T00:00:00Z',
     coords: null,
+    agentId: null,
     ...over,
   }
 }

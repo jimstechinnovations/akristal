@@ -37,11 +37,15 @@ const NOT_A_NAME = /^(agent|test|admin|user)\b/i
 
 export const getAgents = cache(async (): Promise<Agent[]> => {
   const supabase = createPublicClient()
-  const [{ data: rows }, { data: stats }] = await Promise.all([
+  const [{ data: rows }, { data: stats }, team] = await Promise.all([
     supabase.from('agent_directory').select('*'),
     supabase.from('agent_review_stats').select('*'),
+    getTeam(),
   ])
   const ratings = new Map((stats ?? []).map((s) => [s.agent_id, s]))
+  // An agent who is also on the team page reuses that portrait until they upload their own.
+  const norm = (n: string) => n.toLowerCase().replace(/[^a-z]/g, '')
+  const teamPhotos = new Map(team.filter((m) => m.imageUrl).map((m) => [norm(m.name), m.imageUrl!]))
   return (rows ?? [])
     .filter((r) => r.id && r.full_name && !NOT_A_NAME.test(r.full_name.trim()))
     .map((r) => {
@@ -51,7 +55,7 @@ export const getAgents = cache(async (): Promise<Agent[]> => {
         slug: r.slug || agentSlug(r.full_name!, r.id!),
         name: r.full_name!.trim(),
         title: r.title || 'Akristal agent',
-        avatarUrl: r.avatar_url,
+        avatarUrl: r.avatar_url ?? teamPhotos.get(norm(r.full_name!)) ?? null,
         bio: r.bio,
         areas: r.areas_served ?? [],
         specialties: r.specialties ?? [],
@@ -100,4 +104,30 @@ export const getTeam = cache(async (): Promise<TeamMember[]> => {
       details: m.details,
     }
   })
+})
+
+export const getAgentBySlug = cache(async (slug: string) => {
+  const agents = await getAgents()
+  return agents.find((a) => a.slug === slug || a.id === slug) ?? null
+})
+
+export type AgentReview = { id: string; authorName: string; rating: number; body: string; context: string | null; createdAt: string }
+
+/** Approved reviews only (RLS hides pending and rejected ones from the public). */
+export const getAgentReviews = cache(async (agentId: string): Promise<AgentReview[]> => {
+  const supabase = createPublicClient()
+  const { data } = await supabase
+    .from('agent_reviews')
+    .select('id, author_name, rating, body, context, created_at')
+    .eq('agent_id', agentId)
+    .order('created_at', { ascending: false })
+    .limit(100)
+  return (data ?? []).map((r) => ({
+    id: r.id,
+    authorName: r.author_name,
+    rating: r.rating,
+    body: r.body,
+    context: r.context,
+    createdAt: r.created_at,
+  }))
 })
