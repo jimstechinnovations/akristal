@@ -30,6 +30,9 @@
   --c-error: #b3261e;
   --c-focus: var(--c-ink);
   --c-scrim: rgb(20 12 10 / 0.55);
+  /* Soft oxblood-tinted wash for light, illustrated sections (instead of solid colour blocks). */
+  --c-wash: #f6efed;
+  --c-line-art: #3f1712;
 
   /* Legacy names still used by dashboard pages. */
   --background: var(--c-bg);
@@ -56,6 +59,8 @@
   --c-success: #7fbf9f;
   --c-error: #f2867e;
   --c-focus: #c9a35c;
+  --c-wash: #1d1512;
+  --c-line-art: #c9a35c;
 
   --background: var(--c-bg);
   --foreground: var(--c-ink);
@@ -77,6 +82,8 @@
   --color-primary: var(--c-primary);
   --color-primary-hover: var(--c-primary-hover);
   --color-on-primary: var(--c-on-primary);
+  --color-wash: var(--c-wash);
+  --color-line-art: var(--c-line-art);
   --color-success: var(--c-success);
   --color-error: var(--c-error);
   --color-background: var(--background);
@@ -272,4 +279,9 @@
 }
 .ak-popup__body small {
   color: var(--c-muted);
+}
+
+/* Line illustrations keep a constant stroke weight at any size (phones get a cropped, taller view). */
+.ak-line-art :where(path, line, rect, circle) {
+  vector-effect: non-scaling-stroke;
 }

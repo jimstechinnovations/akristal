@@ -5,6 +5,7 @@ import { calculateInstallments } from '@/lib/finance/installment'
 import { formatMoney } from '@/lib/format'
 import { buttonClasses } from '@/components/ui/button'
 import { MoneyCountUp } from './money-count-up'
+import { BlueprintVilla } from '@/components/illustrations/blueprint-villa'
 
 export function Finance() {
   const d = financeDefaults.RWF
@@ -13,8 +14,9 @@ export function Finance() {
   const plan = calculateInstallments({ price, depositPct: 30, months: 24, currency: 'RWF' })
 
   return (
-    <section aria-labelledby="finance-title" className="border-y border-line section-y">
+    <section aria-labelledby="finance-title" className="relative isolate overflow-hidden border-y border-line section-y">
       <div className="page-x-wide">
+        <div className="grid items-end gap-8 lg:grid-cols-[1fr_minmax(0,460px)]">
         <div className="max-w-2xl">
           <h2 id="finance-title" className="font-display text-display-m font-medium">
             What a home costs each month
@@ -23,6 +25,9 @@ export function Finance() {
             Two ways to pay for a {formatMoney(price, 'RWF', { compact: true })} home: a bank mortgage, or our own Pay Small Small
             plan with no bank involved.
           </p>
+        </div>
+          {/* Architect's elevation: the home these numbers pay for. */}
+          <BlueprintVilla className="hidden w-full text-line-art opacity-60 lg:block dark:opacity-50" />
         </div>
 
         <div className="mt-12 grid gap-px overflow-hidden rounded-md border border-line bg-line md:grid-cols-2">

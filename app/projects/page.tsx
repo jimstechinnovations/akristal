@@ -11,6 +11,7 @@ import { cn } from '@/lib/utils'
 import { buttonClasses } from '@/components/ui/button'
 import { StageTrack } from '@/components/projects/stage-track'
 import { Reveal } from '@/components/motion/reveal'
+import { HillsSkyline } from '@/components/illustrations/hills-skyline'
 
 export const metadata: Metadata = pageMetadata({
   title: 'Akristal developments',
@@ -39,18 +40,19 @@ export default async function ProjectsPage({ searchParams }: PageProps) {
 
   return (
     <>
-      <header className="bg-brand text-white">
+      <header className="relative isolate overflow-hidden border-b border-line bg-gradient-to-b from-wash to-page">
+        <HillsSkyline className="pointer-events-none absolute inset-x-0 bottom-0 -z-10 aspect-[2.2/1] w-full text-line-art opacity-[0.16] sm:aspect-[4/1] dark:opacity-[0.3]" />
         <div className="page-x-wide pb-14 pt-12 sm:pb-20 sm:pt-16">
           <div className="flex flex-wrap items-end justify-between gap-6">
             <div className="max-w-2xl">
               <h1 className="font-display text-display-l font-medium">Akristal developments</h1>
-              <p className="mt-4 text-base leading-relaxed text-white/80">
+              <p className="mt-4 text-base leading-relaxed text-muted">
                 Neighbourhoods we plan, build and sell ourselves, from new satellite cities in Rwanda&apos;s Eastern Province to finished
                 homes in Abuja. Buy directly from the developer, off-plan or completed.
               </p>
             </div>
             {isAdmin && (
-              <Link href="/projects/new" className={buttonClasses({ variant: 'inverse' })}>
+              <Link href="/projects/new" className={buttonClasses()}>
                 <Plus aria-hidden className="size-4" /> New development
               </Link>
             )}
@@ -66,7 +68,7 @@ export default async function ProjectsPage({ searchParams }: PageProps) {
                   aria-current={current ? 'page' : undefined}
                   className={cn(
                     'inline-flex h-10 items-center gap-2 rounded-sm border px-4 text-sm transition-colors',
-                    current ? 'border-white bg-white text-[#1f1b19]' : 'border-white/35 hover:border-white'
+                    current ? 'border-primary bg-primary text-on-primary' : 'border-line-strong bg-page/60 hover:border-ink'
                   )}
                 >
                   {s.label}

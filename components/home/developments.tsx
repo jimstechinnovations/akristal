@@ -7,6 +7,7 @@ import { SectionHeading } from '@/components/ui/section-heading'
 import { CountUp } from '@/components/motion/count-up'
 import { Reveal } from '@/components/motion/reveal'
 import { StageTrack } from '@/components/projects/stage-track'
+import { HillsSkyline } from '@/components/illustrations/hills-skyline'
 
 export type Stat = { value: number; label: string }
 
@@ -23,7 +24,7 @@ function PriceLine({ project }: { project: Project }) {
 function ProjectFeature({ project, lead, priority }: { project: Project; lead?: boolean; priority?: boolean }) {
   return (
     <article className="group relative flex flex-col">
-      <div className={cn('relative overflow-hidden rounded-md bg-black/20', lead ? 'aspect-[4/3] lg:aspect-[16/11]' : 'aspect-[16/10]')}>
+      <div className={cn('relative overflow-hidden rounded-md bg-page-alt', lead ? 'aspect-[4/3] lg:aspect-[16/11]' : 'aspect-[16/10]')}>
         <Image
           src={project.images[0]}
           alt=""
@@ -37,18 +38,18 @@ function ProjectFeature({ project, lead, priority }: { project: Project; lead?: 
         </span>
       </div>
       <div className="flex flex-1 flex-col pt-5">
-        <h3 className={cn('font-display font-medium text-white', lead ? 'text-display-s lg:text-[2.25rem]' : 'text-2xl')}>
-          <Link href={projectHref(project)} className="after:absolute after:inset-0 group-hover:underline group-hover:decoration-white/40 group-hover:underline-offset-4">
+        <h3 className={cn('font-display font-medium text-ink', lead ? 'text-display-s lg:text-[2.25rem]' : 'text-2xl')}>
+          <Link href={projectHref(project)} className="after:absolute after:inset-0 group-hover:underline group-hover:decoration-line-strong group-hover:underline-offset-4">
             {project.name}
           </Link>
         </h3>
-        <p className="mt-1 text-sm text-white/70">{project.location}</p>
-        {lead && project.summary && <p className="mt-4 max-w-xl text-[0.9375rem] leading-relaxed text-white/85">{project.summary}</p>}
+        <p className="mt-1 text-sm text-muted">{project.location}</p>
+        {lead && project.summary && <p className="mt-4 max-w-xl text-[0.9375rem] leading-relaxed text-ink/85">{project.summary}</p>}
         <div className="pt-5">
-          <StageTrack stage={project.stage} progressPct={project.progressPct} className="max-w-sm" />
-          <p className="mt-4 flex flex-wrap items-center gap-x-4 gap-y-1 text-sm text-white">
+          <StageTrack stage={project.stage} progressPct={project.progressPct} tone="default" className="max-w-sm" />
+          <p className="mt-4 flex flex-wrap items-center gap-x-4 gap-y-1 text-sm text-ink">
             <PriceLine project={project} />
-            {project.paySmallSmall && !project.soldOut && <span className="text-accent">Pay Small Small available</span>}
+            {project.paySmallSmall && !project.soldOut && <span className="font-medium text-brand dark:text-accent">Pay Small Small available</span>}
           </p>
         </div>
       </div>
@@ -60,14 +61,13 @@ export function Developments({ projects, stats }: { projects: Project[]; stats: 
   if (!projects.length) return null
   const [lead, ...rest] = projects
   return (
-    <section aria-labelledby="developments-title" className="bg-brand text-white">
-      <div className="page-x-wide section-y">
+    <section aria-labelledby="developments-title" className="relative isolate overflow-hidden bg-gradient-to-b from-wash via-wash/70 to-page">
+      <div className="page-x-wide pt-16 lg:pt-24">
         <SectionHeading
           id="developments-title"
           title="Akristal developments"
           intro="Homes and neighbourhoods we plan, build and sell ourselves. Buy directly from us, from the plan or the finished home."
           action={{ href: '/projects', label: 'All developments' }}
-          tone="light"
         />
 
         <div className="mt-12 grid gap-x-10 gap-y-14 lg:grid-cols-12 lg:items-start">
@@ -84,13 +84,13 @@ export function Developments({ projects, stats }: { projects: Project[]; stats: 
         </div>
 
         {stats.length > 0 && (
-          <dl className="mt-16 grid grid-cols-2 gap-y-10 border-t border-white/15 pt-10 lg:grid-cols-4">
+          <dl className="mt-16 grid grid-cols-2 gap-y-10 border-t border-line pt-10 lg:grid-cols-4">
             {stats.map((s) => (
               <div key={s.label} className="pr-6">
                 <dt className="sr-only">{s.label}</dt>
                 <dd>
-                  <CountUp value={s.value} className="text-[2.75rem] font-light leading-none tracking-tight text-white lg:text-[3.5rem]" />
-                  <p aria-hidden className="mt-2 max-w-[14rem] text-sm text-white/70">
+                  <CountUp value={s.value} className="text-[2.75rem] font-light leading-none tracking-tight text-brand lg:text-[3.5rem] dark:text-accent" />
+                  <p aria-hidden className="mt-2 max-w-[14rem] text-sm text-muted">
                     {s.label}
                   </p>
                 </dd>
@@ -99,6 +99,8 @@ export function Developments({ projects, stats }: { projects: Project[]; stats: 
           </dl>
         )}
       </div>
+      {/* Rwanda's terraced hills, drawn as a horizon under the figures: the Akristal signature. */}
+      <HillsSkyline className="mt-6 block aspect-[2.2/1] w-full text-line-art opacity-[0.28] sm:aspect-[4/1] dark:opacity-[0.38]" strokeWidth={1.1} />
     </section>
   )
 }
