@@ -41,7 +41,7 @@ export type UnitType = { type: string; units?: number; beds?: number; bedsMin?: 
 
 const VIDEO = /\.(mp4|webm|mov|m4v)(\?|$)/i
 
-function toProject(row: Row): Project {
+export function toProject(row: Row): Project {
   const media = (row.media_urls ?? []).filter(Boolean)
   const images = [row.cover_image_url, ...media.filter((u) => !VIDEO.test(u))].filter((u): u is string => !!u)
   const stage: ProjectStage =
@@ -100,4 +100,35 @@ export const getFeaturedProjects = cache(async (limit = 3) => {
 export const getProject = cache(async (idOrSlug: string) => {
   const all = await getProjects()
   return all.find((p) => p.id === idOrSlug || p.slug === idOrSlug) ?? null
+})
+
+export type TimelineItem = {
+  id: string
+  kind: 'update' | 'offer' | 'event'
+  title: string | null
+  body: string
+  media: string[]
+  date: string
+  endDate: string | null
+}
+
+/** Visible updates, offers and events for a development (RLS hides scheduled and hidden items). */
+export const getProjectTimeline = cache(async (projectId: string) => {
+  const supabase = createPublicClient()
+  const [{ data: updates }, { data: offers }, { data: events }] = await Promise.all([
+    supabase.from('project_updates').select('id, description, media_urls, created_at').eq('project_id', projectId).order('created_at', { ascending: false }),
+    supabase.from('project_offers').select('id, title, description, media_urls, start_datetime, end_datetime').eq('project_id', projectId).order('start_datetime'),
+    supabase.from('project_events').select('id, title, description, media_urls, start_datetime, end_datetime').eq('project_id', projectId).order('start_datetime'),
+  ])
+  const now = Date.now()
+  return {
+    updates: (updates ?? []).map<TimelineItem>((u) => ({ id: u.id, kind: 'update', title: null, body: u.description, media: u.media_urls ?? [], date: u.created_at ?? '', endDate: null })),
+    // Only offers that haven't ended and events that haven't finished are worth showing.
+    offers: (offers ?? [])
+      .filter((o) => Date.parse(o.end_datetime) > now)
+      .map<TimelineItem>((o) => ({ id: o.id, kind: 'offer', title: o.title, body: o.description, media: o.media_urls ?? [], date: o.start_datetime, endDate: o.end_datetime })),
+    events: (events ?? [])
+      .filter((e) => Date.parse(e.end_datetime) > now)
+      .map<TimelineItem>((e) => ({ id: e.id, kind: 'event', title: e.title, body: e.description, media: e.media_urls ?? [], date: e.start_datetime, endDate: e.end_datetime })),
+  }
 })

@@ -1,177 +1,156 @@
-import { createClient } from '@/lib/supabase/server'
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import type { Metadata } from 'next'
+import Image from 'next/image'
 import Link from 'next/link'
-import { Button } from '@/components/ui/button'
 import { Plus } from 'lucide-react'
 import { getCurrentUser } from '@/lib/auth'
-import { formatCurrency } from '@/lib/utils'
+import { createClient } from '@/lib/supabase/server'
+import { STAGES, getProjects, type ProjectStage } from '@/lib/data/projects'
+import { formatMoney } from '@/lib/format'
+import { pageMetadata } from '@/lib/seo'
+import { cn } from '@/lib/utils'
+import { buttonClasses } from '@/components/ui/button'
+import { StageTrack } from '@/components/projects/stage-track'
+import { Reveal } from '@/components/motion/reveal'
 
-type ProjectStatus = 'draft' | 'active' | 'completed' | 'archived' | 'sold_out'
+export const metadata: Metadata = pageMetadata({
+  title: 'Akristal developments',
+  description:
+    'Homes and neighbourhoods built by The Akristal Group: Le Centurium City in Rwamagana, Pearl View Residence in Kanzenze and more. Buy off-plan or finished, directly from the developer.',
+  path: '/projects',
+})
 
-type ProjectRow = {
-  id: string
-  title: string
-  description: string | null
-  created_by: string
-  status: ProjectStatus
-  type?: string | null
-  pre_selling_price?: number | null
-  pre_selling_currency?: string | null
-  main_price?: number | null
-  main_currency?: string | null
-  created_at: string
-  updated_at: string
-}
+type PageProps = { searchParams: Promise<{ stage?: string }> }
 
-export default async function ProjectsPage() {
-  const supabase = await createClient()
-  const currentUser = await getCurrentUser()
-  const isAdmin = currentUser?.profile?.role === 'admin'
-  const canCreate = isAdmin // Only admins can create projects for now
-
-  // Fetch projects based on user role
-  let projects: ProjectRow[] | null = null
-
-  if (isAdmin) {
-    // Admins see all projects including draft and archived
-    const { data } = await supabase
-      .from('projects')
-      .select('id, title, description, created_by, status, type, pre_selling_price, pre_selling_currency, main_price, main_currency, created_at, updated_at')
-      .order('created_at', { ascending: false })
-    projects = data as ProjectRow[] | null
-  } else if (currentUser) {
-    // Non-admin logged-in users see all statuses except draft/archived + their own projects (including drafts)
-    // Fetch projects that are not draft/archived
-    const { data: publicProjects } = await supabase
-      .from('projects')
-      .select('id, title, description, created_by, status, type, pre_selling_price, pre_selling_currency, main_price, main_currency, created_at, updated_at')
-      .not('status', 'eq', 'draft')
-      .not('status', 'eq', 'archived')
-      .order('created_at', { ascending: false })
-    
-    // Fetch user's own projects (including drafts/archived)
-    const { data: userProjects } = await supabase
-      .from('projects')
-      .select('id, title, description, created_by, status, type, pre_selling_price, pre_selling_currency, main_price, main_currency, created_at, updated_at')
-      .eq('created_by', currentUser.id)
-      .order('created_at', { ascending: false })
-    
-    // Combine and deduplicate by id
-    const publicProjectsList = (publicProjects as ProjectRow[] | null) ?? []
-    const userProjectsList = (userProjects as ProjectRow[] | null) ?? []
-    const projectMap = new Map<string, ProjectRow>()
-    
-    publicProjectsList.forEach(p => projectMap.set(p.id, p))
-    userProjectsList.forEach(p => projectMap.set(p.id, p))
-    
-    projects = Array.from(projectMap.values()).sort((a, b) => 
-      new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
-    )
-  } else {
-    // Public users see all statuses except draft and archived
-    const { data } = await supabase
-      .from('projects')
-      .select('id, title, description, created_by, status, type, pre_selling_price, pre_selling_currency, main_price, main_currency, created_at, updated_at')
-      .not('status', 'eq', 'draft')
-      .not('status', 'eq', 'archived')
-      .order('created_at', { ascending: false })
-    projects = data as ProjectRow[] | null
-  }
-  const typedProjects = (projects as ProjectRow[] | null) ?? []
+export default async function ProjectsPage({ searchParams }: PageProps) {
+  const { stage } = await searchParams
+  const [projects, user] = await Promise.all([getProjects(), getCurrentUser()])
+  const isAdmin = user?.profile?.role === 'admin'
+  const active = STAGES.find((s) => s.value === stage)?.value as ProjectStage | undefined
+  const shown = active ? projects.filter((p) => p.stage === active) : projects
+  // Admins also see drafts and archived developments (hidden from the public by RLS).
+  const hidden = isAdmin
+    ? (((await (await createClient()).from('projects').select('id, title, name, status').in('status', ['draft', 'archived'])).data ?? []) as {
+        id: string
+        title: string
+        name: string | null
+        status: string
+      }[])
+    : []
 
   return (
-    <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
-      <div className="mb-8 flex items-center justify-between">
-        <div>
-          <h1 className="text-3xl font-bold text-gray-900 dark:text-white">Projects</h1>
-          <p className="mt-2 text-gray-600 dark:text-gray-400">
-            Explore our ongoing and completed projects
-          </p>
-        </div>
-        {canCreate && (
-          <Link href="/projects/new">
-            <Button>
-              <Plus className="mr-2 h-4 w-4" />
-              New Project
-            </Button>
-          </Link>
-        )}
-      </div>
-
-      {typedProjects.length > 0 ? (
-        <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
-          {typedProjects.map((project) => (
-            <Link key={project.id} href={`/projects/${project.id}`}>
-              <Card className="h-full transition-shadow hover:shadow-lg">
-                <CardHeader>
-                  <CardTitle className="text-gray-900 dark:text-white">{project.title}</CardTitle>
-                </CardHeader>
-                <CardContent>
-                  {project.type && (
-                    <div className="mb-2">
-                      <span className="inline-flex rounded-full bg-[#c89b3c]/20 px-3 py-1 text-xs font-semibold text-[#c89b3c] capitalize">
-                        {project.type.replace(/_/g, ' ')}
-                      </span>
-                    </div>
-                  )}
-                  <p className="text-sm text-gray-600 dark:text-gray-400 line-clamp-3 mb-4">
-                    {project.description || 'No description available.'}
-                  </p>
-                  {(project.pre_selling_price || project.main_price) && (
-                    <div className="mb-4 space-y-1">
-                      {project.pre_selling_price && (
-                        <div className="text-sm">
-                          <span className="text-gray-600 dark:text-gray-400">Pre-selling: </span>
-                          <span className="font-semibold text-[#c89b3c]">
-                            {formatCurrency(project.pre_selling_price, project.pre_selling_currency || 'RWF')}
-                          </span>
-                        </div>
-                      )}
-                      {project.main_price && (
-                        <div className="text-sm">
-                          <span className="text-gray-600 dark:text-gray-400">Main Price: </span>
-                          <span className="font-semibold text-[#c89b3c]">
-                            {formatCurrency(project.main_price, project.main_currency || 'RWF')}
-                          </span>
-                        </div>
-                      )}
-                    </div>
-                  )}
-                  <div className="mt-4 flex items-center justify-between">
-                    <span
-                      className={`inline-flex rounded-full px-2 py-1 text-xs font-semibold ${
-                        project.status === 'active'
-                          ? 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200'
-                          : project.status === 'completed'
-                            ? 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200'
-                            : project.status === 'sold_out'
-                              ? 'bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-200'
-                              : 'bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-200'
-                      }`}
-                    >
-                      {project.status.replace(/_/g, ' ')}
-                    </span>
-                    <span className="text-xs text-gray-500 dark:text-gray-400">
-                      {new Date(project.created_at).toLocaleDateString()}
-                    </span>
-                  </div>
-                </CardContent>
-              </Card>
-            </Link>
-          ))}
-        </div>
-      ) : (
-        <Card>
-          <CardContent className="py-12 text-center">
-            <p className="text-gray-600 dark:text-gray-400">No projects found.</p>
-            {canCreate && (
-              <Link href="/projects/new" className="mt-4 inline-block">
-                <Button>Create Your First Project</Button>
+    <>
+      <header className="bg-brand text-white">
+        <div className="page-x-wide pb-14 pt-12 sm:pb-20 sm:pt-16">
+          <div className="flex flex-wrap items-end justify-between gap-6">
+            <div className="max-w-2xl">
+              <h1 className="font-display text-display-l font-medium">Akristal developments</h1>
+              <p className="mt-4 text-base leading-relaxed text-white/80">
+                Neighbourhoods we plan, build and sell ourselves, from new satellite cities in Rwanda&apos;s Eastern Province to finished
+                homes in Abuja. Buy directly from the developer, off-plan or completed.
+              </p>
+            </div>
+            {isAdmin && (
+              <Link href="/projects/new" className={buttonClasses({ variant: 'inverse' })}>
+                <Plus aria-hidden className="size-4" /> New development
               </Link>
             )}
-          </CardContent>
-        </Card>
-      )}
-    </div>
+          </div>
+          <nav aria-label="Filter by stage" className="mt-10 flex flex-wrap gap-2">
+            {[{ value: undefined, label: 'All' }, ...STAGES].map((s) => {
+              const current = s.value === active
+              const count = s.value ? projects.filter((p) => p.stage === s.value).length : projects.length
+              return (
+                <Link
+                  key={s.label}
+                  href={s.value ? `/projects?stage=${s.value}` : '/projects'}
+                  aria-current={current ? 'page' : undefined}
+                  className={cn(
+                    'inline-flex h-10 items-center gap-2 rounded-sm border px-4 text-sm transition-colors',
+                    current ? 'border-white bg-white text-[#1f1b19]' : 'border-white/35 hover:border-white'
+                  )}
+                >
+                  {s.label}
+                  <span className="tabular text-xs opacity-70">{count}</span>
+                </Link>
+              )
+            })}
+          </nav>
+        </div>
+      </header>
+
+      <section aria-label="Developments" className="page-x-wide py-14 sm:py-20">
+        {shown.length ? (
+          <ul className="grid gap-20">
+            {shown.map((p, i) => (
+              <li key={p.id}>
+                <Reveal>
+                  <article className="group relative grid items-center gap-8 lg:grid-cols-12 lg:gap-12">
+                    <div className={cn('relative aspect-[4/3] overflow-hidden rounded-md bg-page-alt lg:col-span-7', i % 2 === 1 && 'lg:order-2')}>
+                      {!p.images[0] && p.videos[0] && (
+                        // Video-only development: show an early frame as the cover.
+                        <video src={`${p.videos[0]}#t=1`} muted playsInline preload="metadata" aria-hidden className="absolute inset-0 size-full object-cover" />
+                      )}
+                      {p.images[0] && (
+                        <Image
+                          src={p.images[0]}
+                          alt=""
+                          fill
+                          priority={i === 0}
+                          sizes="(min-width: 1024px) 58vw, 100vw"
+                          className="object-cover transition-transform duration-700 ease-out-soft group-hover:scale-[1.03]"
+                        />
+                      )}
+                      <span className="absolute left-3 top-3 rounded-sm bg-[#1f1b19]/75 px-2 py-1 text-xs font-medium text-white backdrop-blur-sm">
+                        {p.soldOut ? 'Sold out' : p.stageLabel}
+                      </span>
+                    </div>
+                    <div className="lg:col-span-5">
+                      <p className="text-sm text-muted">{p.location}</p>
+                      <h2 className="mt-2 font-display text-display-m font-medium">
+                        <Link href={`/projects/${p.slug ?? p.id}`} className="after:absolute after:inset-0 group-hover:underline group-hover:decoration-line-strong group-hover:underline-offset-4">
+                          {p.name}
+                        </Link>
+                      </h2>
+                      {p.summary && <p className="mt-4 text-[0.9375rem] leading-relaxed text-muted">{p.summary}</p>}
+                      <StageTrack stage={p.stage} progressPct={p.progressPct} tone="default" className="mt-6 max-w-sm" />
+                      <p className="mt-6 text-[0.9375rem] font-medium">
+                        {p.soldOut ? 'All homes sold' : p.priceFrom ? <span className="tabular">From {formatMoney(p.priceFrom.amount, p.priceFrom.currency)}</span> : 'Prices on request'}
+                      </p>
+                      <span className="mt-6 inline-flex border-b border-line-strong pb-0.5 text-[0.9375rem] font-medium group-hover:border-ink">
+                        View development
+                      </span>
+                    </div>
+                  </article>
+                </Reveal>
+              </li>
+            ))}
+          </ul>
+        ) : (
+          <div className="mx-auto max-w-md py-12 text-center">
+            <h2 className="text-lg font-semibold">No developments at this stage right now</h2>
+            <p className="mt-2 text-muted">See every Akristal development instead.</p>
+            <Link href="/projects" className={buttonClasses({ className: 'mt-6' })}>
+              Show all developments
+            </Link>
+          </div>
+        )}
+
+        {hidden.length > 0 && (
+          <div className="mt-20 rounded-md border border-dashed border-line-strong p-6">
+            <h2 className="text-lg font-semibold">Drafts and archived (visible to admins only)</h2>
+            <ul className="mt-4 grid gap-2">
+              {hidden.map((p) => (
+                <li key={p.id} className="flex items-center justify-between gap-4 text-[0.9375rem]">
+                  <Link href={`/projects/${p.id}`} className="underline underline-offset-4">
+                    {p.name ?? p.title}
+                  </Link>
+                  <span className="text-sm capitalize text-muted">{p.status}</span>
+                </li>
+              ))}
+            </ul>
+          </div>
+        )}
+      </section>
+    </>
   )
 }
