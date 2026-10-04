@@ -1,41 +1,60 @@
 import * as React from 'react'
+import { Loader2 } from 'lucide-react'
 import { cn } from '@/lib/utils'
 
-export interface ButtonProps
-  extends React.ButtonHTMLAttributes<HTMLButtonElement> {
-  variant?: 'default' | 'outline' | 'ghost' | 'destructive'
-  size?: 'sm' | 'md' | 'lg'
+type Variant = 'default' | 'outline' | 'ghost' | 'destructive' | 'inverse' | 'link'
+type Size = 'sm' | 'md' | 'lg'
+
+export interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
+  variant?: Variant
+  size?: Size
+  /** Shows a spinner, sets aria-busy and blocks clicks. */
+  loading?: boolean
+}
+
+/** Shared classes so links (<Link className={buttonClasses()}>) match buttons exactly. */
+export function buttonClasses({
+  variant = 'default',
+  size = 'md',
+  className,
+}: { variant?: Variant; size?: Size; className?: string } = {}) {
+  return cn(
+    'inline-flex select-none items-center justify-center gap-2 whitespace-nowrap rounded-sm font-medium transition-[background-color,border-color,color,transform] duration-150 active:translate-y-px disabled:pointer-events-none disabled:opacity-50 aria-disabled:pointer-events-none aria-disabled:opacity-50',
+    {
+      'bg-primary text-on-primary hover:bg-primary-hover': variant === 'default',
+      'border border-line-strong bg-transparent text-ink hover:border-ink hover:bg-page-alt': variant === 'outline',
+      'text-ink hover:bg-page-alt': variant === 'ghost',
+      'bg-error text-white hover:opacity-90 dark:text-[#1f1b19]': variant === 'destructive',
+      // For use on photography and the Oxblood band.
+      'border border-white/70 bg-transparent text-white hover:border-white hover:bg-white hover:text-[#1f1b19]':
+        variant === 'inverse',
+      'h-auto px-0 text-ink underline decoration-line-strong underline-offset-4 hover:decoration-current':
+        variant === 'link',
+    },
+    variant !== 'link' && {
+      'h-9 px-3.5 text-sm': size === 'sm',
+      'h-11 px-5 text-[0.9375rem]': size === 'md',
+      'h-13 px-7 text-base': size === 'lg',
+    },
+    className
+  )
 }
 
 const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
-  ({ className, variant = 'default', size = 'md', ...props }, ref) => {
-    return (
-      <button
-        className={cn(
-          'inline-flex items-center justify-center rounded-lg font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50',
-          {
-            'bg-blue-600 text-white hover:bg-blue-700 dark:bg-blue-500 dark:hover:bg-blue-600':
-              variant === 'default',
-            'border border-gray-300 bg-white text-gray-700 hover:bg-gray-50 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-200 dark:hover:bg-gray-700':
-              variant === 'outline',
-            'text-gray-700 hover:bg-gray-100 dark:text-gray-200 dark:hover:bg-gray-800':
-              variant === 'ghost',
-            'bg-red-600 text-white hover:bg-red-700 dark:bg-red-500 dark:hover:bg-red-600':
-              variant === 'destructive',
-            'h-8 px-3 text-sm': size === 'sm',
-            'h-10 px-4': size === 'md',
-            'h-12 px-6 text-lg': size === 'lg',
-          },
-          className
-        )}
-        ref={ref}
-        {...props}
-      />
-    )
-  }
+  ({ className, variant = 'default', size = 'md', loading = false, disabled, children, type = 'button', ...props }, ref) => (
+    <button
+      ref={ref}
+      type={type}
+      className={buttonClasses({ variant, size, className })}
+      disabled={disabled || loading}
+      aria-busy={loading || undefined}
+      {...props}
+    >
+      {loading && <Loader2 aria-hidden className="size-4 animate-spin" />}
+      {children}
+    </button>
+  )
 )
 Button.displayName = 'Button'
 
 export { Button }
-
-

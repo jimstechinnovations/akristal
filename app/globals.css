@@ -1,54 +1,201 @@
 @import "tailwindcss";
 @import "leaflet/dist/leaflet.css";
 
-/* Tailwind v4: make `dark:` respond to the `.dark` class (ThemeProvider toggles this on <html>) */
+/* `dark:` follows the .dark class set by ThemeProvider (and the no-flash script in layout). */
 @custom-variant dark (&:where(.dark, .dark *));
 
+/* ── Colour roles ────────────────────────────────────────────────────────────
+   Components use roles (bg-surface, text-muted, bg-primary…), never raw hex.
+   Brand = Oxblood from the logo badge; Accent = Brass, used on dark surfaces only. */
 :root {
-  /* Light mode: crisp white background */
-  --background: #ffffff;
-  --foreground: #0f172a;
-  --akristal-primary: #0d233e;
-  --akristal-secondary: #c89b3c;
-  --akristal-accent: #1e6b52;
-  --akristal-light: #f8f9fa;
-  --akristal-dark: #212529;
-  --akristal-gray: #6c757d;
+  --c-brand: #3f1712;
+  --c-brand-hover: #5c231b;
+  --c-on-brand: #ffffff;
+  --c-accent: #b8924a;
+
+  --c-ink: #1f1b19;
+  --c-muted: #66605b;
+  --c-bg: #ffffff;
+  --c-bg-alt: #edefec;
+  --c-surface: #ffffff;
+  --c-line: #d9dad5;
+  --c-line-strong: #a9aaa4;
+
+  /* Interactive primary: Oxblood in light mode, Brass in dark mode. */
+  --c-primary: var(--c-brand);
+  --c-primary-hover: var(--c-brand-hover);
+  --c-on-primary: #ffffff;
+
+  --c-success: #2e5a45;
+  --c-error: #b3261e;
+  --c-focus: var(--c-ink);
+  --c-scrim: rgb(20 12 10 / 0.55);
+
+  /* Legacy names still used by dashboard pages. */
+  --background: var(--c-bg);
+  --foreground: var(--c-ink);
   color-scheme: light;
 }
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-inter);
-}
-
 .dark {
-  /* Dark mode: use the site’s dark-blue */
-  --background: #0f172a;
-  --foreground: #f1f5f9;
+  --c-on-brand: #f1ede8;
+  --c-accent: #c9a35c;
+
+  --c-ink: #f1ede8;
+  --c-muted: #aba29b;
+  --c-bg: #14100e;
+  --c-bg-alt: #1c1714;
+  --c-surface: #221c19;
+  --c-line: #3b332e;
+  --c-line-strong: #5a504a;
+
+  --c-primary: #c9a35c;
+  --c-primary-hover: #d8b571;
+  --c-on-primary: #1f1b19;
+
+  --c-success: #7fbf9f;
+  --c-error: #f2867e;
+  --c-focus: #c9a35c;
+
+  --background: var(--c-bg);
+  --foreground: var(--c-ink);
   color-scheme: dark;
 }
 
-/* Apply theme to html element for full coverage */
-html {
-  background: var(--background);
-  transition: background-color 0.3s ease, color 0.3s ease;
+@theme inline {
+  --color-brand: var(--c-brand);
+  --color-brand-hover: var(--c-brand-hover);
+  --color-on-brand: var(--c-on-brand);
+  --color-accent: var(--c-accent);
+  --color-ink: var(--c-ink);
+  --color-muted: var(--c-muted);
+  --color-page: var(--c-bg);
+  --color-page-alt: var(--c-bg-alt);
+  --color-surface: var(--c-surface);
+  --color-line: var(--c-line);
+  --color-line-strong: var(--c-line-strong);
+  --color-primary: var(--c-primary);
+  --color-primary-hover: var(--c-primary-hover);
+  --color-on-primary: var(--c-on-primary);
+  --color-success: var(--c-success);
+  --color-error: var(--c-error);
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+
+  --font-sans: var(--font-instrument), ui-sans-serif, system-ui, sans-serif;
+  --font-display: var(--font-cormorant), "Cormorant Garamond", Georgia, serif;
 }
 
-body {
-  background: var(--background);
-  font-family: var(--font-inter), system-ui, sans-serif;
-  color: var(--foreground);
-  transition: background-color 0.3s ease, color 0.3s ease;
+@theme {
+  --radius-sm: 4px;
+  --radius-md: 6px;
+  --radius-lg: 10px;
+
+  /* Fluid display scale (Cormorant) — only used at ≥28px */
+  --text-display-xl: clamp(2.75rem, 5.5vw + 1rem, 5.75rem);
+  --text-display-xl--line-height: 0.98;
+  --text-display-xl--letter-spacing: 0.01em;
+  --text-display-l: clamp(2.25rem, 3.5vw + 1rem, 3.75rem);
+  --text-display-l--line-height: 1.04;
+  --text-display-m: clamp(1.875rem, 2vw + 1rem, 2.75rem);
+  --text-display-m--line-height: 1.1;
+  --text-display-s: clamp(1.625rem, 1vw + 1.1rem, 2rem);
+  --text-display-s--line-height: 1.15;
+
+  --shadow-pop: 0 8px 24px rgb(31 27 25 / 0.12);
+
+  --ease-out-soft: cubic-bezier(0.2, 0.7, 0.2, 1);
 }
 
-/* Hide scrollbar for horizontal scrolling */
+/* Page container: 16px gutter on phones, 24px tablet, 40px desktop. */
+@utility page-x {
+  margin-inline: auto;
+  width: 100%;
+  max-width: 1280px;
+  padding-inline: 16px;
+  @media (width >= 48rem) {
+    padding-inline: 24px;
+  }
+  @media (width >= 80rem) {
+    padding-inline: 40px;
+  }
+}
+
+@utility page-x-wide {
+  margin-inline: auto;
+  width: 100%;
+  max-width: 1440px;
+  padding-inline: 16px;
+  @media (width >= 48rem) {
+    padding-inline: 24px;
+  }
+  @media (width >= 80rem) {
+    padding-inline: 40px;
+  }
+}
+
+@utility section-y {
+  padding-block: 64px;
+  @media (width >= 64rem) {
+    padding-block: 96px;
+  }
+}
+
+@utility tabular {
+  font-variant-numeric: tabular-nums;
+}
+
+@layer base {
+  html {
+    background: var(--c-bg);
+    -webkit-text-size-adjust: 100%;
+  }
+
+  body {
+    background: var(--c-bg);
+    color: var(--c-ink);
+    font-family: var(--font-sans);
+    font-feature-settings: "kern";
+    text-rendering: optimizeLegibility;
+  }
+
+  ::selection {
+    background: var(--c-brand);
+    color: #fff;
+  }
+
+  /* Always-visible keyboard focus. */
+  :focus-visible {
+    outline: 2px solid var(--c-focus);
+    outline-offset: 2px;
+  }
+
+  /* Prevent iOS zoom on focus. */
+  @media (width < 48rem) {
+    input,
+    select,
+    textarea {
+      font-size: 16px;
+    }
+  }
+}
+
+/* Hide scrollbar for horizontal rails (content stays scrollable). */
 .scrollbar-hide {
   -ms-overflow-style: none;
   scrollbar-width: none;
 }
-
 .scrollbar-hide::-webkit-scrollbar {
   display: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
 }

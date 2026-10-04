@@ -1,6 +1,6 @@
 'use client'
 
-import { createContext, useContext, useEffect, useState } from 'react'
+import { createContext, useCallback, useContext, useEffect, useState } from 'react'
 
 type Theme = 'light' | 'dark'
 
@@ -12,56 +12,48 @@ interface ThemeContextType {
 
 const ThemeContext = createContext<ThemeContextType | undefined>(undefined)
 
-export function ThemeProvider({ children }: { children: React.ReactNode }) {
-  const [theme, setThemeState] = useState<Theme>('light')
-  const [mounted, setMounted] = useState(false)
+/**
+ * Runs in <head> before first paint so the page never flashes the wrong theme.
+ * Saved choice wins; otherwise follow the operating system.
+ */
+export const themeInitScript = `(function(){try{var t=localStorage.getItem('theme');if(!t){t=window.matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light'}if(t==='dark'){document.documentElement.classList.add('dark')}}catch(e){}})();`
 
+function readInitialTheme(): Theme {
+  if (typeof document === 'undefined') return 'light'
+  return document.documentElement.classList.contains('dark') ? 'dark' : 'light'
+}
+
+export function ThemeProvider({ children }: { children: React.ReactNode }) {
+  const [theme, setThemeState] = useState<Theme>(readInitialTheme)
+
+  // Follow OS changes until the person picks a theme themselves.
   useEffect(() => {
-    setMounted(true)
-    const savedTheme = localStorage.getItem('theme') as Theme | null
-    const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches
-    
-    const initialTheme = savedTheme || (prefersDark ? 'dark' : 'light')
-    setThemeState(initialTheme)
-    applyTheme(initialTheme)
+    const media = window.matchMedia('(prefers-color-scheme: dark)')
+    const onChange = (e: MediaQueryListEvent) => {
+      if (localStorage.getItem('theme')) return
+      const next = e.matches ? 'dark' : 'light'
+      document.documentElement.classList.toggle('dark', next === 'dark')
+      setThemeState(next)
+    }
+    media.addEventListener('change', onChange)
+    return () => media.removeEventListener('change', onChange)
   }, [])
 
-  // Apply theme on mount and when theme changes
-  useEffect(() => {
-    applyTheme(theme)
-  }, [theme])
-
-  const applyTheme = (newTheme: Theme) => {
-    if (typeof document !== 'undefined') {
-      const root = document.documentElement
-      if (newTheme === 'dark') {
-        root.classList.add('dark')
-      } else {
-        root.classList.remove('dark')
-      }
+  const setTheme = useCallback((next: Theme) => {
+    document.documentElement.classList.toggle('dark', next === 'dark')
+    try {
+      localStorage.setItem('theme', next)
+    } catch {
+      // Private mode: the choice lasts for this page view only.
     }
-  }
+    setThemeState(next)
+  }, [])
 
-  const setTheme = (newTheme: Theme) => {
-    setThemeState(newTheme)
-    if (typeof window !== 'undefined') {
-      localStorage.setItem('theme', newTheme)
-    }
-    applyTheme(newTheme)
-  }
+  const toggleTheme = useCallback(() => {
+    setTheme(document.documentElement.classList.contains('dark') ? 'light' : 'dark')
+  }, [setTheme])
 
-  const toggleTheme = () => {
-    const newTheme = theme === 'light' ? 'dark' : 'light'
-    setTheme(newTheme)
-  }
-
-  // Always provide the context, even before mounting
-  // This prevents the "useTheme must be used within a ThemeProvider" error
-  return (
-    <ThemeContext.Provider value={{ theme, toggleTheme, setTheme }}>
-      {children}
-    </ThemeContext.Provider>
-  )
+  return <ThemeContext.Provider value={{ theme, toggleTheme, setTheme }}>{children}</ThemeContext.Provider>
 }
 
 export function useTheme() {
@@ -71,5 +63,3 @@ export function useTheme() {
   }
   return context
 }
-
-

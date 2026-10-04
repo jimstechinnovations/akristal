@@ -1,28 +1,20 @@
-import type { NextConfig } from "next";
+import type { NextConfig } from 'next'
 
 const nextConfig: NextConfig = {
-  /* config options here */
-  reactStrictMode: false,
+  reactStrictMode: true,
   images: {
+    formats: ['image/avif', 'image/webp'],
+    // Next 16 only allows quality 75 unless listed here.
+    qualities: [60, 75, 85],
     remotePatterns: [
-      {
-        protocol: 'https',
-        hostname: '**.supabase.co',
-      },
+      { protocol: 'https', hostname: '**.supabase.co' },
+      { protocol: 'https', hostname: 'images.unsplash.com' },
     ],
   },
-  // Webpack config for Leaflet compatibility (when using --webpack flag)
-  webpack: (config) => {
-    config.resolve.alias = {
-      ...config.resolve.alias,
-      canvas: false,
-    };
-    return config;
+  // Leaflet optionally requires `canvas` (a Node-only package); point it at an empty module.
+  turbopack: {
+    resolveAlias: { canvas: './lib/canvas-stub.js' },
   },
-  // Turbopack config - empty config to silence the warning
-  turbopack: {},
-  // Note: Turbopack handles canvas module differently and typically doesn't need this config
-  // If you encounter issues with Turbopack, use --webpack flag: npm run dev:webpack
-};
+}
 
-export default nextConfig;
+export default nextConfig
