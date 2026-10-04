@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useRef } from 'react'
+import { useRef } from 'react'
 import Link from 'next/link'
 import { AnimatePresence, motion } from 'framer-motion'
 import { MessageCircle, Phone, X } from 'lucide-react'
@@ -8,10 +8,10 @@ import { menuGroups, site } from '@/config/site'
 import { accountLinks, roleLabel } from '@/lib/account-links'
 import type { AuthUser } from '@/lib/use-auth-user'
 import { whatsappLink } from '@/lib/whatsapp'
+import { useFocusTrap } from '@/lib/use-focus-trap'
 import { Logo } from '@/components/brand/logo'
 import { ThemeToggle } from './theme-toggle'
 
-const FOCUSABLE = 'a[href], button:not([disabled]), input, select, textarea, [tabindex]:not([tabindex="-1"])'
 
 export function MenuSheet({
   open,
@@ -26,37 +26,7 @@ export function MenuSheet({
 }) {
   const panelRef = useRef<HTMLDivElement>(null)
 
-  // Lock scroll, trap focus, close on Escape, restore focus on close.
-  useEffect(() => {
-    if (!open) return
-    const previous = document.activeElement as HTMLElement | null
-    const { overflow } = document.body.style
-    document.body.style.overflow = 'hidden'
-    const panel = panelRef.current
-    panel?.querySelector<HTMLElement>(FOCUSABLE)?.focus()
-
-    function onKey(e: KeyboardEvent) {
-      if (e.key === 'Escape') return onClose()
-      if (e.key !== 'Tab' || !panel) return
-      const items = Array.from(panel.querySelectorAll<HTMLElement>(FOCUSABLE))
-      if (!items.length) return
-      const first = items[0]
-      const last = items[items.length - 1]
-      if (e.shiftKey && document.activeElement === first) {
-        e.preventDefault()
-        last.focus()
-      } else if (!e.shiftKey && document.activeElement === last) {
-        e.preventDefault()
-        first.focus()
-      }
-    }
-    document.addEventListener('keydown', onKey)
-    return () => {
-      document.body.style.overflow = overflow
-      document.removeEventListener('keydown', onKey)
-      previous?.focus()
-    }
-  }, [open, onClose])
+  useFocusTrap(panelRef, open, onClose)
 
   return (
     <AnimatePresence>

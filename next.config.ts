@@ -15,6 +15,9 @@ const nextConfig: NextConfig = {
   turbopack: {
     resolveAlias: { canvas: './lib/canvas-stub.js' },
   },
+  async redirects() {
+    return [{ source: '/properties/map', destination: '/properties?view=map', permanent: true }]
+  },
 }
 
 export default nextConfig

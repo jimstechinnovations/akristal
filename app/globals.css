@@ -199,3 +199,77 @@
     scroll-behavior: auto !important;
   }
 }
+
+/* ── Map pins and popups (Leaflet renders these outside React) ─────────────── */
+.ak-pin {
+  display: inline-block;
+  transform: translate(-50%, -100%);
+  white-space: nowrap;
+  border-radius: 4px;
+  background: var(--c-primary);
+  color: var(--c-on-primary);
+  padding: 4px 8px;
+  font: 600 12px/1.2 var(--font-sans);
+  font-variant-numeric: tabular-nums lining-nums;
+  box-shadow: 0 4px 12px rgb(31 27 25 / 0.25);
+}
+.ak-pin--approx {
+  background: var(--c-surface);
+  color: var(--c-ink);
+  outline: 1.5px dashed var(--c-primary);
+  outline-offset: -1.5px;
+}
+.leaflet-marker-icon:hover .ak-pin,
+.leaflet-marker-icon:focus-visible .ak-pin {
+  background: var(--c-ink);
+  color: var(--c-bg);
+}
+.leaflet-container {
+  font-family: var(--font-sans);
+  background: var(--c-bg-alt);
+}
+/* Calm, warm-grey map so the price pins carry the colour. */
+.leaflet-tile-pane {
+  filter: grayscale(0.85) sepia(0.12) contrast(0.95);
+}
+.dark .leaflet-tile-pane {
+  filter: grayscale(1) invert(1) brightness(0.85) contrast(0.9);
+}
+.leaflet-popup-content-wrapper {
+  border-radius: 6px;
+  padding: 0;
+  overflow: hidden;
+  background: var(--c-surface);
+  color: var(--c-ink);
+}
+.leaflet-popup-tip {
+  background: var(--c-surface);
+}
+.leaflet-popup-content {
+  margin: 0;
+  width: 240px !important;
+}
+.ak-popup {
+  display: block;
+  color: inherit !important;
+  text-decoration: none;
+}
+.ak-popup img {
+  display: block;
+  width: 100%;
+  aspect-ratio: 16 / 10;
+  object-fit: cover;
+}
+.ak-popup__body {
+  display: grid;
+  gap: 2px;
+  padding: 10px 12px 12px;
+  font-size: 13px;
+}
+.ak-popup__body strong {
+  font-size: 15px;
+  font-variant-numeric: tabular-nums lining-nums;
+}
+.ak-popup__body small {
+  color: var(--c-muted);
+}

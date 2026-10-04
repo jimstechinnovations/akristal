@@ -17,7 +17,8 @@ export function ListingCard({
   priority?: boolean
   sizes?: string
 }) {
-  const place = [listing.area, listing.market?.name].filter((v, i, a) => v && a.indexOf(v) === i).join(', ')
+  const where = [listing.area, listing.market?.name].filter((v, i, a) => v && a.indexOf(v) === i).join(', ')
+  const place = listing.propertyType ? (where ? `${listing.propertyType} in ${where}` : listing.propertyType) : where
   const facts = [
     listing.bedrooms != null && { icon: BedDouble, label: `${listing.bedrooms} bed` },
     listing.bathrooms != null && { icon: Bath, label: `${listing.bathrooms} bath` },
@@ -77,7 +78,6 @@ export function ListingCard({
                 {label}
               </li>
             ))}
-            {listing.propertyType && <li className="ml-auto">{listing.propertyType}</li>}
           </ul>
         )}
       </div>

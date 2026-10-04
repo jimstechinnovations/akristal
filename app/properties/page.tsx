@@ -1,232 +1,149 @@
-import { createClient } from '@/lib/supabase/server'
-import { PropertySearch } from '@/components/property-search'
-import { PropertyCard } from '@/components/property-card'
-import { PropertyMap } from '@/components/property-map'
-import { Suspense } from 'react'
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
-import { Map, List } from 'lucide-react'
-import type { Database } from '@/types/database'
+import type { Metadata } from 'next'
+import Link from 'next/link'
+import { SearchX } from 'lucide-react'
+import { getAllListings, getPropertyTypes } from '@/lib/data/listings'
+import { marketBySlug, markets } from '@/lib/data/markets'
+import {
+  activeFilterCount,
+  filterListings,
+  paginate,
+  parseSearchParams,
+  sortListings,
+  type SearchParams,
+} from '@/lib/listing-search'
+import { plural } from '@/lib/format'
+import { breadcrumbJsonLd, pageMetadata } from '@/lib/seo'
+import { buttonClasses } from '@/components/ui/button'
+import { JsonLd } from '@/components/seo/json-ld'
+import { ListingCard } from '@/components/listings/listing-card'
+import { FilterBar } from '@/components/search/filter-bar'
+import { MapView } from '@/components/search/map-view'
+import { Pagination } from '@/components/search/pagination'
 
-type Property = Database['public']['Tables']['properties']['Row']
+type PageProps = { searchParams: Promise<Record<string, string | string[] | undefined>> }
 
-type SearchParams = Record<string, string | undefined> & {
-  search?: string
-  type?: string
-  listing_type?: string
-  city?: string
-  minPrice?: string
-  maxPrice?: string
-  bedrooms?: string
-  bathrooms?: string
-  lat?: string
-  lng?: string
-  radius?: string
-  view?: string
+function heading(p: SearchParams) {
+  const what = p.listingType === 'rent' ? 'Homes for rent' : p.listingType === 'sale' ? 'Homes for sale' : 'Homes for sale and rent'
+  const market = marketBySlug(p.market)
+  return market ? `${what} in ${market.name}` : what
 }
 
-export default async function PropertiesPage({
-  searchParams,
-}: {
-  searchParams: Promise<SearchParams>
-}) {
-  const supabase = await createClient()
-  
-  // Next.js 16: searchParams is a Promise
-  const params = await searchParams
-
-  // Fetch property types for filtering
-  const { data: propertyTypes } = await supabase
-    .from('property_types')
-    .select('*')
-    .eq('is_active', true)
-    .order('display_order', { ascending: true })
-
-  let query = supabase
-    .from('properties')
-    .select('*')
-    .eq('listing_status', 'approved')
-    .eq('status', 'available')
-
-  // Apply filters
-  if (params?.type) {
-    query = query.eq('property_type_id', params.type)
+export async function generateMetadata({ searchParams }: PageProps): Promise<Metadata> {
+  const p = parseSearchParams(await searchParams)
+  const title = heading(p)
+  const filtered = p.search || p.type || p.currency || p.bedrooms || p.bathrooms || p.page > 1 || p.sort !== 'newest'
+  return {
+    ...pageMetadata({
+      title,
+      description: `${title}: houses, apartments and land listed with Akristal agents, with photos, prices and monthly cost estimates.`,
+      path: '/properties',
+      noIndex: !!filtered, // keep only the main browse pages in search engines
+    }),
   }
-  if (params?.listing_type) {
-    query = query.eq('listing_type', params.listing_type)
-  }
-  if (params?.city) {
-    query = query.eq('city', params.city)
-  }
-  if (params?.minPrice) {
-    query = query.gte('price', parseFloat(params.minPrice))
-  }
-  if (params?.maxPrice) {
-    query = query.lte('price', parseFloat(params.maxPrice))
-  }
-  if (params?.bedrooms) {
-    query = query.eq('bedrooms', parseInt(params.bedrooms))
-  }
-  if (params?.bathrooms) {
-    query = query.eq('bathrooms', parseInt(params.bathrooms))
-  }
-  if (params?.search) {
-    query = query.or(
-      `title.ilike.%${params.search}%,description.ilike.%${params.search}%,address.ilike.%${params.search}%`
-    )
-  }
+}
 
-  // Location-based filtering (radius search)
-  const { data: initialData, error } = await query.order('created_at', { ascending: false })
-  let data = initialData as Property[] | null
-  
-  if (params?.lat && params?.lng && params?.radius) {
-    const lat = parseFloat(params.lat)
-    const lng = parseFloat(params.lng)
-    const radiusKm = parseFloat(params.radius)
-    
-    // Filter properties by distance
-    if (data) {
-      data = data.filter((property) => {
-        if (!property.latitude || !property.longitude) return false
-        
-        // Haversine formula for distance calculation
-        const R = 6371 // Earth's radius in km
-        const dLat = ((property.latitude - lat) * Math.PI) / 180
-        const dLon = ((property.longitude - lng) * Math.PI) / 180
-        const a =
-          Math.sin(dLat / 2) * Math.sin(dLat / 2) +
-          Math.cos((lat * Math.PI) / 180) *
-            Math.cos((property.latitude * Math.PI) / 180) *
-            Math.sin(dLon / 2) *
-            Math.sin(dLon / 2)
-        const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a))
-        const distance = R * c
-        
-        return distance <= radiusKm
-      })
-    }
-  }
+export default async function PropertiesPage({ searchParams }: PageProps) {
+  const rawParams = await searchParams
+  const p = parseSearchParams(rawParams)
+  const raw = Object.fromEntries(
+    Object.entries(rawParams).map(([k, v]) => [k, Array.isArray(v) ? v[0] : v])
+  ) as Record<string, string | undefined>
 
-  // Get unique cities for filter
-  const { data: citiesData } = await supabase
-    .from('properties')
-    .select('city')
-    .eq('listing_status', 'approved')
-    .eq('status', 'available')
+  const [all, types] = await Promise.all([getAllListings(), getPropertyTypes()])
+  const results = sortListings(filterListings(all, p), p.sort)
+  const page = paginate(results, p.page)
+  const title = heading(p)
 
-  const cities = citiesData as Array<Pick<Property, 'city'>> | null
-  const uniqueCities = Array.from(new Set(cities?.map((c) => c.city) || [])).sort()
+  const marketOptions = markets
+    .filter((m) => all.some((l) => l.market?.slug === m.slug && l.status === 'available'))
+    .map((m) => ({ value: m.slug, label: m.name }))
+  const typeOptions = types.map((t) => ({ value: t.id, label: t.name }))
 
-  return (
-    <div className="min-h-screen bg-white dark:bg-[#0f172a]">
-      <div className="bg-white dark:bg-gray-800 shadow-sm">
-        <div className="mx-auto max-w-7xl px-4 py-6 sm:px-6 lg:px-8">
-          <h1 className="text-2xl font-bold text-[#0d233e] dark:text-white">
-            Browse Properties
-          </h1>
-          <p className="mt-1 text-sm text-gray-600 dark:text-gray-400">
-            Find your perfect property across Africa and worldwide
-          </p>
-        </div>
-      </div>
-
-      <div className="mx-auto max-w-7xl px-4 py-4 sm:px-6 lg:px-8">
-        {/* Mobile: Filters as Drawer/Modal, Desktop: Sidebar */}
-        <div className="mb-4 lg:hidden">
-          <Suspense fallback={<div className="h-20 bg-white dark:bg-gray-800 rounded-lg animate-pulse" />}>
-            <PropertySearch 
-              cities={uniqueCities}
-              propertyTypes={propertyTypes || []}
-              searchParams={params}
-            />
-          </Suspense>
-        </div>
-
-        <div className="grid grid-cols-1 gap-4 lg:grid-cols-4">
-          {/* Desktop Sidebar */}
-          <aside className="hidden lg:block lg:col-span-1">
-            <Suspense fallback={<div className="h-96 bg-white dark:bg-gray-800 rounded-lg animate-pulse" />}>
-              <PropertySearch 
-                cities={uniqueCities}
-                propertyTypes={propertyTypes || []}
-                searchParams={params}
-              />
-            </Suspense>
-          </aside>
-
-          {/* Main Content */}
-          <main className="lg:col-span-3">
-            <Tabs defaultValue={params?.view || 'list'} className="w-full">
-              <div className="mb-4 flex items-center justify-between">
-                <TabsList className="bg-white dark:bg-gray-800">
-                  <TabsTrigger value="list" className="flex items-center gap-2">
-                    <List className="h-4 w-4" />
-                    <span className="hidden sm:inline">List</span>
-                  </TabsTrigger>
-                  <TabsTrigger value="map" className="flex items-center gap-2">
-                    <Map className="h-4 w-4" />
-                    <span className="hidden sm:inline">Map</span>
-                  </TabsTrigger>
-                </TabsList>
-                {data && data.length > 0 && (
-                  <span className="text-sm text-gray-600 dark:text-gray-400">
-                    {data.length} {data.length === 1 ? 'property' : 'properties'} found
-                  </span>
-                )}
-              </div>
-              
-              <TabsContent value="list" className="mt-0">
-                {error ? (
-                  <div className="rounded-lg bg-red-50 dark:bg-red-900/20 p-4 text-red-800 dark:text-red-200">
-                    Error loading properties: {error.message}
-                  </div>
-                ) : data && data.length > 0 ? (
-                  <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-                    {data.map((property) => (
-                      <PropertyCard key={property.id} property={property} />
-                    ))}
-                  </div>
-                ) : (
-                  <div className="rounded-lg bg-white dark:bg-gray-800 p-8 text-center shadow-sm">
-                    <p className="text-gray-600 dark:text-gray-400">
-                      No properties found matching your criteria.
-                    </p>
-                  </div>
-                )}
-              </TabsContent>
-              
-              <TabsContent value="map" className="mt-0">
-                {error ? (
-                  <div className="rounded-lg bg-red-50 dark:bg-red-900/20 p-4 text-red-800 dark:text-red-200">
-                    Error loading properties: {error.message}
-                  </div>
-                ) : data && data.length > 0 ? (
-                  <div className="h-[600px] rounded-lg overflow-hidden shadow-sm">
-                    <PropertyMap
-                      properties={data}
-                      selectedLocation={
-                        params?.lat && params?.lng && params?.radius
-                          ? {
-                              lat: parseFloat(params.lat),
-                              lng: parseFloat(params.lng),
-                              radius: parseFloat(params.radius),
-                            }
-                          : null
-                      }
-                    />
-                  </div>
-                ) : (
-                  <div className="rounded-lg bg-white dark:bg-gray-800 p-8 text-center shadow-sm">
-                    <p className="text-gray-600 dark:text-gray-400">
-                      No properties found matching your criteria.
-                    </p>
-                  </div>
-                )}
-              </TabsContent>
-            </Tabs>
-          </main>
-        </div>
+  const empty = (
+    <div className="mx-auto flex max-w-md flex-col items-center py-20 text-center">
+      <SearchX aria-hidden className="size-10 text-muted" />
+      <h2 className="mt-4 text-lg font-semibold">No homes match these filters</h2>
+      <p className="mt-2 text-[0.9375rem] text-muted">
+        Try a wider price range, another area, or fewer bedrooms.
+      </p>
+      <div className="mt-6 flex flex-wrap justify-center gap-3">
+        <Link href="/properties" className={buttonClasses()}>
+          Clear all filters
+        </Link>
+        <Link href="/sell" className={buttonClasses({ variant: 'outline' })}>
+          Tell us what you need
+        </Link>
       </div>
     </div>
+  )
+
+  const mapListings = results
+    .filter((l) => l.coords)
+    .map((l) => ({
+      id: l.id,
+      title: l.title,
+      price: l.price,
+      currency: l.currency,
+      listingType: l.listingType,
+      image: l.images[0] ?? null,
+      place: [l.area, l.market?.name].filter(Boolean).join(', '),
+      lat: l.coords!.lat,
+      lng: l.coords!.lng,
+      approximate: l.coords!.approximate,
+    }))
+
+  return (
+    <>
+      <JsonLd data={breadcrumbJsonLd([{ name: 'Home', path: '/' }, { name: 'Homes', path: '/properties' }])} />
+      <div className="page-x-wide pb-6 pt-8 sm:pt-10">
+        <h1 className="font-display text-display-l font-medium">{title}</h1>
+        <p className="mt-2 text-[0.9375rem] text-muted" aria-live="polite">
+          {results.length ? `${plural(results.length, 'home')} available` : 'No homes found'}
+          {p.search && <> matching “{p.search}”</>}
+        </p>
+      </div>
+
+      <FilterBar params={p} raw={raw} markets={marketOptions} propertyTypes={typeOptions} activeCount={activeFilterCount(p)} />
+
+      {p.view === 'map' ? (
+        <div className="lg:grid lg:grid-cols-[minmax(0,1fr)_minmax(0,1.1fr)]">
+          <div className="order-2 h-[60svh] lg:sticky lg:top-[9.5rem] lg:order-none lg:col-start-2 lg:row-start-1 lg:h-[calc(100svh-9.5rem)]">
+            <MapView listings={mapListings} />
+          </div>
+          <div className="px-4 py-8 sm:px-6 lg:col-start-1 lg:row-start-1 lg:px-10">
+            {results.length ? (
+              <ul className="grid gap-x-6 gap-y-10 sm:grid-cols-2">
+                {results.map((l) => (
+                  <li key={l.id}>
+                    <ListingCard listing={l} sizes="(min-width: 1024px) 22vw, (min-width: 640px) 45vw, 92vw" />
+                  </li>
+                ))}
+              </ul>
+            ) : (
+              empty
+            )}
+          </div>
+        </div>
+      ) : (
+        <div className="page-x-wide py-10">
+          {page.items.length ? (
+            <>
+              <ul className="grid gap-x-6 gap-y-12 sm:grid-cols-2 lg:grid-cols-3">
+                {page.items.map((l, i) => (
+                  <li key={l.id}>
+                    <ListingCard listing={l} priority={i < 3} />
+                  </li>
+                ))}
+              </ul>
+              <div className="mt-14">
+                <Pagination page={page.page} pageCount={page.pageCount} raw={raw} />
+              </div>
+            </>
+          ) : (
+            empty
+          )}
+        </div>
+      )}
+    </>
   )
 }

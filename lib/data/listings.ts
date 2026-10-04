@@ -2,7 +2,7 @@ import 'server-only'
 import { cache } from 'react'
 import { createPublicClient } from '@/lib/supabase/public'
 import type { Database } from '@/types/supabase'
-import { cleanArea, marketFor, type Market } from './markets'
+import { cleanArea, coordinatesFor, marketFor, type Market } from './markets'
 
 type Row = Database['public']['Tables']['properties']['Row']
 
@@ -26,16 +26,17 @@ export type Listing = {
   hasVideo: boolean
   isFeatured: boolean
   createdAt: string | null
+  coords: { lat: number; lng: number; approximate: boolean } | null
 }
 
 const LISTING_COLUMNS =
-  'id, title, price, currency, listing_type, status, property_type_id, city, district, address, country, bedrooms, bathrooms, size_sqm, parking_spaces, cover_image_url, image_urls, video_urls, is_featured, created_at'
+  'id, title, price, currency, listing_type, status, property_type_id, city, district, address, country, latitude, longitude, bedrooms, bathrooms, size_sqm, parking_spaces, cover_image_url, image_urls, video_urls, is_featured, created_at'
 
 type ListingRow = Pick<
   Row,
   | 'id' | 'title' | 'price' | 'currency' | 'listing_type' | 'status' | 'property_type_id' | 'city' | 'district' | 'address'
   | 'country' | 'bedrooms' | 'bathrooms' | 'size_sqm' | 'parking_spaces' | 'cover_image_url' | 'image_urls' | 'video_urls'
-  | 'is_featured' | 'created_at'
+  | 'is_featured' | 'created_at' | 'latitude' | 'longitude'
 >
 
 export function toListing(row: ListingRow, typeNames: Map<string, string>): Listing {
@@ -61,6 +62,7 @@ export function toListing(row: ListingRow, typeNames: Map<string, string>): List
     hasVideo: (row.video_urls ?? []).length > 0,
     isFeatured: row.is_featured,
     createdAt: row.created_at,
+    coords: coordinatesFor(row, market, row.id),
   }
 }
 
