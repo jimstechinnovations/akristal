@@ -3,7 +3,7 @@ import { site } from '@/config/site'
 import { getAllListings, getFeaturedListings, getMarketCounts, getPropertyTypes } from '@/lib/data/listings'
 import { getFeaturedProjects, getProjects } from '@/lib/data/projects'
 import { getAgents, getTeam } from '@/lib/data/people'
-import { getSettings } from '@/lib/data/settings'
+import { getSettings, getTestimonials } from '@/lib/data/settings'
 import { Hero } from '@/components/home/hero'
 import { Developments, type Stat } from '@/components/home/developments'
 import { FeaturedHomes } from '@/components/home/featured-homes'
@@ -12,6 +12,7 @@ import { InteriorsTeaser } from '@/components/home/interiors-teaser'
 import { Finance } from '@/components/home/finance'
 import { People } from '@/components/home/people'
 import { SellCta } from '@/components/home/sell-cta'
+import { Testimonials } from '@/components/home/testimonials'
 
 // Public data only (cookie-free client), so the page is static and refreshed every 10 minutes.
 export const revalidate = 600
@@ -23,7 +24,7 @@ export const metadata: Metadata = {
 }
 
 export default async function HomePage() {
-  const [allProjects, featuredProjects, listings, featured, marketCounts, propertyTypes, agents, team, settings] = await Promise.all([
+  const [allProjects, featuredProjects, listings, featured, marketCounts, propertyTypes, agents, team, settings, testimonials] = await Promise.all([
     getProjects(),
     getFeaturedProjects(3),
     getAllListings(),
@@ -33,6 +34,7 @@ export default async function HomePage() {
     getAgents(),
     getTeam(),
     getSettings(),
+    getTestimonials(),
   ])
 
   // Every figure below is counted from live data; nothing is estimated or padded.
@@ -70,6 +72,7 @@ export default async function HomePage() {
       <InteriorsTeaser />
       <Finance />
       <People team={team} agents={agents} />
+      <Testimonials items={testimonials} />
       <SellCta propertyTypes={propertyTypes} />
     </>
   )

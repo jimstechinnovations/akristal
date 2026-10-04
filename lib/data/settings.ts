@@ -15,3 +15,11 @@ export const getSettings = cache(async (): Promise<SiteSettings> => {
     agent_programme: { ...defaultSettings.agent_programme, ...((byKey.agent_programme as object) ?? {}) },
   }
 })
+
+export type Testimonial = { id: string; name: string; context: string | null; quote: string }
+
+/** Published client testimonials (the database refuses to publish one without recorded consent). */
+export const getTestimonials = cache(async (): Promise<Testimonial[]> => {
+  const { data } = await createPublicClient().from('testimonials').select('id, name, context, quote').eq('is_published', true).order('display_order').limit(6)
+  return data ?? []
+})
