@@ -19,7 +19,7 @@ export function WhatsAppFab({ number, message, label }: { number?: string; messa
       href={whatsappLink(message, number || undefined)}
       aria-label={label}
       className={cn(
-        'ak-heartbeat fixed bottom-4 right-4 z-40 size-14 items-center justify-center rounded-full bg-[#1f9d55] text-white sm:bottom-6 sm:right-6',
+        'animate-heartbeat motion-reduce:animate-none fixed bottom-4 right-4 z-40 size-14 items-center justify-center rounded-full bg-[#1f9d55] text-white sm:bottom-6 sm:right-6',
         onProperty ? 'hidden lg:inline-flex' : 'inline-flex'
       )}
     >

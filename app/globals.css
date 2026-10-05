@@ -286,52 +286,28 @@
   vector-effect: non-scaling-stroke;
 }
 
-/* ─── Marquee: two copies of the content scroll by half their width, so the loop is seamless ─── */
-@keyframes ak-marquee {
-  from { transform: translateX(0); }
-  to { transform: translateX(-50%); }
-}
-.ak-marquee-track {
-  animation: ak-marquee var(--marquee-duration, 40s) linear infinite;
-}
-.ak-marquee-track[data-reverse] {
-  animation-direction: reverse;
-}
-.ak-marquee:hover .ak-marquee-track,
-.ak-marquee:focus-within .ak-marquee-track {
-  animation-play-state: paused;
-}
-.ak-marquee-mask {
-  mask-image: linear-gradient(to right, transparent, #000 6%, #000 94%, transparent);
-}
+/* Animations live in the theme so Tailwind always emits them with the classes that use them
+   (animate-heartbeat, animate-marquee). Plain rules added after the theme were dropped by the
+   production build, which is why the WhatsApp button stood still on the live site. */
+@theme {
+  /* WhatsApp button: a double beat and a spreading green glow, then a long rest before the next beat. */
+  --animate-heartbeat: ak-heartbeat 3.6s ease-in-out infinite, ak-glow 3.6s ease-out infinite;
+  /* Endless strip: two copies of the content slide by half their width, so the loop is seamless. */
+  --animate-marquee: ak-marquee var(--marquee-duration, 40s) linear infinite;
 
-/* ─── WhatsApp button: a double-beat pulse with a spreading green glow ─── */
-@keyframes ak-heartbeat {
-  0%, 100% { transform: scale(1); }
-  12% { transform: scale(1.12); }
-  24% { transform: scale(1); }
-  36% { transform: scale(1.09); }
-  52% { transform: scale(1); }
-}
-@keyframes ak-glow {
-  0% { box-shadow: 0 0 0 0 rgb(37 211 102 / 0.6), 0 8px 24px rgb(37 211 102 / 0.35); }
-  70% { box-shadow: 0 0 0 18px rgb(37 211 102 / 0), 0 8px 24px rgb(37 211 102 / 0.35); }
-  100% { box-shadow: 0 0 0 0 rgb(37 211 102 / 0), 0 8px 24px rgb(37 211 102 / 0.35); }
-}
-.ak-heartbeat {
-  animation: ak-heartbeat 1.8s ease-in-out infinite, ak-glow 1.8s ease-out infinite;
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .ak-marquee-track,
-  .ak-heartbeat {
-    animation: none;
+  @keyframes ak-heartbeat {
+    0%, 22%, 100% { transform: scale(1); }
+    6% { transform: scale(1.14); }
+    11% { transform: scale(1); }
+    16% { transform: scale(1.1); }
   }
-}
-@media (prefers-reduced-motion: reduce) {
-  /* No movement: let people scroll the row themselves instead. */
-  .ak-marquee {
-    overflow-x: auto;
-    mask-image: none;
+  @keyframes ak-glow {
+    0% { box-shadow: 0 0 0 0 rgb(37 211 102 / 0.65), 0 8px 24px rgb(37 211 102 / 0.35); }
+    32% { box-shadow: 0 0 0 20px rgb(37 211 102 / 0), 0 8px 24px rgb(37 211 102 / 0.35); }
+    100% { box-shadow: 0 0 0 20px rgb(37 211 102 / 0), 0 8px 24px rgb(37 211 102 / 0.35); }
+  }
+  @keyframes ak-marquee {
+    from { transform: translateX(0); }
+    to { transform: translateX(-50%); }
   }
 }
