@@ -20,6 +20,13 @@ type Props = {
   propertyTypes: { id: string; name: string }[]
 }
 
+// The headline is the largest thing on screen, so it is visible from the first paint (no fade);
+// it only drifts into place. Everything else fades up after it.
+const settle: Variants = {
+  hidden: { y: 10 },
+  show: { y: 0, transition: { duration: 0.6, ease: [0.2, 0.7, 0.2, 1] } },
+}
+
 const rise: Variants = {
   hidden: { opacity: 0, y: 14 },
   show: (i: number) => ({ opacity: 1, y: 0, transition: { duration: 0.6, delay: 0.12 + i * 0.12, ease: [0.2, 0.7, 0.2, 1] } }),
@@ -86,7 +93,7 @@ export function Hero({ title, tagline, image, markets, areaSuggestions, property
       <div className="page-x-wide flex flex-1 flex-col items-center justify-center pb-10 pt-28 text-center sm:pt-32">
         <motion.h1
           id="hero-title"
-          variants={rise}
+          variants={settle}
           initial="hidden"
           animate="show"
           custom={0}
