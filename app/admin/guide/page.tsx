@@ -32,28 +32,38 @@ const sections: { id: string; title: string; body: React.ReactNode }[] = [
     id: 'home',
     title: 'What appears where on the home page',
     body: (
-      <ol>
-        <li>
-          <strong>Hero</strong>: headline, tagline and photo come from <Link href="/admin/content/home-settings">Settings → Home page</Link>.
-        </li>
-        <li>
-          <strong>Akristal developments</strong> (the dark red band): developments with <em>Show on the home page</em> on, in <em>Order</em>. The figures under it
-          are counted automatically from your data.
-        </li>
-        <li>
-          <strong>Homes listed with our agents</strong>: approved, available listings, with <em>Featured</em> ones first (
-          <Link href="/admin/content/listings">Listing settings</Link>).
-        </li>
-        <li>
-          <strong>Where we work</strong>: counted from listings automatically.
-        </li>
-        <li>
-          <strong>The people behind Akristal</strong>: <Link href="/admin/content/team">Team</Link> members with photos, then agents.
-        </li>
-        <li>
-          <strong>Testimonials</strong>: shown only when at least one is published (<Link href="/admin/content/testimonials">Testimonials</Link>).
-        </li>
-      </ol>
+      <>
+        <p>
+          All wording and section photos can be changed in <Link href="/admin/content/text-home">Website text → Home page text</Link>. Clear a field
+          and save to bring back the original wording. Other pages have their own entry under Website text.
+        </p>
+        <ol>
+          <li>
+            <strong>Hero and moving ticker</strong>: headline, tagline, photo and ticker phrases in <Link href="/admin/content/home-settings">Settings → Home page</Link>.
+          </li>
+          <li>
+            <strong>Akristal Developments</strong>: developments with <em>Show on the home page</em> on, in <em>Order</em>. The figures under them are set in
+            Home page settings: each one is counted automatically, or shows the number you type.
+          </li>
+          <li>
+            <strong>Homes listed with Akristal Brokers &amp; Agents</strong>: approved, available listings, <em>Featured</em> first (
+            <Link href="/admin/content/listings">Listing settings</Link>). The moving strip below shows the other homes with photos.
+          </li>
+          <li>
+            <strong>Akristal Brokers &amp; Agents</strong>: agent profiles and published <Link href="/admin/content/brokers">broker companies</Link>.
+          </li>
+          <li>
+            <strong>Trusted by leading brands and partners</strong>: <Link href="/admin/content/partners">Partners and brands</Link>. Five or more scroll.
+          </li>
+          <li>
+            <strong>Loved by Akristal clients</strong>: published <Link href="/admin/content/testimonials">Testimonials</Link>. Reviews written on the website
+            arrive there unpublished. Add a Google rating and link in Home page settings to show it in the summary.
+          </li>
+          <li>
+            <strong>Latest insights</strong>: the three newest <Link href="/admin/content/insights">Insights</Link> articles.
+          </li>
+        </ol>
+      </>
     ),
   },
   {
@@ -62,8 +72,8 @@ const sections: { id: string; title: string; body: React.ReactNode }[] = [
     body: (
       <>
         <p>
-          Each development has a <strong>Stage</strong> (Off-plan, Under construction, Completed) shown as a progress bar, and <strong>Visibility</strong>{' '}
-          (Draft and Archived are hidden from the public). Set a starting price so cards show &ldquo;From …&rdquo; instead of &ldquo;Prices on request&rdquo;.
+          Each development has a <strong>Stage</strong> (Off-plan, Under construction, Completed) and a <strong>Visibility</strong> that also sets the
+          sales track: Sold out shows &ldquo;Sold out&rdquo;, every other visible option shows &ldquo;Selling&rdquo;. Draft and Archived are hidden from the public. Set a starting price so cards show &ldquo;From …&rdquo; instead of &ldquo;Prices on request&rdquo;.
           Tick <strong>Pay Small Small available</strong> to show the instalment option.
         </p>
         <p>
@@ -75,7 +85,7 @@ const sections: { id: string; title: string; body: React.ReactNode }[] = [
   },
   {
     id: 'listings',
-    title: 'Listings and agents',
+    title: 'Listings, brokers and agents',
     body: (
       <>
         <p>
@@ -85,7 +95,7 @@ const sections: { id: string; title: string; body: React.ReactNode }[] = [
         <ul>
           <li>
             <strong>Assign the agent.</strong> The agent appears on the listing, and the listing appears on the agent&apos;s page under For sale, For rent or
-            Sold. Agent pages stay empty until listings are assigned.
+            Sold. Homes an agent posts from their own dashboard appear on their page automatically.
           </li>
           <li>
             <strong>Pin it on the map</strong> with latitude and longitude. Without them the map shows an approximate pin for the neighbourhood.
@@ -93,7 +103,18 @@ const sections: { id: string; title: string; body: React.ReactNode }[] = [
           <li>
             <strong>Feature it</strong> to show it first on the home page.
           </li>
+          <li>
+            <strong>Set the build stage</strong> (Off-plan, Under construction, Completed). It shows on the card beside Selling or Sold out.
+          </li>
         </ul>
+        <p>
+          Broker companies register on Register a broker company and arrive in <Link href="/admin/content/applications">Applications</Link>. Once accepted,
+          add them in <Link href="/admin/content/brokers">Broker companies</Link> and tick Published.
+        </p>
+        <p>
+          <Link href="/admin/performance">Performance</Link> counts every WhatsApp, Call and Email tap on a broker or agent, the enquiries sent to them,
+          and the sales you record in <Link href="/admin/content/sales">Sales</Link>.
+        </p>
         <p>
           To add an agent: create the account in <Link href="/admin/users/new">Users</Link> with the role Agent, then complete their public profile in{' '}
           <Link href="/admin/content/agents">Agent profiles</Link> (photo, bio, areas, languages, WhatsApp).
@@ -115,8 +136,8 @@ const sections: { id: string; title: string; body: React.ReactNode }[] = [
           <Link href="/admin/content/reviews">Agent reviews</Link> are hidden until you set them to Approved. Reject anything abusive or not genuine.
         </p>
         <p>
-          <Link href="/admin/content/applications">Agent applications</Link> come from Become an Akristal agent. ID documents are not collected online;
-          applicants send them on WhatsApp.
+          <Link href="/admin/content/applications">Applications</Link> come from Become an Akristal agent and Register a broker company. Documents are
+          not collected online; applicants send them on WhatsApp.
         </p>
       </>
     ),
@@ -127,8 +148,8 @@ const sections: { id: string; title: string; body: React.ReactNode }[] = [
     body: (
       <>
         <p>
-          The first active <Link href="/admin/content/plans">Pay Small Small plan</Link> drives every instalment calculator: minimum deposit,
-          tenures (in months) and any premium per tenure (0 = no extra cost). Switch the plan off to hide the Pay Small Small option everywhere.
+          The first active <Link href="/admin/content/plans">Pay Small Small plan</Link> drives every instalment calculator: minimum and maximum deposit,
+          tenures (in months; whole years show as years) and any premium per tenure (0 = no extra cost). Switch the plan off to hide the Pay Small Small option everywhere.
         </p>
         <p>
           Publish only lenders you have an agreement with in <Link href="/admin/content/lenders">Lenders</Link>. Mortgage calculator starting rates are
@@ -140,7 +161,7 @@ const sections: { id: string; title: string; body: React.ReactNode }[] = [
   },
   {
     id: 'content',
-    title: 'Furniture, interiors, team and testimonials',
+    title: 'Furniture, interiors, management team and testimonials',
     body: (
       <ul>
         <li>
@@ -151,7 +172,7 @@ const sections: { id: string; title: string; body: React.ReactNode }[] = [
           <strong>Interior portfolio</strong>: add <em>Before and after</em> pairs to show the comparison slider.
         </li>
         <li>
-          <strong>Team</strong>: shown on the home page and About.
+          <strong>Management team</strong>: shown on the Management team page; long bios open with Read more.
         </li>
         <li>
           <strong>Testimonials</strong>: tick <em>The client agreed to be quoted</em> first; the website refuses to publish without it.
@@ -164,8 +185,8 @@ const sections: { id: string; title: string; body: React.ReactNode }[] = [
     title: 'Things that still need a developer',
     body: (
       <ul>
-        <li>Phone numbers, office addresses, WhatsApp number and social links (in <code>config/site.ts</code>).</li>
-        <li>Menu items and page layouts.</li>
+        <li>Social media links (in <code>config/site.ts</code>). Phone numbers, offices and email are in Settings → Phone numbers and offices.</li>
+        <li>Menu items, button labels inside forms, and page layouts.</li>
         <li>Adding new markets/cities for the area filter (in <code>lib/data/markets.ts</code>).</li>
       </ul>
     ),
