@@ -44,16 +44,17 @@ const BUILDINGS: Building[] = [
 
 function hillPath(offset: number, amp: number, freq: number, phase: number) {
   const pts: string[] = []
-  for (let x = 0; x <= W; x += 24) {
+  // Sampled every 48 units: smooth at any width, and half the markup of a finer curve.
+  for (let x = 0; x <= W; x += 48) {
     const y = offset - amp * Math.sin((x / W) * Math.PI * freq + phase) - (amp / 4) * Math.sin((x / W) * Math.PI * freq * 3.1 + phase)
-    pts.push(`${x},${y.toFixed(1)}`)
+    pts.push(`${x},${Math.round(y)}`)
   }
   return `M${pts.join(' L')}`
 }
 
 function ridgePath() {
   const pts: string[] = []
-  for (let x = 0; x <= W; x += 16) pts.push(`${x},${ridge(x).toFixed(1)}`)
+  for (let x = 0; x <= W; x += 32) pts.push(`${x},${Math.round(ridge(x))}`)
   return `M${pts.join(' L')}`
 }
 

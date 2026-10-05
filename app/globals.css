@@ -290,8 +290,10 @@
    (animate-heartbeat, animate-marquee). Plain rules added after the theme were dropped by the
    production build, which is why the WhatsApp button stood still on the live site. */
 @theme {
-  /* WhatsApp button: a double beat and a spreading green glow, then a long rest before the next beat. */
-  --animate-heartbeat: ak-heartbeat 3.6s ease-in-out infinite, ak-glow 3.6s ease-out infinite;
+  /* WhatsApp button: a double beat with a spreading green ring, then a long rest before the next beat.
+     Both animate only transform and opacity, so the browser never repaints for them. */
+  --animate-heartbeat: ak-heartbeat 3.6s ease-in-out infinite;
+  --animate-ring: ak-ring 3.6s ease-out infinite;
   /* Endless strip: two copies of the content slide by half their width, so the loop is seamless. */
   --animate-marquee: ak-marquee var(--marquee-duration, 40s) linear infinite;
 
@@ -301,10 +303,9 @@
     11% { transform: scale(1); }
     16% { transform: scale(1.1); }
   }
-  @keyframes ak-glow {
-    0% { box-shadow: 0 0 0 0 rgb(37 211 102 / 0.65), 0 8px 24px rgb(37 211 102 / 0.35); }
-    32% { box-shadow: 0 0 0 20px rgb(37 211 102 / 0), 0 8px 24px rgb(37 211 102 / 0.35); }
-    100% { box-shadow: 0 0 0 20px rgb(37 211 102 / 0), 0 8px 24px rgb(37 211 102 / 0.35); }
+  @keyframes ak-ring {
+    0% { transform: scale(1); opacity: 0.6; }
+    32%, 100% { transform: scale(1.7); opacity: 0; }
   }
   @keyframes ak-marquee {
     from { transform: translateX(0); }

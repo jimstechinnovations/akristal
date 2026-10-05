@@ -11,7 +11,8 @@ const BUILD = { off_plan: 'Off-plan', under_construction: 'Under construction', 
 
 /** A slow-moving strip of every home on the market with a photo. Hidden until there are enough to loop. */
 export function HomesMarquee({ listings, copy }: { listings: Listing[]; copy: Copy }) {
-  const shown = listings.filter((l) => l.images[0]).slice(0, 14)
+  // Eight is enough to loop smoothly; each card renders twice for the seamless loop.
+  const shown = listings.filter((l) => l.images[0]).slice(0, 8)
   if (shown.length < 5) return null
   return (
     <section aria-labelledby="market-now-title" className="section-y overflow-hidden">

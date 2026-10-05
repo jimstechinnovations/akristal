@@ -19,10 +19,12 @@ export function WhatsAppFab({ number, message, label }: { number?: string; messa
       href={whatsappLink(message, number || undefined)}
       aria-label={label}
       className={cn(
-        'animate-heartbeat motion-reduce:animate-none fixed bottom-4 right-4 z-40 size-14 items-center justify-center rounded-full bg-[#1f9d55] text-white sm:bottom-6 sm:right-6',
+        'animate-heartbeat motion-reduce:animate-none fixed bottom-4 right-4 z-40 size-14 items-center justify-center rounded-full bg-[#1f9d55] text-white shadow-[0_8px_24px_rgb(37_211_102/0.35)] sm:bottom-6 sm:right-6',
         onProperty ? 'hidden lg:inline-flex' : 'inline-flex'
       )}
     >
+      {/* The green ring that spreads out with each beat. */}
+      <span aria-hidden className="absolute inset-0 -z-10 animate-ring rounded-full bg-[#25d366] motion-reduce:hidden" />
       {/* Speech bubble with a handset: reads as WhatsApp without reproducing its logo. */}
       <span aria-hidden className="relative inline-flex size-7 items-center justify-center">
         <MessageCircle className="absolute size-7" strokeWidth={2} />
