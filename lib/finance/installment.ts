@@ -9,6 +9,8 @@ export interface InstallmentInput {
   months: number
   /** Optional plan premium on the financed balance, in percent (0 when the plan is interest-free) */
   premiumPct?: number
+  /** Part of the price the buyer borrows from their own bank; it is not paid in instalments */
+  bankAmount?: number
   currency?: string
   /** First instalment falls one month after this date */
   startDate?: Date
@@ -23,6 +25,8 @@ export interface InstallmentRow {
 
 export interface InstallmentResult {
   deposit: number
+  /** The bank's part, capped so it never exceeds the balance after the deposit */
+  bank: number
   financed: number
   premium: number
   monthly: number
@@ -52,7 +56,8 @@ export function calculateInstallments(input: InstallmentInput): InstallmentResul
   const depositPct = Math.min(100, Math.max(0, input.depositPct || 0))
   const months = Math.max(0, Math.round(input.months || 0))
   const deposit = roundTo((price * depositPct) / 100, decimals)
-  const balance = price - deposit
+  const bank = roundTo(Math.min(Math.max(0, input.bankAmount ?? 0), price - deposit), decimals)
+  const balance = price - deposit - bank
   const premium = roundTo((balance * Math.max(0, input.premiumPct ?? 0)) / 100, decimals)
   const financed = balance + premium
 
@@ -69,5 +74,5 @@ export function calculateInstallments(input: InstallmentInput): InstallmentResul
     }
   }
 
-  return { deposit, financed, premium, monthly, totalPayable: deposit + financed, schedule }
+  return { deposit, bank, financed, premium, monthly, totalPayable: deposit + bank + financed, schedule }
 }

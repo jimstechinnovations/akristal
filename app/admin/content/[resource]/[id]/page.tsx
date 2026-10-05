@@ -2,7 +2,7 @@ import Link from 'next/link'
 import { notFound } from 'next/navigation'
 import { ChevronLeft } from 'lucide-react'
 import { getResource } from '@/lib/admin/resources'
-import { agentOptions, getRecord } from '@/lib/admin/load'
+import { agentOptions, brokerOptions, getRecord } from '@/lib/admin/load'
 import { RecordForm } from '@/components/admin/record-form'
 
 type PageProps = { params: Promise<{ resource: string; id: string }> }
@@ -15,7 +15,7 @@ export default async function ResourceRecordPage({ params }: PageProps) {
   const isNew = id === 'new'
   if (isNew && !resource.canCreate) notFound()
 
-  const [record, agents] = await Promise.all([isNew ? Promise.resolve<Record<string, unknown>>({}) : getRecord(resource, id), agentOptions()])
+  const [record, agents, brokers] = await Promise.all([isNew ? Promise.resolve<Record<string, unknown>>({}) : getRecord(resource, id), agentOptions(), brokerOptions()])
   if (!record) notFound()
 
   // Sensible starting values for new records.
@@ -26,7 +26,10 @@ export default async function ResourceRecordPage({ params }: PageProps) {
           f.type === 'boolean' ? ['is_published', 'is_active'].includes(f.name) : f.type === 'select' && f.required ? f.options?.[0]?.value ?? '' : undefined,
         ])
       )
-    : record
+    : resource.defaults
+      ? // Settings: show the current wording, falling back to the default for anything not saved yet.
+        { ...resource.defaults, ...Object.fromEntries(Object.entries(record).filter(([, v]) => v != null && v !== '' && !(Array.isArray(v) && v.length === 0))) }
+      : record
   const listHref = resource.settingKey ? '/admin' : `/admin/content/${key}`
   const viewHref = !isNew && resource.viewHref ? resource.viewHref(record) : null
   const title = resource.settingKey
@@ -42,7 +45,7 @@ export default async function ResourceRecordPage({ params }: PageProps) {
       </Link>
       <h1 className="mt-2 font-display text-display-s font-medium">{title}</h1>
       <p className="mb-6 mt-1 max-w-2xl text-sm text-muted">{resource.description}</p>
-      <RecordForm resourceKey={key} id={isNew || resource.settingKey ? null : id} initial={initial} agentOptions={agents} viewHref={viewHref} listHref={listHref} />
+      <RecordForm resourceKey={key} id={isNew || resource.settingKey ? null : id} initial={initial} agentOptions={agents} brokerOptions={brokers} viewHref={viewHref} listHref={listHref} />
     </div>
   )
 }

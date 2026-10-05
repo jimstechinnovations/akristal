@@ -19,17 +19,23 @@ const schema = z.object({
   cv_url: z.string().trim().url('Enter a full link, starting with https://').max(500).or(z.literal('')).optional().default(''),
   message: z.string().trim().max(3000).optional().default(''),
   consent: z.literal('yes', { message: 'Please agree so we can contact you about your application' }),
+  applicant_type: z.enum(['agent', 'broker']).optional().default('agent'),
+  company_name: z.string().trim().max(160).optional().default(''),
+  registration_number: z.string().trim().max(80).optional().default(''),
+  website_url: z.string().trim().url('Enter a full link, starting with https://').max(500).or(z.literal('')).optional().default(''),
+  team_size: z.coerce.number().int().min(0).max(100000).optional(),
 })
 
 export async function submitApplication(_prev: LeadState, formData: FormData): Promise<LeadState> {
   if (formData.get('company_website')) return { status: 'success' }
-  const parsed = schema.safeParse(Object.fromEntries(formData.entries()))
-  if (!parsed.success) {
-    const fieldErrors: Record<string, string> = {}
-    for (const issue of parsed.error.issues) fieldErrors[String(issue.path[0])] ??= issue.message
-    return { status: 'error', message: 'Check the highlighted fields.', fieldErrors }
-  }
+  const parsed = schema.safeParse(Object.fromEntries([...formData.entries()].filter(([k, v]) => !(k === 'team_size' && v === ''))))
+  const fieldErrors: Record<string, string> = {}
+  if (!parsed.success) for (const issue of parsed.error.issues) fieldErrors[String(issue.path[0])] ??= issue.message
+  // A broker company must give its name.
+  if (formData.get('applicant_type') === 'broker' && !String(formData.get('company_name') ?? '').trim()) fieldErrors.company_name = 'Enter the company name'
+  if (!parsed.success || Object.keys(fieldErrors).length) return { status: 'error', message: 'Check the highlighted fields.', fieldErrors }
   const d = parsed.data
+  const broker = d.applicant_type === 'broker'
   const specialties = formData.getAll('specialties').map(String).filter(Boolean).slice(0, 10)
   const languages = formData.getAll('languages').map(String).filter(Boolean).slice(0, 10)
 
@@ -45,6 +51,11 @@ export async function submitApplication(_prev: LeadState, formData: FormData): P
     licence_number: d.licence_number || null,
     cv_url: d.cv_url || null,
     message: d.message || null,
+    applicant_type: d.applicant_type,
+    company_name: d.company_name || null,
+    registration_number: d.registration_number || null,
+    website_url: d.website_url || null,
+    team_size: d.team_size ?? null,
   })
   if (error) {
     console.error('Application insert failed', error)
@@ -53,8 +64,10 @@ export async function submitApplication(_prev: LeadState, formData: FormData): P
 
   await sendEmail({
     to: forms.notifyEmail,
-    subject: `Agent application: ${d.full_name.slice(0, 80)} (${d.city.slice(0, 40)})`,
-    html: `<p><strong>${esc(d.full_name)}</strong>, ${esc(d.city)}, ${d.years_experience} years</p><p>${esc(d.phone)} · ${esc(d.email)}</p><p>Specialities: ${esc(specialties.join(', ') || '-')}</p><p>${esc(d.message)}</p>`,
+    subject: broker
+      ? `Broker registration: ${d.company_name.slice(0, 80)} (${d.city.slice(0, 40)})`
+      : `Agent application: ${d.full_name.slice(0, 80)} (${d.city.slice(0, 40)})`,
+    html: `${broker ? `<p>Broker company: <strong>${esc(d.company_name)}</strong>${d.registration_number ? `, reg. ${esc(d.registration_number)}` : ''}</p>` : ''}<p><strong>${esc(d.full_name)}</strong>, ${esc(d.city)}, ${d.years_experience} years</p><p>${esc(d.phone)} · ${esc(d.email)}</p><p>Specialities: ${esc(specialties.join(', ') || '-')}</p><p>${esc(d.message)}</p>`,
   }).catch(() => undefined)
 
   return { status: 'success' }

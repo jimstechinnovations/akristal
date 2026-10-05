@@ -6,7 +6,7 @@ import { motion } from 'framer-motion'
 import { financeDefaults, type CurrencyCode } from '@/config/site'
 import { calculateMortgage } from '@/lib/finance/mortgage'
 import { calculateInstallments } from '@/lib/finance/installment'
-import { formatMoney } from '@/lib/format'
+import { formatMoney, formatTenure } from '@/lib/format'
 import { cn } from '@/lib/utils'
 import type { InstallmentPlan } from '@/lib/data/plans'
 import { AnimatedNumber } from '@/components/motion/animated-number'
@@ -38,7 +38,7 @@ function Range({ label, value, min, max, step, onChange, display }: { label: str
   )
 }
 
-const NO_PLAN: InstallmentPlan = { id: '', name: '', description: null, minDepositPct: 30, tenures: [12], premiumByTenure: {}, eligibility: [], termsUrl: null }
+const NO_PLAN: InstallmentPlan = { id: '', name: '', description: null, minDepositPct: 30, maxDepositPct: 50, tenures: [12], premiumByTenure: {}, eligibility: [], termsUrl: null }
 
 export function CostCalculator({ price, currency, plan: activePlan, className }: { price: number; currency: string; plan?: InstallmentPlan; className?: string }) {
   // Without an active Pay Small Small plan, only the mortgage tab is shown.
@@ -147,7 +147,7 @@ export function CostCalculator({ price, currency, plan: activePlan, className }:
                 label="Initial deposit"
                 value={planDeposit}
                 min={plan.minDepositPct}
-                max={90}
+                max={plan.maxDepositPct}
                 step={5}
                 onChange={setPlanDeposit}
                 display={`${planDeposit}%, ${money(installments.deposit)}`}
@@ -166,7 +166,7 @@ export function CostCalculator({ price, currency, plan: activePlan, className }:
                         months === m ? 'border-primary bg-primary text-on-primary' : 'border-line-strong hover:border-ink'
                       )}
                     >
-                      {m} months
+                      {formatTenure(m)}
                     </button>
                   ))}
                 </div>

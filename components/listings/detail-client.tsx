@@ -19,7 +19,7 @@ export function LocationMap({ listing }: { listing: MapListing }) {
         <LeafletMap listings={[listing]} />
       </div>
       {listing.approximate && (
-        <p className="mt-2 text-sm text-muted">The pin shows the neighbourhood. Your agent shares the exact address before a viewing.</p>
+        <p className="mt-2 text-sm text-muted">The pin shows the neighbourhood. Your broker or agent shares the exact address before a viewing.</p>
       )}
     </div>
   )

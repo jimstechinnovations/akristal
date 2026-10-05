@@ -19,6 +19,11 @@ export default async function AdminLayout({ children }: { children: React.ReactN
       title: 'Website content',
       items: [{ href: '/admin/properties', label: 'Properties', badge: counts.pendingListings }, ...byGroup('Website content')],
     },
+    { title: 'Website text', items: byGroup('Website text') },
+    {
+      title: 'Brokers & Agents',
+      items: [{ href: '/admin/performance', label: 'Performance' }, ...byGroup('Brokers & Agents')],
+    },
     { title: 'Settings', items: [...byGroup('Settings'), { href: '/admin/property-types', label: 'Property types' }, { href: '/admin/categories', label: 'Categories' }] },
     { title: 'Accounts', items: [{ href: '/admin/users', label: 'Users' }, { href: '/admin/members', label: 'Team (classic editor)' }, { href: '/admin/payments', label: 'Payments' }] },
   ]

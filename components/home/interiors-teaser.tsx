@@ -1,32 +1,22 @@
 import Image from 'next/image'
 import Link from 'next/link'
-import { images } from '@/content/images'
+import type { Copy } from '@/lib/data/copy'
 
-const panels = [
-  {
-    href: '/interior-design',
-    title: 'Interior design',
-    text: 'We design and decorate homes, offices and short-let apartments, from the first plan to the finished room.',
-    cta: 'See our interiors',
-    image: images.interiorsLivingWarm,
-  },
-  {
-    href: '/furniture',
-    title: 'Furniture',
-    text: 'Sofas, beds, dining sets and lighting chosen to finish a home. Ask about any piece on WhatsApp.',
-    cta: 'Browse furniture',
-    image: images.interiorsLivingWood,
-  },
-]
-
-export function InteriorsTeaser() {
+export function InteriorsTeaser({ copy }: { copy: Copy }) {
+  const panels = (['interiors', 'furniture'] as const).map((k) => ({
+    href: k === 'interiors' ? '/interior-design' : '/furniture',
+    title: copy.t(`${k}.title`),
+    text: copy.t(`${k}.text`),
+    cta: copy.t(`${k}.cta`),
+    image: copy.t(`${k}.image`),
+  }))
   return (
     <section aria-label="Interiors and furniture" className="section-y">
       <div className="page-x-wide grid gap-4 md:grid-cols-2 lg:gap-6">
         {panels.map((p) => (
           <article key={p.href} className="group relative isolate flex min-h-[460px] flex-col justify-end overflow-hidden rounded-md p-6 text-white sm:min-h-[560px] sm:p-10">
             <Image
-              src={p.image.src}
+              src={p.image}
               alt=""
               fill
               sizes="(min-width: 768px) 50vw, 100vw"

@@ -13,7 +13,9 @@ import { fieldClasses } from '@/components/ui/input'
 const SPECIALTIES = ['Sales', 'Rentals', 'Luxury homes', 'Off-plan', 'Commercial', 'Land']
 const LANGUAGES = ['English', 'Kinyarwanda', 'French', 'Swahili', 'Yoruba', 'Igbo', 'Hausa', 'Arabic']
 
-export function ApplicationForm() {
+/** Agent application, or (kind="broker") registration of a broker company. Both land in Admin → Applications. */
+export function ApplicationForm({ kind = 'agent' }: { kind?: 'agent' | 'broker' }) {
+  const broker = kind === 'broker'
   const [state, action, pending] = useActionState<LeadState, FormData>(submitApplication, { status: 'idle' })
   const errors = state.status === 'error' ? state.fieldErrors ?? {} : {}
 
@@ -21,13 +23,13 @@ export function ApplicationForm() {
     return (
       <div role="status" className="rounded-md border border-line bg-page-alt p-8">
         <CheckCircle2 aria-hidden className="size-7 text-success" />
-        <h3 className="mt-4 text-xl font-semibold">Application received</h3>
+        <h3 className="mt-4 text-xl font-semibold">{broker ? 'Registration received' : 'Application received'}</h3>
         <p className="mt-2 max-w-md text-[0.9375rem] text-muted">
-          Thank you. Our team will review it and contact you about next steps. To speed things up, you can send a copy of your ID or
-          licence on WhatsApp now.
+          Thank you. The Akristal team will review it and contact you about next steps. To speed things up, you can send a copy of{' '}
+          {broker ? 'your company registration' : 'your ID or licence'} on WhatsApp now.
         </p>
-        <a href={whatsappLink('Hello Akristal, I have just applied to become an agent. Here is my ID.')} className="mt-6 inline-flex h-11 items-center rounded-sm bg-[#1f6f4a] px-5 text-sm font-medium text-white">
-          Send my ID on WhatsApp
+        <a href={whatsappLink(broker ? 'Hello Akristal, I have just registered our broker company. Here are our documents.' : 'Hello Akristal, I have just applied to become an agent. Here is my ID.')} className="mt-6 inline-flex h-11 items-center rounded-sm bg-[#1f6f4a] px-5 text-sm font-medium text-white">
+          {broker ? 'Send documents on WhatsApp' : 'Send my ID on WhatsApp'}
         </a>
       </div>
     )
@@ -71,16 +73,18 @@ export function ApplicationForm() {
 
   return (
     <form action={action} noValidate className="grid gap-5">
-      {input('full_name', 'Full name', { autoComplete: 'name', required: true })}
+      <input type="hidden" name="applicant_type" value={kind} />
+      {broker && input('company_name', 'Company name', { autoComplete: 'organization', required: true })}
+      {input('full_name', broker ? 'Contact person' : 'Full name', { autoComplete: 'name', required: true })}
       <div className="grid gap-5 sm:grid-cols-2">
         {input('phone', 'Phone or WhatsApp', { type: 'tel', autoComplete: 'tel', placeholder: '+250 788 000 000', required: true })}
         {input('email', 'Email', { type: 'email', autoComplete: 'email', required: true })}
       </div>
       <div className="grid gap-5 sm:grid-cols-2">
-        {input('city', 'City you work in', { placeholder: 'e.g. Kigali', required: true })}
+        {input('city', broker ? 'City where the company is based' : 'City you work in', { placeholder: broker ? 'e.g. Abuja' : 'e.g. Kigali', required: true })}
         <div className="grid gap-1.5">
           <label htmlFor="a-years" className="text-sm">
-            Years selling property
+            {broker ? 'Years in business' : 'Years selling property'}
           </label>
           <select id="a-years" name="years_experience" defaultValue="" aria-invalid={errors.years_experience ? true : undefined} className={fieldClasses}>
             <option value="" disabled>
@@ -96,20 +100,31 @@ export function ApplicationForm() {
           {errors.years_experience && <p className="text-xs text-error">{errors.years_experience}</p>}
         </div>
       </div>
-      {input('areas', 'Neighbourhoods you know best', { optional: true, placeholder: 'e.g. Kibagabaga, Kimihurura, Nyarutarama' })}
-      {chips('specialties', 'What you sell', SPECIALTIES)}
+      {broker && (
+        <div className="grid gap-5 sm:grid-cols-2">
+          {input('team_size', 'Number of agents in the company', { optional: true, type: 'number', min: 0, inputMode: 'numeric' })}
+          {input('website_url', 'Company website', { optional: true, type: 'url', placeholder: 'https://' })}
+        </div>
+      )}
+      {input('areas', broker ? 'Areas the company covers' : 'Neighbourhoods you know best', {
+        optional: true,
+        placeholder: broker ? 'e.g. Maitama, Wuse 2, Lekki' : 'e.g. Kibagabaga, Kimihurura, Nyarutarama',
+      })}
+      {chips('specialties', broker ? 'What the company sells' : 'What you sell', SPECIALTIES)}
       {chips('languages', 'Languages you work in', LANGUAGES)}
       <div className="grid gap-5 sm:grid-cols-2">
-        {input('licence_number', 'Licence or registration number', { optional: true })}
-        {input('cv_url', 'Link to your CV or LinkedIn', { optional: true, type: 'url', placeholder: 'https://' })}
+        {broker
+          ? input('registration_number', 'Company registration number', { optional: true })
+          : input('licence_number', 'Licence or registration number', { optional: true })}
+        {input('cv_url', broker ? 'Link to a company profile or LinkedIn' : 'Link to your CV or LinkedIn', { optional: true, type: 'url', placeholder: 'https://' })}
       </div>
       <div className="grid gap-1.5">
         <span className="text-sm">
-          ID or licence document <span className="text-muted">(after you apply)</span>
+          {broker ? 'Company documents' : 'ID or licence document'} <span className="text-muted">(after you apply)</span>
         </span>
         <p className="rounded-sm border border-dashed border-line-strong px-4 py-3 text-sm text-muted">
-          For your security we don&apos;t collect ID documents through this form. After applying, send them on WhatsApp to {site.phone.label}, or bring
-          them to your interview.
+          For your security we don&apos;t collect documents through this form. After applying, send them on WhatsApp to {site.phone.label}, or bring
+          them to your meeting with the Akristal team.
         </p>
       </div>
       <div className="grid gap-1.5">
@@ -135,7 +150,7 @@ export function ApplicationForm() {
         </p>
       )}
       <Button type="submit" size="lg" loading={pending} className="sm:justify-self-start">
-        {pending ? 'Sending…' : 'Send my application'}
+        {pending ? 'Sending…' : broker ? 'Register the company' : 'Send my application'}
       </Button>
     </form>
   )

@@ -7,6 +7,7 @@ export type InstallmentPlan = {
   name: string
   description: string | null
   minDepositPct: number
+  maxDepositPct: number
   tenures: number[]
   premiumByTenure: Record<string, number>
   eligibility: string[]
@@ -22,6 +23,7 @@ export const getInstallmentPlans = cache(async (): Promise<InstallmentPlan[]> =>
     name: p.name,
     description: p.description,
     minDepositPct: Number(p.min_deposit_pct),
+    maxDepositPct: Math.max(Number(p.min_deposit_pct), Number(p.max_deposit_pct ?? 90)),
     tenures: p.tenures_months,
     premiumByTenure: (p.premium_pct_by_tenure as Record<string, number> | null) ?? {},
     eligibility: p.eligibility ?? [],

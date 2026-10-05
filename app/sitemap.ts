@@ -9,12 +9,17 @@ const STATIC_ROUTES: { path: string; priority: number; changeFrequency: Metadata
   { path: '/properties', priority: 0.9, changeFrequency: 'daily' },
   { path: '/projects', priority: 0.9, changeFrequency: 'weekly' },
   { path: '/agents', priority: 0.7, changeFrequency: 'weekly' },
+  { path: '/brokers', priority: 0.6, changeFrequency: 'weekly' },
+  { path: '/insights', priority: 0.6, changeFrequency: 'weekly' },
+  { path: '/reviews', priority: 0.5, changeFrequency: 'weekly' },
+  { path: '/management', priority: 0.4, changeFrequency: 'monthly' },
   { path: '/mortgage', priority: 0.7, changeFrequency: 'monthly' },
   { path: '/pay-small-small', priority: 0.8, changeFrequency: 'monthly' },
   { path: '/interior-design', priority: 0.7, changeFrequency: 'monthly' },
   { path: '/furniture', priority: 0.7, changeFrequency: 'weekly' },
   { path: '/sell', priority: 0.6, changeFrequency: 'monthly' },
   { path: '/join', priority: 0.5, changeFrequency: 'monthly' },
+  { path: '/join/broker', priority: 0.5, changeFrequency: 'monthly' },
   { path: '/about', priority: 0.5, changeFrequency: 'yearly' },
   { path: '/contact', priority: 0.5, changeFrequency: 'yearly' },
   { path: '/support', priority: 0.3, changeFrequency: 'yearly' },
@@ -33,10 +38,18 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
 
   try {
     const supabase = createPublicClient()
-    const [{ data: properties }, { data: projects }] = await Promise.all([
+    const [{ data: properties }, { data: projects }, { data: articles }, { data: brokers }] = await Promise.all([
       supabase.from('properties').select('id, updated_at').eq('listing_status', 'approved').limit(5000),
       supabase.from('projects').select('id, updated_at').neq('status', 'draft').neq('status', 'archived').limit(1000),
+      supabase.from('articles').select('slug, updated_at').limit(1000),
+      supabase.from('brokers').select('id, slug, updated_at').limit(1000),
     ])
+    for (const a of articles ?? []) {
+      entries.push({ url: absoluteUrl(`/insights/${a.slug}`), lastModified: a.updated_at ?? now, changeFrequency: 'monthly', priority: 0.6 })
+    }
+    for (const b of brokers ?? []) {
+      entries.push({ url: absoluteUrl(`/brokers/${b.slug || b.id}`), lastModified: b.updated_at ?? now, changeFrequency: 'monthly', priority: 0.5 })
+    }
     for (const p of properties ?? []) {
       entries.push({ url: absoluteUrl(`/properties/${p.id}`), lastModified: p.updated_at ? String(p.updated_at) : now, changeFrequency: 'weekly', priority: 0.8 })
     }

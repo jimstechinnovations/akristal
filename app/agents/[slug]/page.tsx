@@ -15,6 +15,7 @@ import { AgentInitials } from '@/components/agents/agent-tile'
 import { AgentListingTabs } from '@/components/agents/listing-tabs'
 import { ReviewForm } from '@/components/agents/review-form'
 import { Stars } from '@/components/agents/stars'
+import { TrackedLink } from '@/components/agents/tracked-link'
 
 type PageProps = { params: Promise<{ slug: string }> }
 
@@ -66,7 +67,7 @@ export default async function AgentPage({ params }: PageProps) {
 
   return (
     <>
-      <JsonLd data={[jsonLd, breadcrumbJsonLd([{ name: 'Home', path: '/' }, { name: 'Agents', path: '/agents' }, { name: agent.name, path: `/agents/${agent.slug}` }])]} />
+      <JsonLd data={[jsonLd, breadcrumbJsonLd([{ name: 'Home', path: '/' }, { name: 'Brokers & Agents', path: '/agents' }, { name: agent.name, path: `/agents/${agent.slug}` }])]} />
 
       <div className="page-x-wide pt-6">
         <nav aria-label="Breadcrumb" className="text-sm text-muted">
@@ -133,18 +134,23 @@ export default async function AgentPage({ params }: PageProps) {
           </dl>
 
           <div className="mt-8 flex flex-wrap gap-2">
-            <a href={whatsappLink(`Hello ${firstName}, I found you on the Akristal website.`, agent.whatsapp ?? agent.phone ?? undefined)} className={cn(action, 'bg-[#1f6f4a] text-white hover:bg-[#185c3d]')}>
+            <TrackedLink
+              channel="whatsapp"
+              agentId={agent.id}
+              href={whatsappLink(`Hello ${firstName}, I found you on the Akristal website.`, agent.whatsapp ?? agent.phone ?? undefined)}
+              className={cn(action, 'bg-[#1f6f4a] text-white hover:bg-[#185c3d]')}
+            >
               <MessageCircle aria-hidden className="size-4" /> WhatsApp {firstName}
-            </a>
+            </TrackedLink>
             {phone && (
-              <a href={`tel:${phone}`} className={cn(action, 'border border-line-strong hover:border-ink')}>
+              <TrackedLink channel="call" agentId={agent.id} href={`tel:${phone}`} className={cn(action, 'border border-line-strong hover:border-ink')}>
                 <Phone aria-hidden className="size-4" /> {agent.phone}
-              </a>
+              </TrackedLink>
             )}
             {agent.email && (
-              <a href={`mailto:${agent.email}`} className={cn(action, 'border border-line-strong hover:border-ink')}>
+              <TrackedLink channel="email" agentId={agent.id} href={`mailto:${agent.email}`} className={cn(action, 'border border-line-strong hover:border-ink')}>
                 <Mail aria-hidden className="size-4" /> Email
-              </a>
+              </TrackedLink>
             )}
           </div>
           {Object.keys(agent.socials).length > 0 && (

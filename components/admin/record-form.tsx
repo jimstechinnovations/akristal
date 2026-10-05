@@ -245,6 +245,15 @@ function ListInput({ value, onChange, fields, itemLabel, folder }: { value: Reco
                 {f.label}
                 {f.type === 'image' ? (
                   <ImageInput value={String(row[f.name] ?? '')} onChange={(v) => set(i, f.name, v)} folder={folder} />
+                ) : f.type === 'select' ? (
+                  <select value={String(row[f.name] ?? '')} onChange={(e) => set(i, f.name, e.target.value)} className={cn(fieldClasses, 'h-10 text-sm')}>
+                    <option value="">Choose…</option>
+                    {(f.options ?? []).map((o) => (
+                      <option key={o.value} value={o.value}>
+                        {o.label}
+                      </option>
+                    ))}
+                  </select>
                 ) : f.type === 'textarea' ? (
                   <textarea rows={3} value={String(row[f.name] ?? '')} placeholder={f.placeholder} onChange={(e) => set(i, f.name, e.target.value)} className={cn(fieldClasses, 'h-auto py-2 text-sm')} />
                 ) : (
@@ -273,6 +282,7 @@ export function RecordForm({
   id,
   initial,
   agentOptions,
+  brokerOptions = [],
   viewHref,
   listHref,
 }: {
@@ -280,6 +290,7 @@ export function RecordForm({
   id: string | null
   initial: Values
   agentOptions: Option[]
+  brokerOptions?: Option[]
   viewHref: string | null
   listHref: string
 }) {
@@ -296,6 +307,7 @@ export function RecordForm({
   function optionsFor(f: Field): Option[] {
     if (f.type !== 'select') return []
     if (f.optionsFrom === 'agents') return [{ value: '', label: 'None' }, ...agentOptions]
+    if (f.optionsFrom === 'brokers') return [{ value: '', label: 'None' }, ...brokerOptions]
     if (f.optionsFrom === 'currencies') return CURRENCIES
     return [...(f.required ? [] : [{ value: '', label: 'Not set' }]), ...(f.options ?? [])]
   }

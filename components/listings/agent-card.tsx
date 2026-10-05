@@ -5,11 +5,12 @@ import { site } from '@/config/site'
 import type { Agent } from '@/lib/data/people'
 import { whatsappLink } from '@/lib/whatsapp'
 import { cn } from '@/lib/utils'
+import { TrackedLink } from '@/components/agents/tracked-link'
 
 /** Assigned agent when there is one; otherwise the Akristal sales desk, so every home has a person to call. */
-export function AgentCard({ agent, enquiry, className }: { agent: Agent | null; enquiry: string; className?: string }) {
+export function AgentCard({ agent, enquiry, propertyId, className }: { agent: Agent | null; enquiry: string; propertyId?: string; className?: string }) {
   const name = agent?.name ?? 'Akristal sales team'
-  const role = agent ? agent.title : 'Kigali head office'
+  const role = agent ? agent.title : 'Akristal head office'
   const phoneHref = agent?.phone ? `tel:${agent.phone.replace(/[^\d+]/g, '')}` : site.phone.href
   const phoneLabel = agent?.phone ?? site.phone.label
   const wa = whatsappLink(enquiry, agent?.whatsapp ?? agent?.phone ?? site.whatsapp)
@@ -54,15 +55,21 @@ export function AgentCard({ agent, enquiry, className }: { agent: Agent | null; 
         </div>
       </div>
       <div className="mt-5 grid grid-cols-2 gap-2">
-        <a href={wa} className={cn(action, 'bg-[#1f6f4a] text-white hover:bg-[#185c3d]')}>
+        <TrackedLink channel="whatsapp" agentId={agent?.id} propertyId={propertyId} href={wa} className={cn(action, 'bg-[#1f6f4a] text-white hover:bg-[#185c3d]')}>
           <MessageCircle aria-hidden className="size-4" /> WhatsApp
-        </a>
-        <a href={phoneHref} className={cn(action, 'border border-line-strong hover:border-ink')}>
+        </TrackedLink>
+        <TrackedLink channel="call" agentId={agent?.id} propertyId={propertyId} href={phoneHref} className={cn(action, 'border border-line-strong hover:border-ink')}>
           <Phone aria-hidden className="size-4" /> Call
-        </a>
-        <a href={`mailto:${email}?subject=${encodeURIComponent(enquiry.slice(0, 120))}`} className={cn(action, 'col-span-2 border border-line-strong hover:border-ink')}>
+        </TrackedLink>
+        <TrackedLink
+          channel="email"
+          agentId={agent?.id}
+          propertyId={propertyId}
+          href={`mailto:${email}?subject=${encodeURIComponent(enquiry.slice(0, 120))}`}
+          className={cn(action, 'col-span-2 border border-line-strong hover:border-ink')}
+        >
           <Mail aria-hidden className="size-4" /> {email}
-        </a>
+        </TrackedLink>
       </div>
       <p className="tabular mt-3 text-xs text-muted">{agent ? "Direct line" : "Office line"} {phoneLabel}</p>
     </div>

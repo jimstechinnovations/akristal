@@ -1,6 +1,7 @@
 import Link from 'next/link'
 import { MessageCircle } from 'lucide-react'
 import { legalNav, menuGroups, site } from '@/config/site'
+import { splitPhones, telHref, type SiteSettings } from '@/content/defaults'
 import { whatsappLink } from '@/lib/whatsapp'
 import { Logo } from '@/components/brand/logo'
 import { HillsSkyline } from '@/components/illustrations/hills-skyline'
@@ -8,23 +9,23 @@ import { buttonClasses } from '@/components/ui/button'
 
 const link = 'text-ink/85 transition-colors hover:text-ink hover:underline underline-offset-4'
 
-export function SiteFooter() {
+export function SiteFooter({ contact, blurb }: { contact: SiteSettings['contact']; blurb: string }) {
   const year = new Date().getFullYear()
   return (
     <footer className="relative isolate overflow-hidden border-t border-line bg-gradient-to-b from-page-alt to-wash text-ink">
       <div className="page-x-wide pt-16 lg:pt-20">
         <div className="grid gap-12 lg:grid-cols-[1.1fr_2fr]">
           <div className="max-w-sm">
-            <Logo />
+            <Logo full={site.legalName} />
             <p className="mt-6 text-[0.9375rem] leading-relaxed text-muted">
-              We build homes in Rwanda, list homes across Africa and the Gulf, and finish them with our own interiors and furniture.
+              {blurb}
             </p>
             <div className="mt-8 flex flex-wrap gap-3">
-              <a href={whatsappLink('Hello Akristal, I have a question.')} className={buttonClasses({ className: 'bg-[#1f6f4a] text-white hover:bg-[#185c3d]' })}>
+              <a href={whatsappLink('Hello Akristal, I have a question.', contact.whatsapp || undefined)} className={buttonClasses({ className: 'bg-[#1f6f4a] text-white hover:bg-[#185c3d]' })}>
                 <MessageCircle aria-hidden className="size-4" /> WhatsApp us
               </a>
-              <a href={`mailto:${site.email}`} className={buttonClasses({ variant: 'outline' })}>
-                {site.email}
+              <a href={`mailto:${contact.email}`} className={buttonClasses({ variant: 'outline' })}>
+                {contact.email}
               </a>
             </div>
           </div>
@@ -60,16 +61,16 @@ export function SiteFooter() {
         </div>
 
         <div className="mt-14 grid gap-8 border-t border-line pt-10 sm:grid-cols-3">
-          {site.offices.map((office) => (
-            <address key={office.region} className="not-italic">
+          {contact.offices.map((office) => (
+            <address key={office.region + office.label} className="not-italic">
               <p className="font-display text-xl">{office.region}</p>
               <p className="mt-1 text-sm text-muted">{office.label}</p>
               <p className="mt-3 text-sm text-ink/85">{office.address}</p>
               <ul className="mt-2 space-y-1 text-sm">
-                {office.phones.map((p) => (
-                  <li key={p.href}>
-                    <a href={p.href} className={`tabular ${link}`}>
-                      {p.label}
+                {splitPhones(office.phones).map((p) => (
+                  <li key={p}>
+                    <a href={telHref(p)} className={`tabular ${link}`}>
+                      {p}
                     </a>
                   </li>
                 ))}

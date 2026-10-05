@@ -4,7 +4,7 @@ import { useMemo, useState } from 'react'
 import { Download } from 'lucide-react'
 import type { InstallmentPlan } from '@/lib/data/plans'
 import { calculateInstallments } from '@/lib/finance/installment'
-import { formatDate, formatMoney } from '@/lib/format'
+import { formatDate, formatMoney, formatTenure } from '@/lib/format'
 import { cn } from '@/lib/utils'
 import { AnimatedNumber } from '@/components/motion/animated-number'
 import { Button } from '@/components/ui/button'
@@ -25,22 +25,25 @@ export function InstallmentPlanner({
 }) {
   const [price, setPrice] = useState(initialPrice)
   const [currency, setCurrency] = useState(initialCurrency)
-  const [depositPct, setDepositPct] = useState(Math.max(plan.minDepositPct, initialDeposit ?? plan.minDepositPct))
+  const [depositPct, setDepositPct] = useState(Math.min(plan.maxDepositPct, Math.max(plan.minDepositPct, initialDeposit ?? plan.minDepositPct)))
+  const [useBank, setUseBank] = useState(false)
+  const [bankAmount, setBankAmount] = useState(0)
   const [months, setMonths] = useState(initialMonths && plan.tenures.includes(initialMonths) ? initialMonths : plan.tenures[Math.min(1, plan.tenures.length - 1)])
   // Fixed once per visit so the schedule doesn't shift while someone is reading it.
   const [start] = useState(() => new Date())
   const premiumPct = plan.premiumByTenure[String(months)] ?? 0
 
   const r = useMemo(
-    () => calculateInstallments({ price, depositPct, months, premiumPct, currency, startDate: start }),
-    [price, depositPct, months, premiumPct, currency, start]
+    () => calculateInstallments({ price, depositPct, months, premiumPct, bankAmount: useBank ? bankAmount : 0, currency, startDate: start }),
+    [price, depositPct, months, premiumPct, useBank, bankAmount, currency, start]
   )
   const money = (n: number) => formatMoney(n, currency)
 
   function downloadCsv() {
     const lines = [
       ['Payment', 'Due date', `Amount (${currency})`, `Balance after (${currency})`],
-      ['Deposit', start.toISOString().slice(0, 10), String(r.deposit), String(r.financed)],
+      ['Deposit', start.toISOString().slice(0, 10), String(r.deposit), String(r.financed + r.bank)],
+      ...(r.bank > 0 ? [['Bank loan', 'At completion', String(r.bank), String(r.financed)]] : []),
       ...r.schedule.map((row) => [String(row.number), row.dueDate.toISOString().slice(0, 10), String(row.amount), String(row.balanceAfter)]),
     ]
     const blob = new Blob([lines.map((l) => l.join(',')).join('\n')], { type: 'text/csv' })
@@ -63,7 +66,7 @@ export function InstallmentPlanner({
             label="Initial deposit"
             value={depositPct}
             min={plan.minDepositPct}
-            max={90}
+            max={plan.maxDepositPct}
             step={5}
             onChange={setDepositPct}
             display={`${depositPct}%, ${money(r.deposit)}`}
@@ -79,12 +82,25 @@ export function InstallmentPlanner({
                   onClick={() => setMonths(m)}
                   className={cn('h-10 rounded-sm border px-4 text-sm transition-colors', months === m ? 'border-primary bg-primary text-on-primary' : 'border-line-strong hover:border-ink')}
                 >
-                  {m} months
+                  {formatTenure(m)}
                 </button>
               ))}
             </div>
           </fieldset>
-          <p className="text-sm text-muted">Minimum deposit {plan.minDepositPct}%.</p>
+          <p className="text-sm text-muted">
+            Deposit from {plan.minDepositPct}% to {plan.maxDepositPct}%, paid over {formatTenure(Math.min(...plan.tenures))} to{' '}
+            {formatTenure(Math.max(...plan.tenures))}.
+          </p>
+          <div className="grid gap-3 rounded-md border border-line p-4">
+            <label className="flex items-start gap-3 text-[0.9375rem]">
+              <input type="checkbox" checked={useBank} onChange={(e) => setUseBank(e.target.checked)} className="mt-1 size-4 accent-[var(--c-primary)]" />
+              <span>
+                My bank can lend me part of the price
+                <span className="block text-sm text-muted">Akristal works with your bank: the loan covers part of the balance, Pay Small Small covers the rest.</span>
+              </span>
+            </label>
+            {useBank && <MoneyInput label="Amount from your bank" value={bankAmount} onChange={setBankAmount} currency={currency} />}
+          </div>
         </div>
 
         <div className="rounded-md bg-brand p-6 text-white sm:p-8">
@@ -92,12 +108,18 @@ export function InstallmentPlanner({
           <p className="mt-2 text-[2.125rem] font-light leading-none tracking-tight sm:text-[2.75rem]">
             <AnimatedNumber value={r.monthly} format={money} />
           </p>
-          <p className="mt-2 text-sm text-white/70">for {months} months</p>
+          <p className="mt-2 text-sm text-white/70">for {formatTenure(months)}</p>
           <dl className="mt-8 grid gap-2 text-[0.9375rem]">
             <div className="flex justify-between gap-4 border-b border-white/15 pb-2">
               <dt>Deposit today</dt>
               <dd className="tabular">{money(r.deposit)}</dd>
             </div>
+            {r.bank > 0 && (
+              <div className="flex justify-between gap-4 border-b border-white/15 pb-2">
+                <dt>From your bank</dt>
+                <dd className="tabular">{money(r.bank)}</dd>
+              </div>
+            )}
             {r.premium > 0 && (
               <div className="flex justify-between gap-4 border-b border-white/15 pb-2">
                 <dt>Plan premium ({premiumPct}%)</dt>
@@ -144,8 +166,16 @@ export function InstallmentPlanner({
                 <td className="py-2.5 pr-4 text-left font-medium">Deposit</td>
                 <td className="py-2.5 pr-4 text-left">On signing</td>
                 <td className="py-2.5 pr-4">{money(r.deposit)}</td>
-                <td className="py-2.5">{money(r.financed)}</td>
+                <td className="py-2.5">{money(r.financed + r.bank)}</td>
               </tr>
+              {r.bank > 0 && (
+                <tr className="border-b border-line">
+                  <td className="py-2.5 pr-4 text-left font-medium">Bank loan</td>
+                  <td className="py-2.5 pr-4 text-left">Agreed with your bank</td>
+                  <td className="py-2.5 pr-4">{money(r.bank)}</td>
+                  <td className="py-2.5">{money(r.financed)}</td>
+                </tr>
+              )}
               {r.schedule.map((row) => (
                 <tr key={row.number} className="border-b border-line">
                   <td className="py-2.5 pr-4 text-left">{row.number}</td>

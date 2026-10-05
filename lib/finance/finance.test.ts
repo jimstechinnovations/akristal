@@ -118,6 +118,22 @@ describe('calculateInstallments (Pay Small Small)', () => {
     expect(r.schedule.map((x) => x.amount)).toEqual([333_333, 333_333, 333_334])
   })
 
+  it('takes a bank loan off the balance paid in instalments', () => {
+    const r = calculateInstallments({ price: 100_000, depositPct: 10, months: 10, bankAmount: 40_000, currency: 'USD', startDate: start })
+    expect(r.deposit).toBe(10_000)
+    expect(r.bank).toBe(40_000)
+    expect(r.financed).toBe(50_000)
+    expect(r.monthly).toBe(5_000)
+    expect(r.totalPayable).toBe(100_000)
+  })
+
+  it('never lets the bank part exceed the balance', () => {
+    const r = calculateInstallments({ price: 100_000, depositPct: 50, months: 6, bankAmount: 90_000, currency: 'USD', startDate: start })
+    expect(r.bank).toBe(50_000)
+    expect(r.financed).toBe(0)
+    expect(r.schedule).toHaveLength(0)
+  })
+
   it('applies a plan premium to the financed balance only', () => {
     const r = calculateInstallments({ price: 10_000, depositPct: 50, months: 10, premiumPct: 10, currency: 'USD', startDate: start })
     expect(r.premium).toBe(500)

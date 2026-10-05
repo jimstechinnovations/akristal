@@ -10,6 +10,8 @@ import type { AuthUser } from '@/lib/use-auth-user'
 import { whatsappLink } from '@/lib/whatsapp'
 import { useFocusTrap } from '@/lib/use-focus-trap'
 import { Logo } from '@/components/brand/logo'
+import { CurrencyPicker } from '@/components/currency/currency-picker'
+import { telHref, type HeaderPhone } from '@/content/defaults'
 import { ThemeToggle } from './theme-toggle'
 
 
@@ -18,7 +20,9 @@ export function MenuSheet({
   onClose,
   user,
   onSignOut,
+  phones,
 }: {
+  phones: HeaderPhone[]
   open: boolean
   onClose: () => void
   user: AuthUser | null | undefined
@@ -128,14 +132,19 @@ export function MenuSheet({
                   <MessageCircle aria-hidden className="size-4" />
                   WhatsApp us
                 </a>
-                <a
-                  href={site.phone.href}
-                  className="inline-flex h-11 items-center gap-2 rounded-sm border border-line-strong px-4 text-sm font-medium hover:border-ink"
-                >
-                  <Phone aria-hidden className="size-4" />
-                  {site.phone.label}
-                </a>
+                {phones.map((p) => (
+                  <a
+                    key={p.number}
+                    href={telHref(p.number)}
+                    className="inline-flex h-11 items-center gap-2 rounded-sm border border-line-strong px-4 text-sm font-medium hover:border-ink"
+                  >
+                    <Phone aria-hidden className="size-4" />
+                    <span className="text-muted">{p.label}</span>
+                    <span className="tabular">{p.number}</span>
+                  </a>
+                ))}
               </div>
+              <CurrencyPicker withLabel className="mt-4 md:hidden" />
               <div className="mt-4 flex items-center justify-between text-sm text-muted">
                 <a href={`mailto:${site.email}`} className="hover:text-ink hover:underline">
                   {site.email}

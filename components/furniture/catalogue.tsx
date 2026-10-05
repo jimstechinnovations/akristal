@@ -6,6 +6,7 @@ import { AnimatePresence, motion } from 'framer-motion'
 import { MessageCircle, Minus, Plus, X } from 'lucide-react'
 import { FURNITURE_CATEGORIES, type FurnitureItem } from '@/lib/data/interiors-shared'
 import { formatMoney } from '@/lib/format'
+import { Price } from '@/components/currency/price'
 import { useFocusTrap } from '@/lib/use-focus-trap'
 import { whatsappLink } from '@/lib/whatsapp'
 import { cn } from '@/lib/utils'
@@ -53,7 +54,7 @@ export function Catalogue({ items }: { items: FurnitureItem[] }) {
                   {item.madeToOrder && <span className="absolute left-2 top-2 rounded-sm bg-white/95 px-2 py-0.5 text-xs text-[#1f1b19]">Made to order</span>}
                 </span>
                 <span className="mt-3 block text-[0.9375rem] font-medium leading-snug group-hover:underline">{item.name}</span>
-                <span className="tabular mt-1 block text-sm text-muted">{priceLabel(item)}</span>
+                <span className="tabular mt-1 block text-sm text-muted">{item.price ? <Price amount={item.price.amount} currency={item.price.currency} /> : 'Price on request'}</span>
               </button>
             </motion.li>
           ))}
@@ -109,7 +110,7 @@ function ProductDialog({ item, onClose }: { item: FurnitureItem | null; onClose:
                 <h2 id="product-title" className="font-display text-display-s font-medium">
                   {item.name}
                 </h2>
-                <p className="tabular mt-2 text-lg">{priceLabel(item)}</p>
+                <p className="tabular mt-2 text-lg">{item.price ? <Price amount={item.price.amount} currency={item.price.currency} /> : 'Price on request'}</p>
               </div>
               {item.description && <p className="text-[0.9375rem] leading-relaxed text-muted">{item.description}</p>}
               <dl className="grid gap-2 text-[0.9375rem]">

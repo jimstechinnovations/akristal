@@ -1,11 +1,12 @@
 import type { Metadata } from 'next'
 import Image from 'next/image'
 import Link from 'next/link'
-import { site } from '@/config/site'
-import { images } from '@/content/images'
+import { getCopy } from '@/lib/data/copy'
 import { getAllListings } from '@/lib/data/listings'
 import { getProjects } from '@/lib/data/projects'
-import { getTeam } from '@/lib/data/people'
+import { getSettings } from '@/lib/data/settings'
+import { splitPhones, telHref } from '@/content/defaults'
+import { computeStats } from '@/lib/stats'
 import { pageMetadata } from '@/lib/seo'
 import { buttonClasses } from '@/components/ui/button'
 import { CountUp } from '@/components/motion/count-up'
@@ -19,43 +20,22 @@ export const metadata: Metadata = pageMetadata({
   path: '/about',
 })
 
-// From the company's own description of its services, grouped for readability.
-const groups = [
-  { title: 'Build', items: ['Real estate development', 'Construction', 'Architectural design', 'Infrastructure'] },
-  { title: 'Sell and let', items: ['Residential property, local and international', 'Commercial property, local and international', 'Lease and rental services', 'Property management'] },
-  { title: 'Finance', items: ['In-house financing, including Pay Small Small', 'F.Y.L. Company (Fund Your Lifestyle)'] },
-  { title: 'Finish', items: ['Interior and exterior decoration', 'Home automation', 'Furniture'] },
-  { title: 'And more', items: ['Outsourcing management', 'Consulting for manufacturing companies', 'Event planning', 'Transport and car hire'] },
-]
-
-const values = [
-  { title: 'Transparency', text: 'Clear prices, clear terms and honest advice in every transaction.' },
-  { title: 'Security', text: 'Your documents, payments and personal data handled with care.' },
-  { title: 'Excellence', text: 'Quality in what we build, what we list and how we finish it.' },
-  { title: 'Customer focus', text: 'We start from what you need, not from what we have to sell.' },
-]
-
 export default async function AboutPage() {
-  const [team, projects, listings] = await Promise.all([getTeam(), getProjects(), getAllListings()])
-  const available = listings.filter((l) => l.status === 'available')
-  const stats = [
-    { value: new Set(projects.map((p) => p.name.split(':')[0].trim())).size, label: 'Akristal developments' },
-    { value: projects.filter((p) => p.soldOut).reduce((n, p) => n + (p.totalUnits ?? 0), 0), label: 'homes sold at Valid Dreams Estate' },
-    { value: available.length, label: 'homes listed today' },
-    { value: new Set([...available.map((l) => l.market?.country), ...projects.map((p) => p.country)].filter(Boolean)).size, label: 'countries' },
-  ].filter((s) => s.value > 0)
-  const hero = images.placesKigali
+  const [projects, listings, settings, copy] = await Promise.all([getProjects(), getAllListings(), getSettings(), getCopy('about')])
+  const groups = copy.list('what.groups').map((g) => ({ title: g.title, items: g.items.split('\n').map((x) => x.trim()).filter(Boolean) }))
+  const values = copy.list('values.items')
+  const stats = computeStats(settings.home.stats, projects, listings)
+  const offices = settings.contact.offices
 
   return (
     <>
       <section className="relative isolate flex min-h-[60svh] items-end text-white">
-        <Image src={hero.src} alt={hero.alt} fill priority sizes="100vw" className="-z-10 object-cover" />
+        <Image src={copy.t('hero.image')} alt="" fill priority sizes="100vw" className="-z-10 object-cover" />
         <div className="absolute inset-0 -z-10 bg-gradient-to-t from-[rgb(20_12_10/0.85)] via-[rgb(20_12_10/0.35)] to-transparent" />
         <div className="page-x pb-14 pt-28">
-          <h1 className="max-w-3xl font-display text-display-xl font-medium">We build, sell and finish homes</h1>
+          <h1 className="max-w-3xl font-display text-display-xl font-medium">{copy.t('hero.title')}</h1>
           <p className="mt-5 max-w-2xl text-lg text-white/85">
-            The Akristal Group Limited is a real estate and lifestyle company with its head office in Kigali. We develop new neighbourhoods,
-            sell and let homes across Africa and the Gulf, finance them with our own Pay Small Small plans, and furnish them.
+            {copy.t('hero.intro')}
           </p>
         </div>
       </section>
@@ -79,13 +59,13 @@ export default async function AboutPage() {
         <div className="grid gap-12 lg:grid-cols-[1fr_2fr]">
           <div>
             <h2 id="what-title" className="font-display text-display-m font-medium">
-              What we do
+              {copy.t('what.title')}
             </h2>
             <p className="mt-4 max-w-sm text-[0.9375rem] leading-relaxed text-muted">
-              Most clients come to us for a home. Many stay for the rest: the loan, the interiors, the furniture and the move.
+              {copy.t('what.intro')}
             </p>
             <Link href="/projects" className="mt-6 inline-flex border-b border-line-strong pb-0.5 text-[0.9375rem] font-medium hover:border-ink">
-              See our developments
+              See Akristal developments
             </Link>
           </div>
           <div className="grid gap-x-10 gap-y-8 sm:grid-cols-2">
@@ -106,7 +86,7 @@ export default async function AboutPage() {
       <section aria-labelledby="values-title" className="bg-brand text-white section-y">
         <div className="page-x">
           <h2 id="values-title" className="font-display text-display-m font-medium">
-            What we stand for
+            {copy.t('values.title')}
           </h2>
           <dl className="mt-10 grid gap-10 sm:grid-cols-2 lg:grid-cols-4">
             {values.map((v) => (
@@ -119,31 +99,23 @@ export default async function AboutPage() {
         </div>
       </section>
 
-      {team.length > 0 && (
-        <section id="team" aria-labelledby="team-title" className="scroll-mt-24 page-x-wide section-y">
-          <h2 id="team-title" className="font-display text-display-m font-medium">
-            Our team
+      <section aria-labelledby="team-link-title" className="page-x-wide section-y grid gap-6 border-b border-line md:grid-cols-[1fr_auto] md:items-end">
+        <div>
+          <h2 id="team-link-title" className="font-display text-display-m font-medium">
+            {copy.t('team.title')}
           </h2>
-          <ul className="mt-10 grid grid-cols-2 gap-x-4 gap-y-10 sm:grid-cols-3 lg:grid-cols-4 lg:gap-x-6">
-            {team.map((m) => (
-              <li key={m.id}>
-                <div className="relative aspect-[4/5] overflow-hidden rounded-md bg-page-alt">
-                  {m.imageUrl && <Image src={m.imageUrl} alt={`Portrait of ${m.name}`} fill sizes="(min-width: 1024px) 22vw, (min-width: 640px) 30vw, 46vw" className="object-cover object-top" />}
-                </div>
-                <p className="mt-3 text-[0.9375rem] font-medium leading-snug">{m.name}</p>
-                {m.credentials && <p className="text-xs text-muted">{m.credentials}</p>}
-                <p className="mt-1 text-sm text-muted">{m.role}</p>
-              </li>
-            ))}
-          </ul>
-        </section>
-      )}
+          <p className="mt-3 max-w-xl text-base leading-relaxed text-muted">{copy.t('team.intro')}</p>
+        </div>
+        <Link href="/management" className={buttonClasses({ variant: 'outline' })}>
+          Meet the management team
+        </Link>
+      </section>
 
       <section aria-labelledby="offices-title" className="border-t border-line bg-page-alt section-y">
         <div className="page-x grid gap-10 lg:grid-cols-[1fr_2fr]">
           <div>
             <h2 id="offices-title" className="font-display text-display-m font-medium">
-              Offices
+              {copy.t('offices.title')}
             </h2>
             <div className="mt-6 flex flex-wrap gap-3">
               <Link href="/contact" className={buttonClasses()}>
@@ -155,16 +127,16 @@ export default async function AboutPage() {
             </div>
           </div>
           <div className="grid gap-8 sm:grid-cols-3">
-            {site.offices.map((o) => (
-              <address key={o.region} className="not-italic">
+            {offices.map((o) => (
+              <address key={o.region + o.label} className="not-italic">
                 <p className="font-display text-2xl">{o.region}</p>
                 <p className="text-sm text-muted">{o.label}</p>
                 <p className="mt-3 text-[0.9375rem]">{o.address}</p>
-                {o.phones.map((p) => (
-                  <a key={p.href} href={p.href} className="tabular mt-1 block text-[0.9375rem] hover:underline">
-                    {p.label}
-                  </a>
-                ))}
+                {splitPhones(o.phones).map((p) => (
+                    <a key={p} href={telHref(p)} className="tabular mt-1 block text-[0.9375rem] hover:underline">
+                      {p}
+                    </a>
+                  ))}
               </address>
             ))}
           </div>

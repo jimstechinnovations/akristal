@@ -1,6 +1,7 @@
 import type { Metadata } from 'next'
 import Image from 'next/image'
-import { images } from '@/content/images'
+import Link from 'next/link'
+import { getCopy } from '@/lib/data/copy'
 import { getSettings } from '@/lib/data/settings'
 import { pageMetadata } from '@/lib/seo'
 import { buttonClasses } from '@/components/ui/button'
@@ -15,52 +16,21 @@ export const metadata: Metadata = pageMetadata({
   path: '/join',
 })
 
-const reasons = [
-  {
-    title: 'Homes no one else can sell',
-    text: 'Our own developments, from Le Centurium City to Pearl View Residence, are sold through Akristal agents.',
-  },
-  {
-    title: 'Buyers who are ready to talk',
-    text: 'Viewing requests, WhatsApp messages and enquiries from akristal.com go straight to the agent on the listing.',
-  },
-  {
-    title: 'Ways for buyers to pay',
-    text: 'Pay Small Small instalments and mortgage support help your buyers get from "I like it" to a signed agreement.',
-  },
-  {
-    title: 'A profile that works for you',
-    text: 'Your own page with your homes for sale and rent, past sales, contact buttons and verified client reviews.',
-  },
-]
-
-const requirements = [
-  'You live in, and know, the area you want to sell in',
-  'A valid ID, and a real estate licence where the law requires one',
-  'A smartphone with WhatsApp, and time to answer clients the same day',
-  'Honesty with buyers and sellers. Every review on your profile is checked',
-]
-
-const steps = [
-  { title: 'Apply', text: 'Fill in the form below. It takes about five minutes.' },
-  { title: 'Interview', text: 'Meet our sales team in Kigali or by video call.' },
-  { title: 'Onboarding', text: 'Learn our developments, our process and set up your profile page.' },
-  { title: 'Your first listing', text: 'Start with an Akristal development or bring your own client.' },
-]
-
 export const revalidate = 300
 
 export default async function JoinPage() {
-  const { agent_programme: agentProgramme } = await getSettings()
-  const hero = images.placesKigaliHillside
+  const [{ agent_programme: agentProgramme }, copy] = await Promise.all([getSettings(), getCopy('join')])
+  const reasons = copy.list('why.items')
+  const requirements = copy.list('requirements.items').map((r) => r.text)
+  const steps = copy.list('steps.items')
   return (
     <>
       <section className="grid lg:min-h-[78svh] lg:grid-cols-2">
         <div className="flex items-center px-4 py-14 sm:px-10 lg:px-16 xl:px-24">
           <div className="max-w-xl">
-            <h1 className="font-display text-display-l font-medium">Sell homes with Akristal</h1>
+            <h1 className="font-display text-display-l font-medium">{copy.t('hero.title')}</h1>
             <p className="mt-5 text-lg leading-relaxed text-muted">
-              Join an agency that also builds. Sell our own developments, list your clients&apos; homes, and earn more as your sales grow.
+              {copy.t('hero.intro')}
             </p>
             <div className="mt-8 flex flex-wrap gap-3">
               <a href="#apply" className={buttonClasses({ size: 'lg' })}>
@@ -70,16 +40,22 @@ export default async function JoinPage() {
                 See how you earn
               </a>
             </div>
+            <p className="mt-6 text-[0.9375rem] text-muted">
+              Run a broker company?{' '}
+              <Link href="/join/broker" className="font-medium text-ink underline decoration-line-strong underline-offset-4 hover:decoration-ink">
+                Register it with Akristal
+              </Link>
+            </p>
           </div>
         </div>
         <div className="relative min-h-[300px]">
-          <Image src={hero.src} alt={hero.alt} fill priority sizes="(min-width: 1024px) 50vw, 100vw" className="object-cover" />
+          <Image src={copy.t('hero.image')} alt="" fill priority sizes="(min-width: 1024px) 50vw, 100vw" className="object-cover" />
         </div>
       </section>
 
       <section aria-labelledby="why-title" className="page-x section-y">
         <h2 id="why-title" className="max-w-2xl font-display text-display-m font-medium">
-          Why agents choose Akristal
+          {copy.t('why.title')}
         </h2>
         <dl className="mt-12 grid gap-x-12 gap-y-10 md:grid-cols-2">
           {reasons.map((r) => (
@@ -95,10 +71,10 @@ export default async function JoinPage() {
         <div className="page-x">
           <div className="max-w-2xl">
             <h2 id="earn-title" className="font-display text-display-m font-medium">
-              How you earn
+              {copy.t('earn.title')}
             </h2>
             <p className="mt-3 text-base leading-relaxed text-muted">
-              You are paid a share of the commission on every sale you complete. Your share grows with your track record.
+              {copy.t('earn.intro', { commission: agentProgramme.commissionPct })}
             </p>
           </div>
           <div className="mt-10 overflow-x-auto">
@@ -106,7 +82,8 @@ export default async function JoinPage() {
               <thead>
                 <tr className="border-b border-line-strong text-sm text-muted">
                   <th className="py-3 pr-6 font-normal">Level</th>
-                  <th className="py-3 pr-6 font-normal">Your share of commission</th>
+                  <th className="py-3 pr-6 font-normal">Your share of the commission</th>
+                  <th className="py-3 pr-6 font-normal">Of the sale price</th>
                   <th className="py-3 font-normal">How you get there</th>
                 </tr>
               </thead>
@@ -115,6 +92,7 @@ export default async function JoinPage() {
                   <tr key={t.name} className="border-b border-line">
                     <td className="py-4 pr-6 font-medium">{t.name}</td>
                     <td className="tabular py-4 pr-6 text-2xl font-light">{t.share}%</td>
+                    <td className="tabular py-4 pr-6 text-2xl font-light">{+((agentProgramme.commissionPct * t.share) / 100).toFixed(2)}%</td>
                     <td className="py-4 text-[0.9375rem] text-muted">{t.requirement}</td>
                   </tr>
                 ))}
@@ -132,7 +110,7 @@ export default async function JoinPage() {
       <section aria-labelledby="req-title" className="page-x section-y grid gap-14 lg:grid-cols-2">
         <div>
           <h2 id="req-title" className="font-display text-display-m font-medium">
-            What we look for
+            {copy.t('requirements.title')}
           </h2>
           <ul className="mt-8 grid gap-4">
             {requirements.map((r) => (
@@ -144,7 +122,7 @@ export default async function JoinPage() {
           </ul>
         </div>
         <div>
-          <h2 className="font-display text-display-m font-medium">How to join</h2>
+          <h2 className="font-display text-display-m font-medium">{copy.t('steps.title')}</h2>
           {/* A genuine sequence, so numbered. */}
           <ol className="mt-8 grid gap-6">
             {steps.map((s, i) => (
@@ -163,7 +141,7 @@ export default async function JoinPage() {
       {agentProgramme.faqs.length > 0 && (
         <section aria-labelledby="faq-title" className="page-x pb-20">
           <h2 id="faq-title" className="mb-8 font-display text-display-m font-medium">
-            Questions agents ask
+            {copy.t('faq.title')}
           </h2>
           <Faq items={agentProgramme.faqs} />
         </section>
@@ -173,9 +151,9 @@ export default async function JoinPage() {
         <div className="page-x grid gap-12 lg:grid-cols-[1fr_1.4fr]">
           <div>
             <h2 id="apply-title" className="font-display text-display-m font-medium">
-              Apply to join
+              {copy.t('apply.title')}
             </h2>
-            <p className="mt-3 max-w-sm text-base leading-relaxed text-muted">Tell us about yourself and where you sell. We&apos;ll be in touch about an interview.</p>
+            <p className="mt-3 max-w-sm text-base leading-relaxed text-muted">{copy.t('apply.intro')}</p>
           </div>
           <div className="rounded-md border border-line bg-surface p-6 sm:p-8">
             <ApplicationForm />

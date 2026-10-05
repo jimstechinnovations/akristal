@@ -2,16 +2,22 @@ import Link from 'next/link'
 import { financeDefaults } from '@/config/site'
 import { calculateMortgage } from '@/lib/finance/mortgage'
 import { calculateInstallments } from '@/lib/finance/installment'
-import { formatMoney } from '@/lib/format'
+import { formatMoney, formatTenure } from '@/lib/format'
+import type { InstallmentPlan } from '@/lib/data/plans'
+import type { Copy } from '@/lib/data/copy'
 import { buttonClasses } from '@/components/ui/button'
 import { MoneyCountUp } from './money-count-up'
 import { BlueprintVilla } from '@/components/illustrations/blueprint-villa'
 
-export function Finance() {
+export function Finance({ plan: activePlan, copy }: { plan?: InstallmentPlan; copy: Copy }) {
   const d = financeDefaults.RWF
   const price = d.samplePrice
   const mortgage = calculateMortgage({ price, deposit: (price * d.depositPct) / 100, ratePct: d.rate, termYears: d.termYears })
-  const plan = calculateInstallments({ price, depositPct: 30, months: 24, currency: 'RWF' })
+  // Example from the live plan: a 30% deposit (within the plan's range) over three years, or the longest term offered.
+  const tenures = activePlan?.tenures.length ? activePlan.tenures : [24]
+  const depositPct = Math.min(activePlan?.maxDepositPct ?? 30, Math.max(activePlan?.minDepositPct ?? 30, 30))
+  const months = tenures.includes(36) ? 36 : Math.max(...tenures)
+  const plan = calculateInstallments({ price, depositPct, months, currency: 'RWF' })
 
   return (
     <section aria-labelledby="finance-title" className="relative isolate overflow-hidden border-y border-line section-y">
@@ -19,11 +25,10 @@ export function Finance() {
         <div className="grid items-end gap-8 lg:grid-cols-[1fr_minmax(0,460px)]">
         <div className="max-w-2xl">
           <h2 id="finance-title" className="font-display text-display-m font-medium">
-            What a home costs each month
+            {copy.t('finance.title')}
           </h2>
           <p className="mt-3 text-base leading-relaxed text-muted">
-            Two ways to pay for a {formatMoney(price, 'RWF', { compact: true })} home: a bank mortgage, or our own Pay Small Small
-            plan with no bank involved.
+            {copy.t('finance.intro', { price: formatMoney(price, 'RWF', { compact: true }) })}
           </p>
         </div>
           {/* Architect's elevation: the home these numbers pay for. */}
@@ -41,35 +46,36 @@ export function Finance() {
             </p>
             <p className="mt-2 text-sm text-muted">per month, estimated</p>
             <p className="mt-6 max-w-sm text-[0.9375rem] leading-relaxed text-muted">
-              We help you prepare a bank application and guide you from approval to handover.
+              {copy.t('finance.mortgageText')}
             </p>
             <div className="mt-auto pt-8">
               <Link href="/mortgage" className={buttonClasses({ variant: 'outline' })}>
-                Work out your mortgage
+                {copy.t('finance.mortgageCta')}
               </Link>
             </div>
           </article>
 
           <article className="flex flex-col bg-surface p-6 sm:p-10">
             <h3 className="text-lg font-semibold">Pay Small Small</h3>
-            <p className="mt-1 text-sm text-muted">30% deposit, then 24 monthly instalments</p>
+            <p className="mt-1 text-sm text-muted">
+              {depositPct}% deposit, then monthly over {formatTenure(months)}
+            </p>
             <p className="mt-8 text-[2.25rem] font-light leading-none tracking-tight sm:text-[3rem]">
               <MoneyCountUp value={plan.monthly} currency="RWF" />
             </p>
             <p className="mt-2 text-sm text-muted">per month, estimated</p>
             <p className="mt-6 max-w-sm text-[0.9375rem] leading-relaxed text-muted">
-              Pay Akristal directly in monthly instalments on selected homes and developments, without a bank loan.
+              {copy.t('finance.planText', { minDeposit: activePlan?.minDepositPct ?? depositPct, longest: formatTenure(Math.max(...tenures)) })}
             </p>
             <div className="mt-auto pt-8">
               <Link href="/pay-small-small" className={buttonClasses()}>
-                See Pay Small Small plans
+                {copy.t('finance.planCta')}
               </Link>
             </div>
           </article>
         </div>
         <p className="mt-4 text-xs text-muted">
-          Estimates for illustration only, not a loan offer. Rates, deposits and terms depend on the lender or plan and are
-          confirmed in writing.
+          {copy.t('finance.disclaimer')}
         </p>
       </div>
     </section>

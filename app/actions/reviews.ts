@@ -55,3 +55,42 @@ export async function submitReview(agentId: string, agentName: string, _prev: Le
 
   return { status: 'success' }
 }
+
+/** A review of Akristal itself, saved unpublished as a testimonial; an admin publishes it. */
+export async function submitCompanyReview(_prev: LeadState, formData: FormData): Promise<LeadState> {
+  if (formData.get('company_website')) return { status: 'success' }
+
+  const parsed = reviewSchema.safeParse({
+    author_name: formData.get('author_name') ?? '',
+    author_contact: formData.get('author_contact') ?? '',
+    rating: formData.get('rating') ?? 0,
+    body: formData.get('body') ?? '',
+    context: formData.get('context') ?? '',
+  })
+  const fieldErrors: Record<string, string> = {}
+  if (!parsed.success) for (const issue of parsed.error.issues) fieldErrors[String(issue.path[0])] ??= issue.message
+  if (formData.get('consent') !== 'yes') fieldErrors.consent = 'Tick the box so we can publish your review'
+  if (!parsed.success || fieldErrors.consent) return { status: 'error', message: 'Check the highlighted fields.', fieldErrors }
+
+  const { error } = await createPublicClient().from('testimonials').insert({
+    name: parsed.data.author_name,
+    context: parsed.data.context || null,
+    quote: parsed.data.body.slice(0, 600),
+    rating: parsed.data.rating,
+    source: 'site',
+    consent_given: true,
+    is_published: false,
+  })
+  if (error) {
+    console.error('Testimonial insert failed', error)
+    return { status: 'error', message: 'We could not save your review. Please try again.' }
+  }
+
+  await sendEmail({
+    to: forms.notifyEmail,
+    subject: `New client review (${parsed.data.rating}/5) waiting to be published`,
+    html: `<p><strong>${parsed.data.rating}/5</strong> from ${esc(parsed.data.author_name)}${parsed.data.author_contact ? ` (${esc(parsed.data.author_contact)})` : ''}</p><p>${esc(parsed.data.body)}</p><p>Publish it in Admin → Testimonials.</p>`,
+  }).catch(() => undefined)
+
+  return { status: 'success' }
+}

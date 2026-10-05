@@ -2,9 +2,11 @@ import Image from 'next/image'
 import Link from 'next/link'
 import { Bath, BedDouble, Home, Ruler, Video } from 'lucide-react'
 import type { Listing } from '@/lib/data/listings'
-import { formatArea, formatMoney } from '@/lib/format'
+import { formatArea } from '@/lib/format'
 import { cn } from '@/lib/utils'
+import { Price } from '@/components/currency/price'
 import { SaveButton } from './save-button'
+import { ListingStatus } from './listing-status'
 
 export function ListingCard({
   listing,
@@ -57,9 +59,10 @@ export function ListingCard({
 
       <div className="pt-4">
         <p className="tabular text-[1.1875rem] font-semibold tracking-tight text-ink">
-          {formatMoney(listing.price, listing.currency)}
+          <Price amount={listing.price} currency={listing.currency} />
           {listing.listingType === 'rent' && <span className="text-sm font-normal text-muted"> / month</span>}
         </p>
+        <ListingStatus listing={listing} className="mt-2" />
         <h3 className="mt-1 line-clamp-1 text-[0.9375rem] text-ink">
           {/* Stretched link: the whole card is clickable, the save button stays separate. */}
           <Link

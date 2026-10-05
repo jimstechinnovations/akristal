@@ -2,13 +2,18 @@
 // form and save action all read from here, so adding a field is a one-line change.
 // Shared by server and client: no server-only imports.
 
+import { CURRENCY_LIST } from '@/config/currencies'
+import { COPY_PAGES, type CopyPage } from '@/content/copy'
+
 export type Option = { value: string; label: string }
 
 export type SubField = {
   name: string
   label: string
-  type: 'text' | 'textarea' | 'number' | 'image'
+  type: 'text' | 'textarea' | 'number' | 'image' | 'select'
   placeholder?: string
+  /** For type "select" */
+  options?: Option[]
 }
 
 export type Field = {
@@ -24,7 +29,7 @@ export type Field = {
   | { type: 'text' | 'textarea' | 'url' | 'email' | 'date' | 'richtext' }
   | { type: 'number'; step?: number; min?: number; max?: number }
   | { type: 'boolean' }
-  | { type: 'select'; options?: Option[]; optionsFrom?: 'agents' | 'currencies' }
+  | { type: 'select'; options?: Option[]; optionsFrom?: 'agents' | 'brokers' | 'currencies' }
   | { type: 'tags' }
   | { type: 'numberTags' }
   | { type: 'image' }
@@ -36,7 +41,7 @@ export type Field = {
 export type Resource = {
   key: string
   /** Sidebar group */
-  group: 'Website content' | 'Inbox' | 'Settings'
+  group: 'Website content' | 'Website text' | 'Inbox' | 'Brokers & Agents' | 'Settings'
   title: string
   singular: string
   description: string
@@ -56,9 +61,11 @@ export type Resource = {
   revalidate: string[]
   /** Where the record appears on the public site */
   viewHref?: (row: Record<string, unknown>) => string | null
+  /** Settings only: values shown in the form until the admin saves their own */
+  defaults?: Record<string, unknown>
 }
 
-export const CURRENCIES: Option[] = ['RWF', 'NGN', 'USD', 'ZAR', 'AED', 'UGX'].map((c) => ({ value: c, label: c }))
+export const CURRENCIES: Option[] = CURRENCY_LIST.map((c) => ({ value: c.code, label: `${c.code}, ${c.name}` }))
 const opts = (...values: [string, string][]) => values.map(([value, label]) => ({ value, label }))
 
 export const resources: Resource[] = [
@@ -67,7 +74,7 @@ export const resources: Resource[] = [
     group: 'Website content',
     title: 'Developments',
     singular: 'development',
-    description: "Akristal's own projects. These appear first on the home page and on Our developments.",
+    description: "Akristal's own projects and partner projects. These appear first on the home page and on Developments.",
     table: 'projects',
     listColumns: [
       { name: 'cover_image_url', label: '', format: 'image' },
@@ -87,7 +94,7 @@ export const resources: Resource[] = [
       { name: 'title', label: 'Headline', type: 'text', required: true, help: 'Longer announcement title.' },
       { name: 'summary', label: 'Summary', type: 'textarea', help: 'One or two sentences shown on cards and at the top of the page.' },
       { name: 'description', label: 'Full description', type: 'textarea' },
-      { name: 'status', label: 'Visibility', type: 'select', required: true, half: true, options: opts(['draft', 'Draft (hidden)'], ['active', 'Active'], ['completed', 'Completed'], ['sold_out', 'Sold out'], ['archived', 'Archived (hidden)']) },
+      { name: 'status', label: 'Visibility', type: 'select', required: true, half: true, options: opts(['draft', 'Draft (hidden)'], ['active', 'Selling'], ['completed', 'Completed, still selling'], ['sold_out', 'Sold out'], ['archived', 'Archived (hidden)']), help: 'Sold out shows "Sold out" on the sales track; every other visible option shows "Selling".' },
       { name: 'stage', label: 'Stage', type: 'select', half: true, options: opts(['off_plan', 'Off-plan'], ['under_construction', 'Under construction'], ['completed', 'Completed']) },
       { name: 'progress_pct', label: 'Construction progress (%)', type: 'number', min: 0, max: 100, half: true, help: 'Shown while under construction.' },
       { name: 'completion_date', label: 'Completion date', type: 'date', half: true },
@@ -143,7 +150,8 @@ export const resources: Resource[] = [
       { name: 'title', label: 'Title', type: 'text', required: true },
       { name: 'listing_status', label: 'Approval', type: 'select', half: true, options: opts(['draft', 'Draft'], ['pending_approval', 'Waiting for approval'], ['approved', 'Approved (live)'], ['rejected', 'Rejected'], ['suspended', 'Suspended']) },
       { name: 'status', label: 'Availability', type: 'select', half: true, options: opts(['available', 'Available'], ['pending', 'Under offer'], ['sold', 'Sold'], ['rented', 'Rented'], ['suspended', 'Suspended']) },
-      { name: 'agent_id', label: 'Agent', type: 'select', optionsFrom: 'agents', help: 'The agent shown on the listing and on whose profile it appears.' },
+      { name: 'build_stage', label: 'Build stage', type: 'select', half: true, options: opts(['', 'Not shown'], ['off_plan', 'Off-plan'], ['under_construction', 'Under construction'], ['completed', 'Completed']), help: 'Shown on the listing card beside Selling or Sold out.' },
+      { name: 'agent_id', label: 'Agent', type: 'select', optionsFrom: 'agents', help: 'The agent shown on the listing and on whose profile it appears. When empty, the account that posted it is used.' },
       { name: 'is_featured', label: 'Feature on the home page', type: 'boolean' },
       { name: 'latitude', label: 'Latitude', type: 'number', step: 0.000001, half: true, help: 'From Google Maps: right-click the spot and copy the numbers.' },
       { name: 'longitude', label: 'Longitude', type: 'number', step: 0.000001, half: true },
@@ -153,7 +161,7 @@ export const resources: Resource[] = [
   },
   {
     key: 'agents',
-    group: 'Website content',
+    group: 'Brokers & Agents',
     title: 'Agent profiles',
     singular: 'agent profile',
     description: 'What visitors see on Find an agent and each agent page. Create the account first in Users with the role Agent.',
@@ -195,9 +203,9 @@ export const resources: Resource[] = [
   {
     key: 'team',
     group: 'Website content',
-    title: 'Team',
+    title: 'Management team',
     singular: 'team member',
-    description: 'The people shown on the home page and About.',
+    description: 'The people on the Management team page. The short bio opens with "Read more" on each card.',
     table: 'members',
     listColumns: [
       { name: 'image_url', label: '', format: 'image' },
@@ -214,11 +222,12 @@ export const resources: Resource[] = [
       { name: 'name', label: 'Name', type: 'text', required: true, help: 'Credentials can follow in brackets, e.g. Jane Doe (FCA).' },
       { name: 'role', label: 'Role', type: 'text', required: true },
       { name: 'image_url', label: 'Photo', type: 'image' },
-      { name: 'details', label: 'Short bio', type: 'textarea', required: true },
+      { name: 'details', label: 'Bio', type: 'textarea', required: true, help: 'Write it in full: the card shows the first lines and a Read more button.' },
       { name: 'display_order', label: 'Order', type: 'number', half: true },
       { name: 'is_active', label: 'Visible on the website', type: 'boolean' },
     ],
-    revalidate: ['/', '/about'],
+    revalidate: ['/management', '/about'],
+    viewHref: () => '/management',
   },
   {
     key: 'furniture',
@@ -323,7 +332,8 @@ export const resources: Resource[] = [
       { name: 'name', label: 'Name', type: 'text', required: true },
       { name: 'description', label: 'Description', type: 'textarea' },
       { name: 'min_deposit_pct', label: 'Minimum deposit (%)', type: 'number', required: true, min: 0, max: 100, half: true },
-      { name: 'tenures_months', label: 'Tenures (months)', type: 'numberTags', required: true, help: 'e.g. 6, 12, 18, 24.' },
+      { name: 'max_deposit_pct', label: 'Maximum deposit (%)', type: 'number', required: true, min: 0, max: 100, half: true },
+      { name: 'tenures_months', label: 'Tenures (months)', type: 'numberTags', required: true, help: 'e.g. 6, 12, 18, 24, 36, 48, 60. Whole years show as years on the website.' },
       { name: 'premium_pct_by_tenure', label: 'Premium by tenure', type: 'keyValue', valueType: 'number', keyLabel: 'Months', valueLabel: 'Premium %', help: 'Extra % on the balance for each tenure. 0 means no extra cost.' },
       { name: 'eligibility', label: 'Who can apply', type: 'tags' },
       { name: 'terms_url', label: 'Link to full terms', type: 'url' },
@@ -370,12 +380,12 @@ export const resources: Resource[] = [
     group: 'Website content',
     title: 'Testimonials',
     singular: 'testimonial',
-    description: 'Quotes from real clients, shown on the home page. Publish only with the client’s permission.',
+    description: 'Client reviews for "Loved by Akristal clients" on the home page and the Reviews page. Reviews written on the website arrive here unpublished.',
     table: 'testimonials',
     listColumns: [
       { name: 'name', label: 'Client' },
       { name: 'context', label: 'Context' },
-      { name: 'consent_given', label: 'Consent', format: 'boolean' },
+      { name: 'rating', label: 'Stars', format: 'stars' },
       { name: 'is_published', label: 'Published', format: 'boolean' },
     ],
     searchColumns: ['name', 'quote'],
@@ -386,11 +396,152 @@ export const resources: Resource[] = [
       { name: 'name', label: 'Client name', type: 'text', required: true, half: true },
       { name: 'context', label: 'Context', type: 'text', half: true, placeholder: 'e.g. Bought in Kibagabaga, 2026' },
       { name: 'quote', label: 'Quote', type: 'textarea', required: true, help: 'Up to 600 characters.' },
+      { name: 'rating', label: 'Stars (1 to 5)', type: 'number', min: 1, max: 5, half: true },
+      { name: 'source', label: 'Where it was posted', type: 'select', half: true, options: opts(['site', 'Akristal website or in person'], ['google', 'Google']) },
       { name: 'consent_given', label: 'The client agreed to be quoted', type: 'boolean', help: 'Required before publishing.' },
       { name: 'is_published', label: 'Published', type: 'boolean' },
       { name: 'display_order', label: 'Order', type: 'number', half: true },
     ],
+    revalidate: ['/', '/reviews'],
+    viewHref: () => '/reviews',
+  },
+  {
+    key: 'partners',
+    group: 'Website content',
+    title: 'Partners and brands',
+    singular: 'partner',
+    description: 'Logos in "Trusted by leading brands and partners" on the home page. Five or more scroll as a moving strip.',
+    table: 'partners',
+    listColumns: [
+      { name: 'logo_url', label: '', format: 'image' },
+      { name: 'name', label: 'Name' },
+      { name: 'kind', label: 'Type', format: 'status' },
+      { name: 'is_published', label: 'Published', format: 'boolean' },
+      { name: 'display_order', label: 'Order' },
+    ],
+    searchColumns: ['name'],
+    orderBy: { column: 'display_order', ascending: true },
+    canCreate: true,
+    canDelete: true,
+    fields: [
+      { name: 'name', label: 'Name', type: 'text', required: true },
+      { name: 'logo_url', label: 'Logo', type: 'image', help: 'PNG or SVG with a transparent background works best. Without a logo, the name is shown.' },
+      { name: 'website_url', label: 'Website', type: 'url', placeholder: 'https://' },
+      { name: 'kind', label: 'Type', type: 'select', half: true, options: opts(['partner', 'Partner'], ['brand', 'Brand']) },
+      { name: 'display_order', label: 'Order', type: 'number', half: true },
+      { name: 'is_published', label: 'Published', type: 'boolean' },
+    ],
     revalidate: ['/'],
+    viewHref: () => '/',
+  },
+  {
+    key: 'insights',
+    group: 'Website content',
+    title: 'Insights',
+    singular: 'article',
+    description: 'Articles on the Insights page and in "Stay updated with the latest insights" on the home page.',
+    table: 'articles',
+    listColumns: [
+      { name: 'cover_image_url', label: '', format: 'image' },
+      { name: 'title', label: 'Title' },
+      { name: 'category', label: 'Topic', format: 'status' },
+      { name: 'published_at', label: 'Date', format: 'date' },
+      { name: 'is_published', label: 'Published', format: 'boolean' },
+    ],
+    searchColumns: ['title', 'excerpt'],
+    orderBy: { column: 'published_at', ascending: false },
+    canCreate: true,
+    canDelete: true,
+    fields: [
+      { name: 'title', label: 'Title', type: 'text', required: true },
+      { name: 'slug', label: 'Web address', type: 'text', required: true, help: 'Lower-case words with dashes, e.g. buying-off-plan-in-kigali.' },
+      { name: 'excerpt', label: 'Summary', type: 'textarea', help: 'One or two sentences for cards and search results.' },
+      {
+        name: 'body',
+        label: 'Article',
+        type: 'textarea',
+        required: true,
+        help: 'Leave a blank line between paragraphs. Start a line with "## " for a heading and "- " for a list item.',
+      },
+      { name: 'cover_image_url', label: 'Cover image', type: 'image' },
+      { name: 'category', label: 'Topic', type: 'text', half: true, placeholder: 'e.g. Buying, Finance, Interiors' },
+      { name: 'author_name', label: 'Author', type: 'text', half: true, placeholder: 'The Akristal Group' },
+      { name: 'published_at', label: 'Publish date', type: 'date', half: true, help: 'A future date keeps it hidden until then.' },
+      { name: 'is_published', label: 'Published', type: 'boolean' },
+    ],
+    revalidate: ['/', '/insights'],
+    viewHref: (r) => (r.slug ? `/insights/${r.slug as string}` : '/insights'),
+  },
+  {
+    key: 'brokers',
+    group: 'Brokers & Agents',
+    title: 'Broker companies',
+    singular: 'broker company',
+    description: 'Companies on the Brokers page. Only published brokers appear. The example record shows how a filled-in broker looks.',
+    table: 'brokers',
+    listColumns: [
+      { name: 'logo_url', label: '', format: 'image' },
+      { name: 'name', label: 'Company' },
+      { name: 'city', label: 'City' },
+      { name: 'is_verified', label: 'Verified', format: 'boolean' },
+      { name: 'is_published', label: 'Published', format: 'boolean' },
+    ],
+    searchColumns: ['name', 'city', 'contact_name'],
+    orderBy: { column: 'display_order', ascending: true },
+    canCreate: true,
+    canDelete: true,
+    fields: [
+      { name: 'name', label: 'Company name', type: 'text', required: true },
+      { name: 'slug', label: 'Web address', type: 'text', help: 'e.g. sade-properties. Leave empty to use the ID.' },
+      { name: 'logo_url', label: 'Logo', type: 'image' },
+      { name: 'about', label: 'About the company', type: 'textarea' },
+      { name: 'contact_name', label: 'Contact person', type: 'text', half: true },
+      { name: 'registration_number', label: 'Registration number', type: 'text', half: true },
+      { name: 'phone', label: 'Phone', type: 'text', half: true, placeholder: '+234 800 000 0000' },
+      { name: 'whatsapp', label: 'WhatsApp number', type: 'text', half: true, help: 'Digits with country code.' },
+      { name: 'email', label: 'Email', type: 'email', half: true },
+      { name: 'website_url', label: 'Website', type: 'url', half: true },
+      { name: 'address', label: 'Office address', type: 'text' },
+      { name: 'city', label: 'City', type: 'text', half: true },
+      { name: 'country', label: 'Country', type: 'text', half: true },
+      { name: 'areas', label: 'Areas covered', type: 'tags' },
+      { name: 'display_order', label: 'Order', type: 'number', half: true },
+      { name: 'is_verified', label: 'Verified by Akristal', type: 'boolean' },
+      { name: 'is_published', label: 'Published on the website', type: 'boolean' },
+    ],
+    revalidate: ['/', '/brokers'],
+    viewHref: (r) => (r.is_published ? `/brokers/${(r.slug as string) || (r.id as string)}` : null),
+  },
+  {
+    key: 'sales',
+    group: 'Brokers & Agents',
+    title: 'Sales',
+    singular: 'sale',
+    description: 'Record each completed sale against the agent or broker who made it. Totals appear in Performance.',
+    table: 'agent_sales',
+    listColumns: [
+      { name: 'closed_on', label: 'Closed', format: 'date' },
+      { name: 'description', label: 'Home' },
+      { name: 'sale_price', label: 'Price', format: 'money' },
+      { name: 'status', label: 'Status', format: 'status' },
+    ],
+    searchColumns: ['description', 'buyer_name', 'notes'],
+    orderBy: { column: 'closed_on', ascending: false },
+    canCreate: true,
+    canDelete: true,
+    fields: [
+      { name: 'agent_id', label: 'Agent', type: 'select', half: true, optionsFrom: 'agents' },
+      { name: 'broker_id', label: 'Broker company', type: 'select', half: true, optionsFrom: 'brokers' },
+      { name: 'description', label: 'Home sold', type: 'text', required: true, placeholder: 'e.g. 4-bed duplex, Valid Dreams Estate' },
+      { name: 'buyer_name', label: 'Buyer (private)', type: 'text', half: true },
+      { name: 'closed_on', label: 'Date closed', type: 'date', half: true },
+      { name: 'sale_price', label: 'Sale price', type: 'number', half: true },
+      { name: 'currency', label: 'Currency', type: 'select', half: true, optionsFrom: 'currencies' },
+      { name: 'commission_amount', label: 'Commission earned', type: 'number', half: true, help: 'In the same currency.' },
+      { name: 'status', label: 'Status', type: 'select', required: true, half: true, options: opts(['confirmed', 'Confirmed'], ['reported', 'Reported, to check'], ['cancelled', 'Cancelled']) },
+      { name: 'notes', label: 'Internal notes', type: 'textarea' },
+    ],
+    revalidate: [],
   },
   {
     key: 'leads',
@@ -456,23 +607,30 @@ export const resources: Resource[] = [
   {
     key: 'applications',
     group: 'Inbox',
-    title: 'Agent applications',
+    title: 'Applications',
     singular: 'application',
-    description: 'People who applied on Become an Akristal agent.',
+    description: 'Agents who applied on Become an Akristal agent, and broker companies that registered. Publish an accepted broker in Broker companies.',
     table: 'agent_applications',
     listColumns: [
       { name: 'created_at', label: 'Received', format: 'date' },
+      { name: 'applicant_type', label: 'Type', format: 'status' },
       { name: 'full_name', label: 'Name' },
+      { name: 'company_name', label: 'Company' },
       { name: 'city', label: 'City' },
       { name: 'years_experience', label: 'Years' },
       { name: 'status', label: 'Status', format: 'status' },
     ],
-    searchColumns: ['full_name', 'email', 'phone', 'city'],
+    searchColumns: ['full_name', 'company_name', 'email', 'phone', 'city'],
     orderBy: { column: 'created_at', ascending: false },
     canCreate: false,
     canDelete: true,
     fields: [
+      { name: 'applicant_type', label: 'Applying as', type: 'select', readOnly: true, half: true, options: opts(['agent', 'Agent'], ['broker', 'Broker company']) },
+      { name: 'company_name', label: 'Company', type: 'text', readOnly: true, half: true },
       { name: 'full_name', label: 'Name', type: 'text', readOnly: true },
+      { name: 'registration_number', label: 'Company registration', type: 'text', readOnly: true, half: true },
+      { name: 'team_size', label: 'Agents in the company', type: 'number', readOnly: true, half: true },
+      { name: 'website_url', label: 'Company website', type: 'url', readOnly: true },
       { name: 'phone', label: 'Phone', type: 'text', readOnly: true, half: true },
       { name: 'email', label: 'Email', type: 'text', readOnly: true, half: true },
       { name: 'city', label: 'City', type: 'text', readOnly: true, half: true },
@@ -493,7 +651,7 @@ export const resources: Resource[] = [
     group: 'Settings',
     title: 'Home page',
     singular: 'home page settings',
-    description: 'The big headline, tagline and photo at the top of the home page.',
+    description: 'The headline and photo at the top of the home page, the moving ticker, the figures under Akristal Developments, and the review summary.',
     table: 'site_settings',
     settingKey: 'home',
     listColumns: [],
@@ -502,12 +660,39 @@ export const resources: Resource[] = [
     canCreate: false,
     canDelete: false,
     fields: [
-      { name: 'heroTitle', label: 'Headline', type: 'text', required: true, help: 'Shown in capitals, e.g. "Kigali & beyond". Keep it short.' },
+      { name: 'heroTitle', label: 'Headline', type: 'text', required: true, help: 'Shown in capitals, e.g. "Africa & beyond". Keep it short.' },
       { name: 'tagline', label: 'Tagline', type: 'text', required: true },
       { name: 'heroImageUrl', label: 'Hero photo', type: 'image', required: true, help: 'Wide landscape photo, at least 2400 pixels across.' },
       { name: 'heroImageAlt', label: 'Photo description', type: 'text', help: 'Describe the photo for people using screen readers.' },
+      { name: 'tickerItems', label: 'Moving ticker under the photo', type: 'tags', help: 'Short phrases, press Enter after each. Two or more to show the ticker.' },
+      {
+        name: 'stats',
+        label: 'Figures under Akristal Developments',
+        type: 'list',
+        itemLabel: 'figure',
+        fields: [
+          { name: 'label', label: 'Label', type: 'text', placeholder: 'e.g. Properties sold' },
+          {
+            name: 'source',
+            label: 'Number',
+            type: 'select',
+            options: opts(
+              ['developments', 'Count developments automatically'],
+              ['sold', 'Count homes sold automatically'],
+              ['available', 'Count homes for sale and rent automatically'],
+              ['countries', 'Count countries automatically'],
+              ['manual', 'Use the number I type']
+            ),
+          },
+          { name: 'value', label: 'Number to show (overrides the count)', type: 'number' },
+          { name: 'suffix', label: 'After the number', type: 'text', placeholder: 'e.g. + or %' },
+        ],
+      },
+      { name: 'googleRating', label: 'Google rating', type: 'number', step: 0.1, min: 1, max: 5, half: true, help: 'Optional. Shown on the reviews summary instead of the average of published reviews.' },
+      { name: 'googleReviewCount', label: 'Number of Google reviews', type: 'number', half: true },
+      { name: 'googleReviewsUrl', label: 'Link to Google reviews', type: 'url', placeholder: 'https://g.page/...' },
     ],
-    revalidate: ['/'],
+    revalidate: ['/', '/reviews', '/about'],
     viewHref: () => '/',
   },
   {
@@ -515,7 +700,7 @@ export const resources: Resource[] = [
     group: 'Settings',
     title: 'Agent programme',
     singular: 'agent programme',
-    description: 'Commission levels and questions on the Become an Akristal agent page.',
+    description: 'Commission levels and questions on the Become an Akristal agent page. Each level shows both the share of the commission and the share of the sale price.',
     table: 'site_settings',
     settingKey: 'agent_programme',
     listColumns: [],
@@ -524,7 +709,7 @@ export const resources: Resource[] = [
     canCreate: false,
     canDelete: false,
     fields: [
-      { name: 'commissionPct', label: 'Typical commission on a sale (%)', type: 'number', step: 0.1, required: true },
+      { name: 'commissionPct', label: 'Commission Akristal charges on a sale (%)', type: 'number', step: 0.1, required: true, help: 'With 10%, a 40% share is 4% of the sale price.' },
       {
         name: 'tiers',
         label: 'Agent levels',
@@ -550,7 +735,77 @@ export const resources: Resource[] = [
     revalidate: ['/join'],
     viewHref: () => '/join',
   },
+  {
+    key: 'contact',
+    group: 'Settings',
+    title: 'Phone numbers and offices',
+    singular: 'contact details',
+    description: 'Phone numbers in the header (Rwanda and Nigeria by default), the email address, and the offices in the footer, About and Contact pages.',
+    table: 'site_settings',
+    settingKey: 'contact',
+    listColumns: [],
+    searchColumns: [],
+    orderBy: { column: 'key', ascending: true },
+    canCreate: false,
+    canDelete: false,
+    fields: [
+      { name: 'email', label: 'Email address', type: 'email', required: true },
+      { name: 'whatsapp', label: 'Main WhatsApp number', type: 'text', help: 'Digits with country code, no + or spaces, e.g. 250734994909.' },
+      {
+        name: 'headerPhones',
+        label: 'Phone numbers in the header',
+        type: 'list',
+        itemLabel: 'phone number',
+        fields: [
+          { name: 'label', label: 'Country', type: 'text', placeholder: 'e.g. Nigeria' },
+          { name: 'number', label: 'Number', type: 'text', placeholder: '+234 800 000 0000' },
+        ],
+      },
+      {
+        name: 'offices',
+        label: 'Offices',
+        type: 'list',
+        itemLabel: 'office',
+        fields: [
+          { name: 'region', label: 'Country', type: 'text', placeholder: 'e.g. Nigeria' },
+          { name: 'label', label: 'Role', type: 'text', placeholder: 'e.g. Head office, West Africa' },
+          { name: 'address', label: 'Address', type: 'text' },
+          { name: 'phones', label: 'Phone numbers, one per line', type: 'textarea' },
+        ],
+      },
+    ],
+    revalidate: ['/', '/about', '/contact'],
+    viewHref: () => '/contact',
+  },
 ]
+
+/** One "Website text" form per page in content/copy.ts. */
+function copyResource(page: CopyPage): Resource {
+  return {
+    key: `text-${page.key}`,
+    group: 'Website text',
+    title: page.title,
+    singular: page.title.toLowerCase(),
+    description: `${page.description} Clear a field and save to bring back the original wording.`,
+    table: 'site_settings',
+    settingKey: `copy_${page.key}`,
+    listColumns: [],
+    searchColumns: [],
+    orderBy: { column: 'key', ascending: true },
+    canCreate: false,
+    canDelete: false,
+    fields: page.fields.map<Field>((f) =>
+      f.type === 'list'
+        ? { name: f.name, label: f.label, help: f.help, type: 'list', itemLabel: f.itemLabel, fields: f.fields }
+        : { name: f.name, label: f.label, help: f.help, type: f.type }
+    ),
+    revalidate: page.paths,
+    viewHref: () => page.paths[0],
+    defaults: Object.fromEntries(page.fields.map((f) => [f.name, f.default])),
+  }
+}
+
+resources.push(...COPY_PAGES.map(copyResource))
 
 export function getResource(key: string) {
   return resources.find((r) => r.key === key) ?? null

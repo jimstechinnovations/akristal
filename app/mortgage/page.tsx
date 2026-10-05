@@ -1,7 +1,9 @@
 import type { Metadata } from 'next'
 import Image from 'next/image'
 import Link from 'next/link'
-import { images } from '@/content/images'
+import { getCopy } from '@/lib/data/copy'
+import { getInstallmentPlans } from '@/lib/data/plans'
+import { formatTenure } from '@/lib/format'
 import { getLenders } from '@/lib/data/plans'
 import { pageMetadata } from '@/lib/seo'
 import { buttonClasses } from '@/components/ui/button'
@@ -17,49 +19,26 @@ export const metadata: Metadata = pageMetadata({
   path: '/mortgage',
 })
 
-const steps = [
-  { title: 'Check what you can afford', text: 'Use the calculators below to set a realistic budget before you start viewing.' },
-  { title: 'Get pre-qualified', text: 'Send us a few details. We review your figures and tell you which lenders fit.' },
-  { title: 'Choose your home', text: 'Pick a listing or an Akristal development. Your agent negotiates the price.' },
-  { title: 'Approval and handover', text: 'The bank values the home and approves the loan. You sign, pay the deposit and collect the keys.' },
-]
-
-const faqs = [
-  {
-    q: 'How much deposit do I need?',
-    a: 'Banks usually ask for 10% to 30% of the price, depending on the country, the lender and your income. The calculator starts with a typical figure for each currency.',
-  },
-  {
-    q: 'Can I get a mortgage if I live abroad?',
-    a: 'Some lenders offer diaspora mortgages. Tell us where you live and earn in the pre-qualification form and we will point you to the options.',
-  },
-  {
-    q: 'What documents will the bank ask for?',
-    a: 'Usually ID, proof of income (payslips or business statements), bank statements for the last six to twelve months, and the sale agreement for the home.',
-  },
-  {
-    q: 'Mortgage or Pay Small Small?',
-    a: 'A mortgage spreads the cost over many years through a bank. Pay Small Small spreads it over months, paid directly to Akristal, with no bank loan. The right choice depends on your budget and how fast you want to own the home outright.',
-  },
-]
-
 type PageProps = { searchParams: Promise<{ price?: string; currency?: string }> }
 
 export default async function MortgagePage({ searchParams }: PageProps) {
   const sp = await searchParams
   const price = Number(sp.price) > 0 ? Number(sp.price) : undefined
   const currency = sp.currency && /^[A-Z]{3}$/.test(sp.currency) ? sp.currency : 'RWF'
-  const lenders = await getLenders()
-  const hero = images.homesVilla2
+  const [lenders, copy, plans] = await Promise.all([getLenders(), getCopy('mortgage'), getInstallmentPlans()])
+  const tenures = plans[0]?.tenures.length ? plans[0].tenures : [6, 60]
+  const vars = { shortest: formatTenure(Math.min(...tenures)), longest: formatTenure(Math.max(...tenures)) }
+  const steps = copy.list('how.steps')
+  const faqs = copy.list('faq.items', vars).map((f) => ({ q: f.q, a: f.a }))
 
   return (
     <>
       <section className="relative isolate flex min-h-[52svh] items-end text-white">
-        <Image src={hero.src} alt="" fill priority sizes="100vw" className="-z-10 object-cover" />
+        <Image src={copy.t('hero.image')} alt="" fill priority sizes="100vw" className="-z-10 object-cover" />
         <div className="absolute inset-0 -z-10 bg-gradient-to-t from-[rgb(20_12_10/0.8)] via-[rgb(20_12_10/0.35)] to-[rgb(20_12_10/0.1)]" />
         <div className="page-x pb-12 pt-28">
-          <h1 className="max-w-2xl font-display text-display-l font-medium">Buy with a mortgage</h1>
-          <p className="mt-4 max-w-xl text-lg text-white/85">Know your monthly payment before you fall in love with a home, then let us help you through the bank.</p>
+          <h1 className="max-w-2xl font-display text-display-l font-medium">{copy.t('hero.title')}</h1>
+          <p className="mt-4 max-w-xl text-lg text-white/85">{copy.t('hero.intro')}</p>
           <div className="mt-8 flex flex-wrap gap-3">
             <a href="#calculator" className={buttonClasses({ className: 'bg-white text-[#1f1b19] hover:bg-[#edefec]' })}>
               Work out your payment
@@ -73,7 +52,7 @@ export default async function MortgagePage({ searchParams }: PageProps) {
 
       <section aria-labelledby="how-title" className="page-x section-y">
         <h2 id="how-title" className="font-display text-display-m font-medium">
-          How it works
+          {copy.t('how.title')}
         </h2>
         <ol className="mt-10 grid gap-8 sm:grid-cols-2 lg:grid-cols-4">
           {steps.map((s, i) => (
@@ -89,9 +68,9 @@ export default async function MortgagePage({ searchParams }: PageProps) {
       <section id="calculator" aria-labelledby="calc-title" className="scroll-mt-20 border-t border-line section-y">
         <div className="page-x">
           <h2 id="calc-title" className="font-display text-display-m font-medium">
-            Mortgage calculator
+            {copy.t('calculator.title')}
           </h2>
-          <p className="mb-10 mt-3 max-w-2xl text-base text-muted">Change the price, deposit, rate and term to see your monthly payment and the full repayment schedule.</p>
+          <p className="mb-10 mt-3 max-w-2xl text-base text-muted">{copy.t('calculator.intro')}</p>
           <MortgageCalculator initialPrice={price} initialCurrency={currency} />
         </div>
       </section>
@@ -99,9 +78,9 @@ export default async function MortgagePage({ searchParams }: PageProps) {
       <section aria-labelledby="afford-title" className="bg-page-alt section-y">
         <div className="page-x">
           <h2 id="afford-title" className="font-display text-display-m font-medium">
-            How much can you afford?
+            {copy.t('afford.title')}
           </h2>
-          <p className="mb-10 mt-3 max-w-2xl text-base text-muted">A quick guide based on your income, existing repayments and savings.</p>
+          <p className="mb-10 mt-3 max-w-2xl text-base text-muted">{copy.t('afford.intro')}</p>
           <AffordabilityCalculator />
         </div>
       </section>
@@ -109,14 +88,11 @@ export default async function MortgagePage({ searchParams }: PageProps) {
       <section id="prequalify" aria-labelledby="pq-title" className="scroll-mt-20 page-x section-y grid gap-12 lg:grid-cols-[1fr_1.3fr]">
         <div>
           <h2 id="pq-title" className="font-display text-display-m font-medium">
-            Get pre-qualified
+            {copy.t('prequalify.title')}
           </h2>
-          <p className="mt-3 max-w-sm text-base leading-relaxed text-muted">
-            Tell us about your income and deposit. We will tell you which lenders fit and what to prepare. It does not affect your credit
-            record.
-          </p>
+          <p className="mt-3 max-w-sm text-base leading-relaxed text-muted">{copy.t('prequalify.intro')}</p>
           <div className="mt-10 rounded-md bg-page-alt p-6">
-            <h3 className="font-semibold">Our lending partners</h3>
+            <h3 className="font-semibold">{copy.t('lenders.title')}</h3>
             {lenders.length ? (
               <ul className="mt-4 grid gap-4">
                 {lenders.map((l) => (
@@ -134,7 +110,7 @@ export default async function MortgagePage({ searchParams }: PageProps) {
               </ul>
             ) : (
               <p className="mt-2 text-[0.9375rem] text-muted">
-                Partner lenders will be listed here. Until then, send the form and we will point you to lenders that fit your situation.
+                {copy.t('lenders.empty')}
               </p>
             )}
           </div>
@@ -175,9 +151,9 @@ export default async function MortgagePage({ searchParams }: PageProps) {
         <div className="page-x flex flex-col gap-6 py-14 md:flex-row md:items-center md:justify-between">
           <div className="max-w-xl">
             <h2 id="pss-title" className="font-display text-display-s font-medium">
-              Prefer to skip the bank?
+              {copy.t('pss.title')}
             </h2>
-            <p className="mt-2 text-white/80">With Pay Small Small you pay Akristal directly: a deposit, then monthly instalments over up to two years.</p>
+            <p className="mt-2 text-white/80">{copy.t('pss.text', vars)}</p>
           </div>
           <Link href="/pay-small-small" className={buttonClasses({ variant: 'inverse' })}>
             See Pay Small Small
@@ -187,7 +163,7 @@ export default async function MortgagePage({ searchParams }: PageProps) {
 
       <section aria-labelledby="mfaq-title" className="page-x section-y">
         <h2 id="mfaq-title" className="mb-8 font-display text-display-m font-medium">
-          Mortgage questions
+          {copy.t('faq.title')}
         </h2>
         <Faq items={faqs} />
       </section>

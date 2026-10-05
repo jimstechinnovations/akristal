@@ -1,3 +1,5 @@
+import { CURRENCY_CODES } from './currencies'
+
 // Single source for company details, navigation, form submission and finance defaults.
 // Client-editable: change values here, not inside components.
 
@@ -9,7 +11,7 @@ export const site = {
     ? process.env.NEXT_PUBLIC_APP_URL
     : 'https://akristal.com',
   description:
-    'The Akristal Group builds, sells and furnishes homes in Kigali and across Africa. Browse our own developments, homes listed with our agents, and Pay Small Small plans.',
+    'The Akristal Group builds, sells and furnishes homes across Africa and beyond. Browse Akristal developments, homes listed by Akristal Brokers & Agents, and Pay Small Small plans.',
   email: 'info@akristal.com',
   phone: { label: '+250 791 900 316', href: 'tel:+250791900316' },
   // Digits only, international format, no "+" (used for wa.me links).
@@ -54,8 +56,8 @@ export type NavGroup = { label: string; items: NavItem[] }
 export const primaryNav: NavItem[] = [
   { href: '/properties?listing_type=sale', label: 'Buy' },
   { href: '/properties?listing_type=rent', label: 'Rent' },
-  { href: '/projects', label: 'Our developments' },
-  { href: '/agents', label: 'Agents' },
+  { href: '/projects', label: 'Developments' },
+  { href: '/agents', label: 'Brokers & Agents' },
 ]
 
 export const menuGroups: NavGroup[] = [
@@ -65,7 +67,7 @@ export const menuGroups: NavGroup[] = [
       { href: '/properties?listing_type=sale', label: 'Homes for sale' },
       { href: '/properties?listing_type=rent', label: 'Homes for rent' },
       { href: '/properties?view=map', label: 'Map search' },
-      { href: '/projects', label: 'Our developments' },
+      { href: '/projects', label: 'Developments' },
       { href: '/saved', label: 'Saved homes' },
     ],
   },
@@ -88,13 +90,17 @@ export const menuGroups: NavGroup[] = [
     items: [
       { href: '/sell', label: 'Sell or value your home' },
       { href: '/agents', label: 'Find an agent' },
+      { href: '/brokers', label: 'Find a broker' },
       { href: '/join', label: 'Become an Akristal agent' },
+      { href: '/join/broker', label: 'Register a broker company' },
     ],
   },
   {
     label: 'Company',
     items: [
       { href: '/about', label: 'About' },
+      { href: '/management', label: 'Management team' },
+      { href: '/insights', label: 'Insights' },
       { href: '/contact', label: 'Contact' },
       { href: '/support', label: 'Help' },
     ],
@@ -113,8 +119,11 @@ export const forms = {
   notifyEmail: process.env.BUSINESS_EMAIL ?? 'info@akristal.com',
 }
 
-export const currencies = ['RWF', 'NGN', 'USD', 'ZAR', 'AED', 'UGX'] as const
-export type CurrencyCode = (typeof currencies)[number]
+/** Every currency a price can be listed or shown in (see config/currencies.ts). */
+export const currencies: readonly string[] = CURRENCY_CODES
+
+/** Currencies with their own calculator defaults; any other currency starts from the US dollar ones. */
+export type CurrencyCode = 'RWF' | 'NGN' | 'USD' | 'ZAR' | 'AED' | 'UGX'
 
 // Calculator defaults. These are illustrative estimates, not lender offers —
 // confirm real figures with partner banks (PLAN.md Q6) and update here.

@@ -1,6 +1,6 @@
 'use client'
 
-import { createContext, useCallback, useContext, useEffect, useState } from 'react'
+import { createContext, useCallback, useContext, useState } from 'react'
 
 type Theme = 'light' | 'dark'
 
@@ -14,30 +14,17 @@ const ThemeContext = createContext<ThemeContextType | undefined>(undefined)
 
 /**
  * Runs in <head> before first paint so the page never flashes the wrong theme.
- * Saved choice wins; otherwise follow the operating system.
+ * Dark is the house default; a saved choice of light wins.
  */
-export const themeInitScript = `(function(){try{var t=localStorage.getItem('theme');if(!t){t=window.matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light'}if(t==='dark'){document.documentElement.classList.add('dark')}}catch(e){}})();`
+export const themeInitScript = `(function(){try{if(localStorage.getItem('theme')==='light'){document.documentElement.classList.remove('dark')}}catch(e){}})();`
 
 function readInitialTheme(): Theme {
-  if (typeof document === 'undefined') return 'light'
+  if (typeof document === 'undefined') return 'dark'
   return document.documentElement.classList.contains('dark') ? 'dark' : 'light'
 }
 
 export function ThemeProvider({ children }: { children: React.ReactNode }) {
   const [theme, setThemeState] = useState<Theme>(readInitialTheme)
-
-  // Follow OS changes until the person picks a theme themselves.
-  useEffect(() => {
-    const media = window.matchMedia('(prefers-color-scheme: dark)')
-    const onChange = (e: MediaQueryListEvent) => {
-      if (localStorage.getItem('theme')) return
-      const next = e.matches ? 'dark' : 'light'
-      document.documentElement.classList.toggle('dark', next === 'dark')
-      setThemeState(next)
-    }
-    media.addEventListener('change', onChange)
-    return () => media.removeEventListener('change', onChange)
-  }, [])
 
   const setTheme = useCallback((next: Theme) => {
     document.documentElement.classList.toggle('dark', next === 'dark')

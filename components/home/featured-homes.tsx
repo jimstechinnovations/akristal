@@ -1,17 +1,18 @@
 import type { Listing } from '@/lib/data/listings'
+import type { Copy } from '@/lib/data/copy'
 import { SectionHeading } from '@/components/ui/section-heading'
 import { ListingCard } from '@/components/listings/listing-card'
 
-export function FeaturedHomes({ listings }: { listings: Listing[] }) {
+export function FeaturedHomes({ listings, copy }: { listings: Listing[]; copy: Copy }) {
   if (!listings.length) return null
   return (
     <section aria-labelledby="featured-title" className="section-y">
       <div className="page-x-wide">
         <SectionHeading
           id="featured-title"
-          title="Homes listed with our agents"
-          intro="Houses, apartments and land for sale and rent. Every listing is checked by our team before it goes live."
-          action={{ href: '/properties', label: 'See all homes' }}
+          title={copy.t('featured.title')}
+          intro={copy.t('featured.intro')}
+          action={{ href: '/properties', label: copy.t('featured.action') }}
         />
       </div>
       {/* Phones: a swipeable row that shows part of the next card. Larger screens: a grid. */}

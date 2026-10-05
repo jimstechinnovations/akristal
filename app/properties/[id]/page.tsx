@@ -18,6 +18,8 @@ import { AgentCard } from '@/components/listings/agent-card'
 import { ViewingForm } from '@/components/listings/viewing-form'
 import { ListingCard } from '@/components/listings/listing-card'
 import { AccountPanel } from '@/components/listings/account-panel'
+import { ListingStatus } from '@/components/listings/listing-status'
+import { Price, QuickConversions } from '@/components/currency/price'
 import { LocationMap, ShareAndSave, StickyActions } from '@/components/listings/detail-client'
 
 type PageProps = { params: Promise<{ id: string }> }
@@ -50,7 +52,9 @@ export default async function PropertyPage({ params }: PageProps) {
   if (!listing) notFound()
 
   const [similar, agents, plans] = await Promise.all([getSimilarListings(listing), getAgents(), getInstallmentPlans()])
-  const agent = listing.agentId ? agents.find((a) => a.id === listing.agentId) ?? null : null
+  // The assigned agent, or the agent who posted the home from their dashboard.
+  const agentRef = listing.agentId ?? listing.sellerId
+  const agent = agentRef ? agents.find((a) => a.id === agentRef) ?? null : null
   const place = [listing.area, listing.market?.name].filter((v, i, a) => v && a.indexOf(v) === i).join(', ')
   const url = absoluteUrl(`/properties/${listing.id}`)
   const enquiry = `Hello Akristal, I'm interested in "${listing.title}" (${formatMoney(listing.price, listing.currency)}). ${url}`
@@ -154,9 +158,11 @@ export default async function PropertyPage({ params }: PageProps) {
                 <h1 className="mt-1 font-display text-display-m font-medium">{listing.title}</h1>
                 {place && <p className="mt-2 text-[0.9375rem] text-muted">{place}</p>}
                 <p className="tabular mt-5 text-[2rem] font-semibold tracking-tight">
-                  {formatMoney(listing.price, listing.currency)}
+                  <Price amount={listing.price} currency={listing.currency} />
                   {listing.listingType === 'rent' && <span className="text-base font-normal text-muted"> a month</span>}
                 </p>
+                <QuickConversions amount={listing.price} currency={listing.currency} className="tabular mt-1 text-sm text-muted" />
+                <ListingStatus listing={listing} className="mt-4" />
               </div>
               <ShareAndSave id={listing.id} title={listing.title} />
             </header>
@@ -249,7 +255,7 @@ export default async function PropertyPage({ params }: PageProps) {
           </div>
 
           <aside className="lg:sticky lg:top-24 lg:self-start">
-            <AgentCard agent={agent} enquiry={enquiry} />
+            <AgentCard agent={agent} enquiry={enquiry} propertyId={listing.id} />
             <section id="book-viewing" aria-labelledby="viewing-title" className="mt-6 scroll-mt-24 rounded-md border border-line p-5">
               <h2 id="viewing-title" className="text-lg font-semibold">
                 Book a viewing

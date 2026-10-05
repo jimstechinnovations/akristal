@@ -1,3 +1,4 @@
+import { getCopy } from '@/lib/data/copy'
 import type { Metadata } from 'next'
 import Image from 'next/image'
 import Link from 'next/link'
@@ -14,7 +15,7 @@ import { Reveal } from '@/components/motion/reveal'
 import { HillsSkyline } from '@/components/illustrations/hills-skyline'
 
 export const metadata: Metadata = pageMetadata({
-  title: 'Akristal developments',
+  title: 'Akristal Developments',
   description:
     'Homes and neighbourhoods built by The Akristal Group: Le Centurium City in Rwamagana, Pearl View Residence in Kanzenze and more. Buy off-plan or finished, directly from the developer.',
   path: '/projects',
@@ -24,7 +25,7 @@ type PageProps = { searchParams: Promise<{ stage?: string }> }
 
 export default async function ProjectsPage({ searchParams }: PageProps) {
   const { stage } = await searchParams
-  const [projects, user] = await Promise.all([getProjects(), getCurrentUser()])
+  const [projects, user, copy] = await Promise.all([getProjects(), getCurrentUser(), getCopy('projects')])
   const isAdmin = user?.profile?.role === 'admin'
   const active = STAGES.find((s) => s.value === stage)?.value as ProjectStage | undefined
   const shown = active ? projects.filter((p) => p.stage === active) : projects
@@ -45,11 +46,8 @@ export default async function ProjectsPage({ searchParams }: PageProps) {
         <div className="page-x-wide pb-14 pt-12 sm:pb-20 sm:pt-16">
           <div className="flex flex-wrap items-end justify-between gap-6">
             <div className="max-w-2xl">
-              <h1 className="font-display text-display-l font-medium">Akristal developments</h1>
-              <p className="mt-4 text-base leading-relaxed text-muted">
-                Neighbourhoods we plan, build and sell ourselves, from new satellite cities in Rwanda&apos;s Eastern Province to finished
-                homes in Abuja. Buy directly from the developer, off-plan or completed.
-              </p>
+              <h1 className="font-display text-display-l font-medium">{copy.t('hero.title')}</h1>
+              <p className="mt-4 text-base leading-relaxed text-muted">{copy.t('hero.intro')}</p>
             </div>
             {isAdmin && (
               <Link href="/projects/new" className={buttonClasses()}>
@@ -114,7 +112,7 @@ export default async function ProjectsPage({ searchParams }: PageProps) {
                         </Link>
                       </h2>
                       {p.summary && <p className="mt-4 text-[0.9375rem] leading-relaxed text-muted">{p.summary}</p>}
-                      <StageTrack stage={p.stage} progressPct={p.progressPct} tone="default" className="mt-6 max-w-sm" />
+                      <StageTrack stage={p.stage} progressPct={p.progressPct} soldOut={p.soldOut} tone="default" className="mt-6 max-w-md" />
                       <p className="mt-6 text-[0.9375rem] font-medium">
                         {p.soldOut ? 'All homes sold' : p.priceFrom ? <span className="tabular">From {formatMoney(p.priceFrom.amount, p.priceFrom.currency)}</span> : 'Prices on request'}
                       </p>
@@ -129,8 +127,8 @@ export default async function ProjectsPage({ searchParams }: PageProps) {
           </ul>
         ) : (
           <div className="mx-auto max-w-md py-12 text-center">
-            <h2 className="text-lg font-semibold">No developments at this stage right now</h2>
-            <p className="mt-2 text-muted">See every Akristal development instead.</p>
+            <h2 className="text-lg font-semibold">{copy.t('empty.title')}</h2>
+            <p className="mt-2 text-muted">{copy.t('empty.text')}</p>
             <Link href="/projects" className={buttonClasses({ className: 'mt-6' })}>
               Show all developments
             </Link>

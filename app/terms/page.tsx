@@ -24,7 +24,7 @@ export default function Page() {
               <p>
                 By accessing and using the Akristal Group Limited real estate marketplace platform
                 (“”), you accept and agree to be bound by these Terms and Conditions.
-                If you do not agree to these terms, please do not use our services.
+                If you do not agree to these terms, please do not use Akristal services.
               </p>
             </section>
 
@@ -61,7 +61,7 @@ export default function Page() {
               </h3>
               <p>
                 Users may register as Buyers, Sellers, Agents, or Admins. Each role has specific
-                permissions and responsibilities as defined in our platform.
+                permissions and responsibilities as defined on the Akristal platform.
               </p>
             </section>
 
@@ -86,8 +86,8 @@ export default function Page() {
                 4.2 Approval Process
               </h3>
               <p>
-                All property listings are subject to review and approval by our admin team. We
-                reserve the right to reject, suspend, or remove listings that violate our policies
+                All property listings are subject to review and approval by the Akristal admin team. We
+                reserve the right to reject, suspend, or remove listings that violate Akristal policies
                 or applicable laws.
               </p>
             </section>
@@ -135,7 +135,7 @@ export default function Page() {
               <p>
                 The Platform and its content are owned by The Akristal Group and protected by
                 copyright and other intellectual property laws. You may not reproduce, distribute,
-                or create derivative works without our written permission.
+                or create derivative works without written permission from Akristal.
               </p>
             </section>
 

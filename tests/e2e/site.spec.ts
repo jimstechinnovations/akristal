@@ -83,7 +83,7 @@ test('mortgage calculator responds to the deposit', async ({ page }) => {
 
 test('Pay Small Small schedule has one row per month plus the deposit', async ({ page }) => {
   await page.goto('/pay-small-small')
-  await page.getByRole('button', { name: '12 months' }).click()
+  await page.getByRole('button', { name: '1 year', exact: true }).click()
   await expect(page.locator('#planner tbody tr')).toHaveCount(13)
 })
 
@@ -130,4 +130,39 @@ test('SEO basics: sitemap, robots and structured data', async ({ page, request }
   await page.goto('/')
   const ld = await page.locator('script[type="application/ld+json"]').allTextContents()
   expect(ld.join(' ')).toContain('RealEstateAgent')
+})
+
+test('currency picker shows prices in the chosen currency', async ({ page, isMobile }) => {
+  test.skip(isMobile, 'The picker sits in the menu on phones')
+  await page.goto('/properties')
+  const price = page.locator('article p.tabular').first()
+  await page.getByLabel('Show prices in').selectOption('EUR')
+  await expect(price).toContainText('EUR')
+  await expect(price).toContainText('≈')
+})
+
+test('new pages open: brokers, insights, management, reviews, broker registration', async ({ page }) => {
+  for (const [path, heading] of [
+    ['/brokers', /Brokers/],
+    ['/insights', /Insights/],
+    ['/management', /Management team/],
+    ['/reviews', /reviews/i],
+    ['/join/broker', /broker company/i],
+  ] as const) {
+    await page.goto(path)
+    await expect(page.getByRole('heading', { level: 1 })).toContainText(heading)
+  }
+  await page.goto('/insights')
+  await page.locator('article h3 a').first().click()
+  await expect(page.getByRole('heading', { level: 1 })).toBeVisible()
+  await expect(page.locator('article h2').first()).toBeVisible()
+})
+
+test('Pay Small Small offers up to five years and a bank part', async ({ page }) => {
+  await page.goto('/pay-small-small')
+  await page.getByRole('button', { name: '5 years', exact: true }).click()
+  await expect(page.locator('#planner tbody tr')).toHaveCount(61)
+  await page.getByLabel(/My bank can lend me part/).check()
+  await page.getByLabel('Amount from your bank').fill('10000000')
+  await expect(page.getByText('From your bank', { exact: true })).toBeVisible()
 })

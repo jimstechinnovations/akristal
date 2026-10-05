@@ -13,6 +13,11 @@ export async function agentOptions(): Promise<Option[]> {
   return ((data ?? []) as { id: string; full_name: string | null; email: string }[]).map((a) => ({ value: a.id, label: a.full_name || a.email }))
 }
 
+export async function brokerOptions(): Promise<Option[]> {
+  const { data } = await (await db()).from('brokers').select('id, name').order('name')
+  return ((data ?? []) as { id: string; name: string }[]).map((b) => ({ value: b.id, label: b.name }))
+}
+
 export async function listRecords(resource: Resource, opts: { q?: string; status?: string; page?: number }) {
   const pageSize = 50
   const page = Math.max(1, opts.page ?? 1)

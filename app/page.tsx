@@ -2,55 +2,59 @@ import type { Metadata } from 'next'
 import { site } from '@/config/site'
 import { getAllListings, getFeaturedListings, getMarketCounts, getPropertyTypes } from '@/lib/data/listings'
 import { getFeaturedProjects, getProjects } from '@/lib/data/projects'
-import { getAgents, getTeam } from '@/lib/data/people'
-import { getSettings, getTestimonials } from '@/lib/data/settings'
+import { getAgents } from '@/lib/data/people'
+import { getBrokers } from '@/lib/data/brokers'
+import { getArticles } from '@/lib/data/articles'
+import { getPartners, getSettings, getTestimonials } from '@/lib/data/settings'
+import { getInstallmentPlans } from '@/lib/data/plans'
+import { getCopy } from '@/lib/data/copy'
+import { computeStats } from '@/lib/stats'
 import { Hero } from '@/components/home/hero'
-import { Developments, type Stat } from '@/components/home/developments'
+import { Ticker } from '@/components/home/ticker'
+import { Developments } from '@/components/home/developments'
 import { FeaturedHomes } from '@/components/home/featured-homes'
 import { Markets } from '@/components/home/markets'
+import { HomesMarquee } from '@/components/home/homes-marquee'
 import { InteriorsTeaser } from '@/components/home/interiors-teaser'
 import { Finance } from '@/components/home/finance'
 import { People } from '@/components/home/people'
-import { SellCta } from '@/components/home/sell-cta'
+import { Partners } from '@/components/home/partners'
 import { Testimonials } from '@/components/home/testimonials'
+import { Insights } from '@/components/home/insights'
+import { SellCta } from '@/components/home/sell-cta'
 
 // Public data only (cookie-free client), so the page is static and refreshed every 10 minutes.
 export const revalidate = 600
 
 export const metadata: Metadata = {
-  title: { absolute: 'The Akristal Group | Homes in Kigali and across Africa' },
+  title: { absolute: 'The Akristal Group | Homes across Africa and beyond' },
   description: site.description,
   alternates: { canonical: '/' },
 }
 
 export default async function HomePage() {
-  const [allProjects, featuredProjects, listings, featured, marketCounts, propertyTypes, agents, team, settings, testimonials] = await Promise.all([
-    getProjects(),
-    getFeaturedProjects(3),
-    getAllListings(),
-    getFeaturedListings(6),
-    getMarketCounts(),
-    getPropertyTypes(),
-    getAgents(),
-    getTeam(),
-    getSettings(),
-    getTestimonials(),
-  ])
+  const [allProjects, featuredProjects, listings, featured, marketCounts, propertyTypes, agents, brokers, settings, testimonials, partners, articles, plans, copy] =
+    await Promise.all([
+      getProjects(),
+      getFeaturedProjects(3),
+      getAllListings(),
+      getFeaturedListings(6),
+      getMarketCounts(),
+      getPropertyTypes(),
+      getAgents(),
+      getBrokers(),
+      getSettings(),
+      getTestimonials(),
+      getPartners(),
+      getArticles(),
+      getInstallmentPlans(),
+      getCopy('home'),
+    ])
 
-  // Every figure below is counted from live data; nothing is estimated or padded.
+  // Figures come from live data unless the admin typed a number (Admin → Home page → Figures).
+  const stats = computeStats(settings.home.stats, allProjects, listings)
   const available = listings.filter((l) => l.status === 'available')
-  const developments = new Set(allProjects.map((p) => p.name.split(':')[0].trim())).size
-  const homesSold = allProjects.filter((p) => p.soldOut).reduce((n, p) => n + (p.totalUnits ?? 0), 0)
-  const countries = new Set([
-    ...available.map((l) => l.market?.country).filter(Boolean),
-    ...allProjects.map((p) => p.country).filter(Boolean),
-  ]).size
-  const stats: Stat[] = [
-    developments > 0 && { value: developments, label: 'Akristal developments, built or underway' },
-    homesSold > 0 && { value: homesSold, label: 'homes sold at Valid Dreams Estate, Abuja' },
-    available.length > 0 && { value: available.length, label: 'homes for sale and rent today' },
-    countries > 0 && { value: countries, label: 'countries where we sell and let homes' },
-  ].filter(Boolean) as Stat[]
+  const featuredIds = new Set(featured.map((l) => l.id))
 
   const areaSuggestions = Array.from(
     new Set([...marketCounts.map((m) => m.market.name), ...available.map((l) => l.area).filter(Boolean)])
@@ -66,14 +70,23 @@ export default async function HomePage() {
         areaSuggestions={areaSuggestions}
         propertyTypes={propertyTypes}
       />
-      <Developments projects={featuredProjects} stats={stats} />
-      <FeaturedHomes listings={featured} />
-      <Markets markets={marketCounts} />
-      <InteriorsTeaser />
-      <Finance />
-      <People team={team} agents={agents} />
-      <Testimonials items={testimonials} />
-      <SellCta propertyTypes={propertyTypes} />
+      <Ticker items={settings.home.tickerItems} />
+      <Developments projects={featuredProjects} stats={stats} copy={copy} />
+      <FeaturedHomes listings={featured} copy={copy} />
+      <Markets markets={marketCounts} copy={copy} />
+      {/* The moving strip skips homes already shown in the featured grid. */}
+      <HomesMarquee listings={available.filter((l) => !featuredIds.has(l.id))} copy={copy} />
+      <InteriorsTeaser copy={copy} />
+      <Finance plan={plans[0]} copy={copy} />
+      <People agents={agents} brokers={brokers} copy={copy} />
+      <Partners partners={partners} copy={copy} />
+      <Testimonials
+        copy={copy}
+        items={testimonials}
+        summary={{ rating: settings.home.googleRating, count: settings.home.googleReviewCount, url: settings.home.googleReviewsUrl }}
+      />
+      <Insights articles={articles} copy={copy} />
+      <SellCta propertyTypes={propertyTypes} copy={copy} />
     </>
   )
 }

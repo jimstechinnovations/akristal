@@ -285,3 +285,53 @@
 .ak-line-art :where(path, line, rect, circle) {
   vector-effect: non-scaling-stroke;
 }
+
+/* ─── Marquee: two copies of the content scroll by half their width, so the loop is seamless ─── */
+@keyframes ak-marquee {
+  from { transform: translateX(0); }
+  to { transform: translateX(-50%); }
+}
+.ak-marquee-track {
+  animation: ak-marquee var(--marquee-duration, 40s) linear infinite;
+}
+.ak-marquee-track[data-reverse] {
+  animation-direction: reverse;
+}
+.ak-marquee:hover .ak-marquee-track,
+.ak-marquee:focus-within .ak-marquee-track {
+  animation-play-state: paused;
+}
+.ak-marquee-mask {
+  mask-image: linear-gradient(to right, transparent, #000 6%, #000 94%, transparent);
+}
+
+/* ─── WhatsApp button: a double-beat pulse with a spreading green glow ─── */
+@keyframes ak-heartbeat {
+  0%, 100% { transform: scale(1); }
+  12% { transform: scale(1.12); }
+  24% { transform: scale(1); }
+  36% { transform: scale(1.09); }
+  52% { transform: scale(1); }
+}
+@keyframes ak-glow {
+  0% { box-shadow: 0 0 0 0 rgb(37 211 102 / 0.6), 0 8px 24px rgb(37 211 102 / 0.35); }
+  70% { box-shadow: 0 0 0 18px rgb(37 211 102 / 0), 0 8px 24px rgb(37 211 102 / 0.35); }
+  100% { box-shadow: 0 0 0 0 rgb(37 211 102 / 0), 0 8px 24px rgb(37 211 102 / 0.35); }
+}
+.ak-heartbeat {
+  animation: ak-heartbeat 1.8s ease-in-out infinite, ak-glow 1.8s ease-out infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ak-marquee-track,
+  .ak-heartbeat {
+    animation: none;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  /* No movement: let people scroll the row themselves instead. */
+  .ak-marquee {
+    overflow-x: auto;
+    mask-image: none;
+  }
+}

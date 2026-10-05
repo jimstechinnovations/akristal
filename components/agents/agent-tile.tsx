@@ -5,6 +5,7 @@ import type { Agent } from '@/lib/data/people'
 import { whatsappLink } from '@/lib/whatsapp'
 import { plural } from '@/lib/format'
 import { Stars } from './stars'
+import { TrackedLink } from './tracked-link'
 
 export function AgentInitials({ name, className }: { name: string; className?: string }) {
   const initials = name
@@ -72,16 +73,18 @@ export function AgentTile({ agent, listingCount }: { agent: Agent; listingCount:
       </dl>
 
       <div className="relative z-10 mt-auto flex gap-2 pt-5">
-        <a
+        <TrackedLink
+          channel="whatsapp"
+          agentId={agent.id}
           href={whatsappLink(`Hello ${agent.name}, I found you on the Akristal website.`, agent.whatsapp ?? agent.phone ?? undefined)}
           className="inline-flex h-10 flex-1 items-center justify-center gap-2 rounded-sm bg-[#1f6f4a] text-sm font-medium text-white hover:bg-[#185c3d]"
         >
           <MessageCircle aria-hidden className="size-4" /> WhatsApp
-        </a>
+        </TrackedLink>
         {phone && (
-          <a href={`tel:${phone}`} className="inline-flex h-10 flex-1 items-center justify-center gap-2 rounded-sm border border-line-strong text-sm font-medium hover:border-ink">
+          <TrackedLink channel="call" agentId={agent.id} href={`tel:${phone}`} className="inline-flex h-10 flex-1 items-center justify-center gap-2 rounded-sm border border-line-strong text-sm font-medium hover:border-ink">
             <Phone aria-hidden className="size-4" /> Call
-          </a>
+          </TrackedLink>
         )}
       </div>
     </article>

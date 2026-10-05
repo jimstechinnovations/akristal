@@ -17,7 +17,7 @@ export function LeadForm({
   context = {},
   submitLabel,
   successTitle = 'Thank you, we have your request',
-  successText = 'Someone from our team will contact you shortly.',
+  successText = 'Someone from the Akristal team will contact you shortly.',
   className,
   children,
 }: {

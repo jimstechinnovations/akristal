@@ -4,9 +4,10 @@ import type { MarketCount } from '@/lib/data/listings'
 import { marketImage } from '@/lib/data/markets'
 import { plural } from '@/lib/format'
 import { cn } from '@/lib/utils'
+import type { Copy } from '@/lib/data/copy'
 import { SectionHeading } from '@/components/ui/section-heading'
 
-export function Markets({ markets }: { markets: MarketCount[] }) {
+export function Markets({ markets, copy }: { markets: MarketCount[]; copy: Copy }) {
   const withImages = markets.filter((m) => marketImage(m.market))
   const others = markets.filter((m) => !marketImage(m.market))
   if (!withImages.length) return null
@@ -18,8 +19,8 @@ export function Markets({ markets }: { markets: MarketCount[] }) {
       <div className="page-x-wide">
         <SectionHeading
           id="markets-title"
-          title="Where we work"
-          intro="Our head office is in Kigali. Our agents also list homes in Nigeria, the Gulf and across the region."
+          title={copy.t('markets.title')}
+          intro={copy.t('markets.intro')}
         />
         <ul className="mt-10 grid auto-rows-[220px] grid-cols-2 gap-3 sm:auto-rows-[260px] lg:grid-cols-4 lg:gap-4">
           {ordered.map(({ market, count }, i) => {

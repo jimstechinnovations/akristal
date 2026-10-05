@@ -127,7 +127,7 @@ export default async function ProjectPage({ params }: PageProps) {
           </Link>
           <h1 className="mt-3 font-display text-display-xl font-medium">{project.name}</h1>
           <p className="mt-3 text-base text-white/85">{project.location}</p>
-          <StageTrack stage={project.stage} progressPct={project.progressPct} className="mt-8 max-w-md" />
+          <StageTrack stage={project.stage} progressPct={project.progressPct} soldOut={project.soldOut} className="mt-8 max-w-lg" />
           <div className="mt-8 flex flex-wrap gap-3">
             <a href="#enquire" className={buttonClasses({ className: 'bg-white text-[#1f1b19] hover:bg-[#edefec]' })}>
               {project.soldOut ? 'Ask about similar homes' : 'Register your interest'}

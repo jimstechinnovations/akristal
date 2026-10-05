@@ -50,6 +50,12 @@ export function formatArea(sqm: number | null | undefined): string | null {
   return `${Math.round(sqm).toLocaleString('en')} m²`
 }
 
+/** 6 → "6 months", 12 → "1 year", 18 → "18 months", 60 → "5 years" */
+export function formatTenure(months: number) {
+  if (months >= 12 && months % 12 === 0) return plural(months / 12, 'year')
+  return plural(months, 'month')
+}
+
 export function plural(n: number, one: string, many = `${one}s`) {
   return `${n} ${n === 1 ? one : many}`
 }

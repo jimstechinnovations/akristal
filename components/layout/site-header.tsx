@@ -4,11 +4,13 @@ import { Suspense, useCallback, useEffect, useState } from 'react'
 import Link from 'next/link'
 import { usePathname, useSearchParams } from 'next/navigation'
 import { Menu, MessageCircle, Phone } from 'lucide-react'
-import { primaryNav, site } from '@/config/site'
+import { primaryNav } from '@/config/site'
+import { telHref, type HeaderPhone } from '@/content/defaults'
 import { useAuthUser } from '@/lib/use-auth-user'
 import { whatsappLink } from '@/lib/whatsapp'
 import { cn } from '@/lib/utils'
 import { Logo } from '@/components/brand/logo'
+import { CurrencyPicker } from '@/components/currency/currency-picker'
 import { AccountMenu } from './account-menu'
 import { MenuSheet } from './menu-sheet'
 import { ThemeToggle } from './theme-toggle'
@@ -16,7 +18,11 @@ import { ThemeToggle } from './theme-toggle'
 /** Routes that open with a full-bleed hero; the header sits transparently over it until scrolled. */
 const OVERLAY_ROUTES = ['/']
 
-export function SiteHeader() {
+// Short code beside each header phone number; unknown countries use their first two letters.
+const CODES: Record<string, string> = { rwanda: 'RW', nigeria: 'NG', 'south africa': 'ZA', kenya: 'KE', uganda: 'UG', ghana: 'GH', tanzania: 'TZ', uae: 'AE', dubai: 'AE', 'united arab emirates': 'AE', 'united kingdom': 'UK', uk: 'UK', usa: 'US' }
+const countryCode = (label: string) => CODES[label.trim().toLowerCase()] ?? label.trim().slice(0, 2).toUpperCase()
+
+export function SiteHeader({ phones }: { phones: HeaderPhone[] }) {
   const pathname = usePathname() ?? '/'
   const { user, signOut } = useAuthUser()
   const [scrolled, setScrolled] = useState(false)
@@ -57,16 +63,26 @@ export function SiteHeader() {
           <Logo tone={overlay ? 'light' : 'default'} priority className="lg:justify-self-center" />
 
           <div className="flex items-center justify-end gap-1">
-            <a
-              href={site.phone.href}
-              className={cn(
-                'hidden h-10 items-center gap-2 rounded-sm px-3 text-sm xl:inline-flex',
-                overlay ? 'hover:bg-white/10' : 'hover:bg-page-alt'
-              )}
-            >
-              <Phone aria-hidden className="size-4" />
-              {site.phone.label}
-            </a>
+            {phones.length > 0 && (
+              // Every office number the admin lists (Rwanda and Nigeria by default), stacked to save width.
+              <div className="hidden items-center gap-2 pr-2 xl:flex">
+                <Phone aria-hidden className="size-4 shrink-0" />
+                <ul aria-label="Call Akristal" className="grid">
+                  {phones.slice(0, 3).map((p) => (
+                    <li key={p.number}>
+                      <a href={telHref(p.number)} className="tabular text-[0.8125rem] leading-[1.15rem] hover:underline">
+                        <span className={cn('mr-1.5 inline-block w-[1.6rem] text-[0.6875rem] uppercase', overlay ? 'text-white/70' : 'text-muted')}>
+                          {countryCode(p.label)}
+                        </span>
+                        <span className="sr-only">{p.label}: </span>
+                        {p.number}
+                      </a>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            )}
+            <CurrencyPicker className="hidden md:inline-flex" />
             <a
               href={whatsappLink('Hello Akristal, I would like some help finding a property.')}
               aria-label="Chat with Akristal on WhatsApp"
@@ -114,7 +130,7 @@ export function SiteHeader() {
       {/* Pages without a hero start below the fixed header. */}
       {!hasHero && <div aria-hidden className="h-16 sm:h-20" />}
 
-      <MenuSheet open={menuOpen} onClose={closeMenu} user={user} onSignOut={signOut} />
+      <MenuSheet open={menuOpen} onClose={closeMenu} user={user} onSignOut={signOut} phones={phones} />
     </>
   )
 }

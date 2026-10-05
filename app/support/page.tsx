@@ -25,8 +25,8 @@ const groups: { title: string; items: { q: string; a: string }[] }[] = [
   {
     title: 'Selling and listing',
     items: [
-      { q: 'How do I list a property?', a: 'Create an account as a seller or agent, open your dashboard and choose New listing. Add the details and photos, then submit it for approval. Or ask us for a valuation and an agent will list it for you.' },
-      { q: 'How long does approval take?', a: 'Listings are reviewed by our team before they go live, typically within 24 to 48 hours. You get an email when a listing is approved or needs changes.' },
+      { q: 'How do I list a property?', a: 'Create an account as a seller or agent, open your dashboard and choose New listing. Add the details and photos, then submit it for approval. Or ask for a valuation and an Akristal broker or agent will list it for you.' },
+      { q: 'How long does approval take?', a: 'Listings are reviewed by the Akristal team before they go live, typically within 24 to 48 hours. You get an email when a listing is approved or needs changes.' },
       { q: 'Can I edit a listing after it is live?', a: 'Yes, from your seller or agent dashboard. Significant changes may need approval again.' },
     ],
   },
@@ -34,7 +34,7 @@ const groups: { title: string; items: { q: string; a: string }[] }[] = [
     title: 'Payments and accounts',
     items: [
       { q: 'What payment methods are accepted?', a: 'Bank transfer, with your bank statement attached as proof of payment. Other methods are planned.' },
-      { q: 'How is my account verified?', a: 'Our team verifies accounts. Complete your profile with accurate details to speed this up.' },
+      { q: 'How is my account verified?', a: 'The Akristal team verifies accounts. Complete your profile with accurate details to speed this up.' },
     ],
   },
 ]

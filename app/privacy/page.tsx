@@ -24,7 +24,7 @@ export default function Page() {
               <p>
                 The Akristal Group (“” “” or “”) is committed to protecting your
                 privacy. This Privacy Policy explains how we collect, use, disclose, and safeguard
-                your information when you use our real estate marketplace platform.
+                your information when you use the Akristal real estate platform.
               </p>
             </section>
 
@@ -50,7 +50,7 @@ export default function Page() {
                 2.2 Automatically Collected Information
               </h3>
               <p>
-                We automatically collect certain information when you use our platform:
+                We automatically collect certain information when you use the Akristal platform:
               </p>
               <ul>
                 <li>Device information and IP address</li>
@@ -66,7 +66,7 @@ export default function Page() {
               </h2>
               <p>We use collected information to:</p>
               <ul>
-                <li>Provide, maintain, and improve our services</li>
+                <li>Provide, maintain, and improve Akristal services</li>
                 <li>Process transactions and manage payments</li>
                 <li>Facilitate communication between users</li>
                 <li>Send administrative information and updates</li>
@@ -91,11 +91,11 @@ export default function Page() {
                 </li>
                 <li>
                   <strong>Service providers:</strong> We may share data with trusted third-party
-                  service providers who assist in operating our platform
+                  service providers who assist in operating the Akristal platform
                 </li>
                 <li>
                   <strong>Legal requirements:</strong> We may disclose information if required by
-                  law or to protect our rights and safety
+                  law or to protect the rights and safety of Akristal and its users
                 </li>
                 <li>
                   <strong>Business transfers:</strong> Information may be transferred in connection
@@ -145,7 +145,7 @@ export default function Page() {
                 8. Children’s Privacy
               </h2>
               <p>
-                Our platform is not intended for users under the age of 18. We do not knowingly
+                The Akristal platform is not intended for users under the age of 18. We do not knowingly
                 collect personal information from children.
               </p>
             </section>
@@ -184,7 +184,7 @@ export default function Page() {
               <h2>Forms, WhatsApp and saved homes</h2>
               <p>
                 When you request a viewing, a valuation, a consultation, a Pay Small Small plan or a mortgage call-back, or when you
-                message an agent, we store the details you enter so our team can reply. When you write an agent review, we store your
+                message an agent, we store the details you enter so the Akristal team can reply. When you write an agent review, we store your
                 name, rating and comments; your phone or email is never shown. When you apply to become an agent, we store your
                 application to assess it.
               </p>

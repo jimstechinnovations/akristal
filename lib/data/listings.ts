@@ -29,16 +29,19 @@ export type Listing = {
   createdAt: string | null
   coords: { lat: number; lng: number; approximate: boolean } | null
   agentId: string | null
+  /** The account that posted it: an agent posting from their dashboard is the seller */
+  sellerId: string | null
+  buildStage: 'off_plan' | 'under_construction' | 'completed' | null
 }
 
 const LISTING_COLUMNS =
-  'id, title, price, currency, listing_type, status, property_type_id, agent_id, city, district, address, country, latitude, longitude, bedrooms, bathrooms, size_sqm, parking_spaces, cover_image_url, image_urls, video_urls, is_featured, created_at'
+  'id, title, price, currency, listing_type, status, property_type_id, agent_id, city, district, address, country, latitude, longitude, bedrooms, bathrooms, size_sqm, parking_spaces, cover_image_url, image_urls, video_urls, is_featured, created_at, seller_id, build_stage'
 
 type ListingRow = Pick<
   Row,
   | 'id' | 'title' | 'price' | 'currency' | 'listing_type' | 'status' | 'property_type_id' | 'city' | 'district' | 'address'
   | 'country' | 'bedrooms' | 'bathrooms' | 'size_sqm' | 'parking_spaces' | 'cover_image_url' | 'image_urls' | 'video_urls'
-  | 'is_featured' | 'created_at' | 'latitude' | 'longitude' | 'agent_id'
+  | 'is_featured' | 'created_at' | 'latitude' | 'longitude' | 'agent_id' | 'seller_id' | 'build_stage'
 >
 
 export function toListing(row: ListingRow, typeNames: Map<string, string>): Listing {
@@ -66,6 +69,8 @@ export function toListing(row: ListingRow, typeNames: Map<string, string>): List
     createdAt: row.created_at,
     coords: coordinatesFor(row, market, row.id),
     agentId: row.agent_id,
+    sellerId: row.seller_id,
+    buildStage: (row.build_stage as Listing['buildStage']) ?? null,
   }
 }
 
@@ -148,7 +153,7 @@ export const getListing = cache(async (id: string): Promise<ListingDetail | null
   const [{ data }, names] = await Promise.all([
     supabase
       .from('properties')
-      .select(`${LISTING_COLUMNS}, description, amenities, features, year_built, seller_id`)
+      .select(`${LISTING_COLUMNS}, description, amenities, features, year_built`)
       .eq('id', id)
       .eq('listing_status', 'approved')
       .maybeSingle(),
@@ -181,7 +186,8 @@ export async function getSimilarListings(listing: Listing, limit = 3): Promise<L
 
 /** Everything listed with an agent, split the way the profile tabs show it. */
 export async function getAgentListings(agentId: string) {
-  const mine = (await getAllListings()).filter((l) => l.agentId === agentId)
+  // Homes assigned to the agent, and homes they posted themselves from their dashboard.
+  const mine = (await getAllListings()).filter((l) => l.agentId === agentId || (!l.agentId && l.sellerId === agentId))
   return {
     forSale: mine.filter((l) => l.status === 'available' && l.listingType === 'sale'),
     forRent: mine.filter((l) => l.status === 'available' && l.listingType === 'rent'),

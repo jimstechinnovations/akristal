@@ -156,7 +156,7 @@ export function Hero({ title, tagline, image, markets, areaSuggestions, property
             </Link>
             <Link href="/projects" className="inline-flex h-11 items-center justify-center gap-2 hover:bg-white">
               <Building2 aria-hidden className="size-4 text-[#5c231b]" />
-              Our developments
+              Developments
             </Link>
           </div>
         </motion.div>

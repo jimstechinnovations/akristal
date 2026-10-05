@@ -69,8 +69,10 @@ export type Database = {
       agent_applications: {
         Row: {
           admin_notes: string | null
+          applicant_type: string
           areas: string | null
           city: string | null
+          company_name: string | null
           created_at: string
           cv_url: string | null
           email: string
@@ -81,15 +83,20 @@ export type Database = {
           licence_number: string | null
           message: string | null
           phone: string
+          registration_number: string | null
           specialties: string[]
           status: string
+          team_size: number | null
           updated_at: string
+          website_url: string | null
           years_experience: number | null
         }
         Insert: {
           admin_notes?: string | null
+          applicant_type?: string
           areas?: string | null
           city?: string | null
+          company_name?: string | null
           created_at?: string
           cv_url?: string | null
           email: string
@@ -100,15 +107,20 @@ export type Database = {
           licence_number?: string | null
           message?: string | null
           phone: string
+          registration_number?: string | null
           specialties?: string[]
           status?: string
+          team_size?: number | null
           updated_at?: string
+          website_url?: string | null
           years_experience?: number | null
         }
         Update: {
           admin_notes?: string | null
+          applicant_type?: string
           areas?: string | null
           city?: string | null
+          company_name?: string | null
           created_at?: string
           cv_url?: string | null
           email?: string
@@ -119,9 +131,12 @@ export type Database = {
           licence_number?: string | null
           message?: string | null
           phone?: string
+          registration_number?: string | null
           specialties?: string[]
           status?: string
+          team_size?: number | null
           updated_at?: string
+          website_url?: string | null
           years_experience?: number | null
         }
         Relationships: []
@@ -197,6 +212,210 @@ export type Database = {
           },
         ]
       }
+      agent_sales: {
+        Row: {
+          agent_id: string | null
+          broker_id: string | null
+          buyer_name: string | null
+          closed_on: string
+          commission_amount: number | null
+          created_at: string
+          currency: string
+          description: string | null
+          id: string
+          notes: string | null
+          project_id: string | null
+          property_id: string | null
+          sale_price: number | null
+          status: string
+          updated_at: string
+        }
+        Insert: {
+          agent_id?: string | null
+          broker_id?: string | null
+          buyer_name?: string | null
+          closed_on?: string
+          commission_amount?: number | null
+          created_at?: string
+          currency?: string
+          description?: string | null
+          id?: string
+          notes?: string | null
+          project_id?: string | null
+          property_id?: string | null
+          sale_price?: number | null
+          status?: string
+          updated_at?: string
+        }
+        Update: {
+          agent_id?: string | null
+          broker_id?: string | null
+          buyer_name?: string | null
+          closed_on?: string
+          commission_amount?: number | null
+          created_at?: string
+          currency?: string
+          description?: string | null
+          id?: string
+          notes?: string | null
+          project_id?: string | null
+          property_id?: string | null
+          sale_price?: number | null
+          status?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "agent_sales_agent_id_fkey"
+            columns: ["agent_id"]
+            isOneToOne: false
+            referencedRelation: "agent_directory"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "agent_sales_agent_id_fkey"
+            columns: ["agent_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "agent_sales_broker_id_fkey"
+            columns: ["broker_id"]
+            isOneToOne: false
+            referencedRelation: "brokers"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "agent_sales_project_id_fkey"
+            columns: ["project_id"]
+            isOneToOne: false
+            referencedRelation: "projects"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "agent_sales_property_id_fkey"
+            columns: ["property_id"]
+            isOneToOne: false
+            referencedRelation: "properties"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      articles: {
+        Row: {
+          author_name: string
+          body: string
+          category: string | null
+          cover_image_url: string | null
+          created_at: string
+          excerpt: string | null
+          id: string
+          is_published: boolean
+          published_at: string
+          slug: string
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          author_name?: string
+          body: string
+          category?: string | null
+          cover_image_url?: string | null
+          created_at?: string
+          excerpt?: string | null
+          id?: string
+          is_published?: boolean
+          published_at?: string
+          slug: string
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          author_name?: string
+          body?: string
+          category?: string | null
+          cover_image_url?: string | null
+          created_at?: string
+          excerpt?: string | null
+          id?: string
+          is_published?: boolean
+          published_at?: string
+          slug?: string
+          title?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      brokers: {
+        Row: {
+          about: string | null
+          address: string | null
+          areas: string[]
+          city: string | null
+          contact_name: string | null
+          country: string | null
+          created_at: string
+          display_order: number
+          email: string | null
+          id: string
+          is_published: boolean
+          is_verified: boolean
+          logo_url: string | null
+          name: string
+          phone: string | null
+          registration_number: string | null
+          slug: string | null
+          updated_at: string
+          website_url: string | null
+          whatsapp: string | null
+        }
+        Insert: {
+          about?: string | null
+          address?: string | null
+          areas?: string[]
+          city?: string | null
+          contact_name?: string | null
+          country?: string | null
+          created_at?: string
+          display_order?: number
+          email?: string | null
+          id?: string
+          is_published?: boolean
+          is_verified?: boolean
+          logo_url?: string | null
+          name: string
+          phone?: string | null
+          registration_number?: string | null
+          slug?: string | null
+          updated_at?: string
+          website_url?: string | null
+          whatsapp?: string | null
+        }
+        Update: {
+          about?: string | null
+          address?: string | null
+          areas?: string[]
+          city?: string | null
+          contact_name?: string | null
+          country?: string | null
+          created_at?: string
+          display_order?: number
+          email?: string | null
+          id?: string
+          is_published?: boolean
+          is_verified?: boolean
+          logo_url?: string | null
+          name?: string
+          phone?: string | null
+          registration_number?: string | null
+          slug?: string | null
+          updated_at?: string
+          website_url?: string | null
+          whatsapp?: string | null
+        }
+        Relationships: []
+      }
       categories: {
         Row: {
           color: string | null
@@ -260,6 +479,65 @@ export type Database = {
             columns: ["parent_id"]
             isOneToOne: false
             referencedRelation: "categories"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      contact_events: {
+        Row: {
+          agent_id: string | null
+          broker_id: string | null
+          channel: string
+          created_at: string
+          id: string
+          property_id: string | null
+          source_path: string | null
+        }
+        Insert: {
+          agent_id?: string | null
+          broker_id?: string | null
+          channel: string
+          created_at?: string
+          id?: string
+          property_id?: string | null
+          source_path?: string | null
+        }
+        Update: {
+          agent_id?: string | null
+          broker_id?: string | null
+          channel?: string
+          created_at?: string
+          id?: string
+          property_id?: string | null
+          source_path?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "contact_events_agent_id_fkey"
+            columns: ["agent_id"]
+            isOneToOne: false
+            referencedRelation: "agent_directory"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "contact_events_agent_id_fkey"
+            columns: ["agent_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "contact_events_broker_id_fkey"
+            columns: ["broker_id"]
+            isOneToOne: false
+            referencedRelation: "brokers"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "contact_events_property_id_fkey"
+            columns: ["property_id"]
+            isOneToOne: false
+            referencedRelation: "properties"
             referencedColumns: ["id"]
           },
         ]
@@ -473,6 +751,7 @@ export type Database = {
           eligibility: string[]
           id: string
           is_active: boolean
+          max_deposit_pct: number
           min_deposit_pct: number
           name: string
           premium_pct_by_tenure: Json
@@ -487,6 +766,7 @@ export type Database = {
           eligibility?: string[]
           id?: string
           is_active?: boolean
+          max_deposit_pct?: number
           min_deposit_pct: number
           name: string
           premium_pct_by_tenure?: Json
@@ -501,6 +781,7 @@ export type Database = {
           eligibility?: string[]
           id?: string
           is_active?: boolean
+          max_deposit_pct?: number
           min_deposit_pct?: number
           name?: string
           premium_pct_by_tenure?: Json
@@ -814,6 +1095,42 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      partners: {
+        Row: {
+          created_at: string
+          display_order: number
+          id: string
+          is_published: boolean
+          kind: string
+          logo_url: string | null
+          name: string
+          updated_at: string
+          website_url: string | null
+        }
+        Insert: {
+          created_at?: string
+          display_order?: number
+          id?: string
+          is_published?: boolean
+          kind?: string
+          logo_url?: string | null
+          name: string
+          updated_at?: string
+          website_url?: string | null
+        }
+        Update: {
+          created_at?: string
+          display_order?: number
+          id?: string
+          is_published?: boolean
+          kind?: string
+          logo_url?: string | null
+          name?: string
+          updated_at?: string
+          website_url?: string | null
+        }
+        Relationships: []
       }
       payments: {
         Row: {
@@ -1311,6 +1628,7 @@ export type Database = {
           approved_by: string | null
           bathrooms: number | null
           bedrooms: number | null
+          build_stage: string | null
           category_id: string | null
           city: string
           country: string | null
@@ -1353,6 +1671,7 @@ export type Database = {
           approved_by?: string | null
           bathrooms?: number | null
           bedrooms?: number | null
+          build_stage?: string | null
           category_id?: string | null
           city: string
           country?: string | null
@@ -1395,6 +1714,7 @@ export type Database = {
           approved_by?: string | null
           bathrooms?: number | null
           bedrooms?: number | null
+          build_stage?: string | null
           category_id?: string | null
           city?: string
           country?: string | null
@@ -1703,6 +2023,8 @@ export type Database = {
           is_published: boolean
           name: string
           quote: string
+          rating: number | null
+          source: string
         }
         Insert: {
           consent_given?: boolean
@@ -1713,6 +2035,8 @@ export type Database = {
           is_published?: boolean
           name: string
           quote: string
+          rating?: number | null
+          source?: string
         }
         Update: {
           consent_given?: boolean
@@ -1723,6 +2047,8 @@ export type Database = {
           is_published?: boolean
           name?: string
           quote?: string
+          rating?: number | null
+          source?: string
         }
         Relationships: []
       }

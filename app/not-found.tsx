@@ -31,7 +31,7 @@ export default function NotFound() {
           Homes for rent
         </Link>
         <Link href="/projects" className="underline underline-offset-4">
-          Our developments
+          Akristal Developments
         </Link>
         <Link href="/" className="underline underline-offset-4">
           Home page

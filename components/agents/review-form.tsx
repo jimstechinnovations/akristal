@@ -2,7 +2,7 @@
 
 import { useActionState, useState } from 'react'
 import { AlertCircle, CheckCircle2, Star } from 'lucide-react'
-import { submitReview } from '@/app/actions/reviews'
+import { submitCompanyReview, submitReview } from '@/app/actions/reviews'
 import type { LeadState } from '@/lib/leads'
 import { cn } from '@/lib/utils'
 import { Button } from '@/components/ui/button'
@@ -10,8 +10,10 @@ import { fieldClasses } from '@/components/ui/input'
 
 const LABELS = ['', 'Poor', 'Fair', 'Good', 'Very good', 'Excellent']
 
-export function ReviewForm({ agentId, agentName }: { agentId: string; agentName: string }) {
-  const [state, action, pending] = useActionState<LeadState, FormData>(submitReview.bind(null, agentId, agentName), { status: 'idle' })
+/** Reviews an agent (with agentId) or Akristal as a whole (without). Both wait for an admin before they show. */
+export function ReviewForm({ agentId, agentName }: { agentId?: string; agentName: string }) {
+  const company = !agentId
+  const [state, action, pending] = useActionState<LeadState, FormData>(company ? submitCompanyReview : submitReview.bind(null, agentId, agentName), { status: 'idle' })
   const [rating, setRating] = useState(0)
   const [hover, setHover] = useState(0)
   const errors = state.status === 'error' ? state.fieldErrors ?? {} : {}
@@ -22,7 +24,9 @@ export function ReviewForm({ agentId, agentName }: { agentId: string; agentName:
       <div role="status" className="rounded-md border border-line bg-page-alt p-6">
         <CheckCircle2 aria-hidden className="size-6 text-success" />
         <p className="mt-3 font-semibold">Thank you. Your review is pending moderation.</p>
-        <p className="mt-1 text-sm text-muted">We check every review before it appears on {agentName}&apos;s profile.</p>
+        <p className="mt-1 text-sm text-muted">
+          {company ? 'We check every review before it appears on the website.' : <>We check every review before it appears on {agentName}&apos;s profile.</>}
+        </p>
       </div>
     )
   }
@@ -56,7 +60,7 @@ export function ReviewForm({ agentId, agentName }: { agentId: string; agentName:
         <label htmlFor="r-body" className="text-sm">
           Your experience
         </label>
-        <textarea {...field('body')} rows={4} className={cn(fieldClasses, 'h-auto py-2.5')} placeholder={`What was it like working with ${agentName}?`} />
+        <textarea {...field('body')} rows={4} className={cn(fieldClasses, 'h-auto py-2.5')} placeholder={company ? 'What was it like buying, renting or building with Akristal?' : `What was it like working with ${agentName}?`} />
         {error('body')}
       </div>
       <div className="grid gap-4 sm:grid-cols-2">
@@ -69,7 +73,7 @@ export function ReviewForm({ agentId, agentName }: { agentId: string; agentName:
         </div>
         <div className="grid gap-1.5">
           <label htmlFor="r-context" className="text-sm">
-            What did they help with? <span className="text-muted">(optional)</span>
+            {company ? 'What did Akristal help with?' : 'What did they help with?'} <span className="text-muted">(optional)</span>
           </label>
           <input {...field('context')} className={fieldClasses} placeholder="e.g. Bought in Kibagabaga, 2026" />
         </div>
@@ -80,6 +84,15 @@ export function ReviewForm({ agentId, agentName }: { agentId: string; agentName:
         </label>
         <input {...field('author_contact')} className={fieldClasses} />
       </div>
+      {company && (
+        <div className="grid gap-1">
+          <label className="flex items-start gap-2.5 text-sm">
+            <input type="checkbox" name="consent" value="yes" className="mt-0.5 size-4 accent-[var(--color-primary)]" aria-describedby={errors.consent ? 'r-consent-error' : undefined} />
+            Akristal may publish this review on the website with my name.
+          </label>
+          {error('consent')}
+        </div>
+      )}
       <div aria-hidden className="absolute -left-[9999px] h-px w-px overflow-hidden">
         <input name="company_website" tabIndex={-1} autoComplete="off" />
       </div>
