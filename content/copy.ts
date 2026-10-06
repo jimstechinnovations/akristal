@@ -51,7 +51,7 @@ export const COPY_PAGES: CopyPage[] = [
     description: 'Wording that appears on every page.',
     paths: ['/'],
     fields: [
-      text('footer.blurb', 'Footer: about Akristal', 'The Akristal Group Limited builds homes in Africa, lists homes across Africa, the Gulf and beyond, and finishes them with Akristal interiors and furniture.'),
+      text('footer.blurb', 'Footer: about Akristal', 'Homes built in Africa, listed across Africa, the Gulf and beyond, and finished with Akristal interiors and furniture.'),
       text('whatsapp.message', 'WhatsApp button: first message', 'Hello Akristal, I would like some help.'),
       text('whatsapp.label', 'WhatsApp button: name read by screen readers', 'Chat with Akristal on WhatsApp'),
     ],

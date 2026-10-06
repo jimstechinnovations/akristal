@@ -16,7 +16,7 @@ export function SiteFooter({ contact, blurb }: { contact: SiteSettings['contact'
       <div className="page-x-wide pt-16 lg:pt-20">
         <div className="grid gap-12 lg:grid-cols-[1.1fr_2fr]">
           <div className="max-w-sm">
-            <Logo full={site.legalName} />
+            <Logo />
             <p className="mt-6 text-[0.9375rem] leading-relaxed text-muted">
               {blurb}
             </p>
