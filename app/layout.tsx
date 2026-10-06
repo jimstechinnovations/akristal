@@ -31,8 +31,8 @@ const sans = Instrument_Sans({
 export const metadata: Metadata = {
   metadataBase: new URL(site.url),
   title: {
-    default: 'The Akristal Group | Homes across Africa and beyond',
-    template: '%s | The Akristal Group',
+    default: 'The Akristal Group (TAG) | Homes across Africa and beyond',
+    template: '%s | The Akristal Group (TAG)',
   },
   description: site.description,
   applicationName: site.name,
@@ -51,13 +51,13 @@ export const metadata: Metadata = {
     type: 'website',
     locale: 'en_GB',
     siteName: site.name,
-    title: 'The Akristal Group | Homes across Africa and beyond',
+    title: 'The Akristal Group (TAG) | Homes across Africa and beyond',
     description: site.description,
     url: '/',
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'The Akristal Group | Homes across Africa and beyond',
+    title: 'The Akristal Group (TAG) | Homes across Africa and beyond',
     description: site.description,
   },
   formatDetection: { telephone: false },

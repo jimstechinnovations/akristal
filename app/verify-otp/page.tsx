@@ -9,6 +9,7 @@ import { Input } from '@/components/ui/input'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import toast from 'react-hot-toast'
 import { getErrorMessage } from '@/lib/utils'
+import { dashboardHref, type Role } from '@/lib/account-links'
 
 export default function VerifyOTPPage() {
   return (
@@ -163,15 +164,7 @@ function VerifyOTPPageInner() {
         const userRole = profileData?.role
         
         // Use router.replace for client-side navigation
-        if (userRole === 'admin') {
-          router.replace('/admin')
-        } else if (userRole === 'agent') {
-          router.replace('/agent/dashboard')
-        } else if (userRole === 'seller') {
-          router.replace('/seller/dashboard')
-        } else {
-          router.replace('/buyer/dashboard')
-        }
+        router.replace(dashboardHref((userRole as Role | undefined) ?? 'buyer'))
       }
     } catch (error: unknown) {
       toast.error(getErrorMessage(error) || 'Invalid verification code. Please try again.')
@@ -301,7 +294,7 @@ function VerifyOTPPageInner() {
 
           <div className="mt-6 text-center space-y-2">
             <p className="text-sm text-gray-600 dark:text-gray-400">
-              Didn't receive the code?
+              Didn&apos;t receive the code?
             </p>
             <Button
               type="button"

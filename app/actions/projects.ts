@@ -147,6 +147,8 @@ export async function createProject(formData: FormData) {
     }
 
     revalidatePath('/projects')
+    revalidatePath('/')
+    revalidatePath('/about')
     revalidatePath(`/projects/${project.id}`)
 
     return { success: true, project }
@@ -255,6 +257,8 @@ export async function updateProject(id: string, formData: FormData) {
     }
 
     revalidatePath('/projects')
+    revalidatePath('/')
+    revalidatePath('/about')
     revalidatePath(`/projects/${id}`)
 
     return { success: true, project }
@@ -286,6 +290,8 @@ export async function deleteProject(id: string) {
     if (error) throw error
 
     revalidatePath('/projects')
+    revalidatePath('/')
+    revalidatePath('/about')
     revalidatePath(`/projects/${id}`)
 
     return { success: true }

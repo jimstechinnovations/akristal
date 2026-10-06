@@ -27,7 +27,7 @@ import { SellCta } from '@/components/home/sell-cta'
 export const revalidate = 600
 
 export const metadata: Metadata = {
-  title: { absolute: 'The Akristal Group | Homes across Africa and beyond' },
+  title: { absolute: 'The Akristal Group (TAG) | Homes across Africa and beyond' },
   description: site.description,
   alternates: { canonical: '/' },
 }

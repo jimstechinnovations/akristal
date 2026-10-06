@@ -10,6 +10,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import toast from 'react-hot-toast'
 import { getErrorMessage } from '@/lib/utils'
 import { Eye, EyeOff } from 'lucide-react'
+import { dashboardHref, type Role } from '@/lib/account-links'
 
 export default function LoginPage() {
   const router = useRouter()
@@ -33,16 +34,8 @@ export default function LoginPage() {
             .eq('id', user.id)
             .single()
           
-          const userRole = (profile as { role?: string } | null)?.role
-          if (userRole === 'admin') {
-            router.replace('/admin')
-          } else if (userRole === 'agent') {
-            router.replace('/agent/dashboard')
-          } else if (userRole === 'seller') {
-            router.replace('/seller/dashboard')
-          } else {
-            router.replace('/buyer/dashboard')
-          }
+          const userRole = (profile as { role?: Role } | null)?.role
+          router.replace(dashboardHref(userRole ?? 'buyer'))
         } else if (user && !user.email_confirmed_at) {
           // User logged in but not confirmed - redirect to verify
           router.replace(`/verify-otp?email=${encodeURIComponent(user.email || '')}`)
@@ -208,13 +201,7 @@ export default function LoginPage() {
         const userRole = profileData?.role
         
         // Use router.replace for client-side navigation
-        if (userRole === 'admin') {
-          router.replace('/admin')
-        } else if (userRole === 'seller' || userRole === 'agent') {
-          router.replace('/seller/dashboard')
-        } else {
-          router.replace('/buyer/dashboard')
-        }
+        router.replace(dashboardHref((userRole as Role | undefined) ?? 'buyer'))
       }
     } catch (error: unknown) {
       // Only show error if it's not email confirmation related (already handled above)
@@ -294,7 +281,7 @@ export default function LoginPage() {
               </Link>
             </p>
             <p className="text-center text-sm text-gray-600 dark:text-gray-400">
-              Don't have an account?{' '}
+              Don&apos;t have an account?{' '}
               <Link href="/register" className="text-primary hover:underline dark:text-primary">
                 Sign up
               </Link>

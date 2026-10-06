@@ -14,6 +14,8 @@ const nextConfig: NextConfig = {
       { protocol: 'https', hostname: 'images.unsplash.com' },
     ],
   },
+  // Broker logos are uploaded through a server action (up to 2 MB plus form fields).
+  experimental: { serverActions: { bodySizeLimit: '3mb' } },
   // Leaflet optionally requires `canvas` (a Node-only package); point it at an empty module.
   turbopack: {
     resolveAlias: { canvas: './lib/canvas-stub.js' },

@@ -10,7 +10,7 @@ import { ContactFields, Field, LeadForm } from '@/components/forms/lead-form'
 
 export const metadata: Metadata = pageMetadata({
   title: 'Contact us',
-  description: 'Call, WhatsApp or email The Akristal Group, or visit the Akristal head offices in Kigali (East Africa) and Abuja (West Africa).',
+  description: 'Call, WhatsApp or email The Akristal Group (TAG), or visit the Akristal head offices in Kigali (East Africa) and Abuja (West Africa).',
   path: '/contact',
 })
 

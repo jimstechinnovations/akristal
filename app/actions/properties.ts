@@ -11,7 +11,7 @@ type PropertyUpdate = Database['public']['Tables']['properties']['Update']
 
 export async function createProperty(formData: FormData) {
   try {
-    const user = await requireRole(['seller', 'agent', 'admin'])
+    const user = await requireRole(['seller', 'agent', 'broker', 'admin'])
     const supabase = await createClient()
 
     const isAdmin = user.profile.role === 'admin'
@@ -72,6 +72,9 @@ export async function createProperty(formData: FormData) {
     revalidatePath('/properties')
     revalidatePath('/seller/dashboard')
     revalidatePath('/admin/properties')
+    // Home and About show live counts of homes for sale, sold and countries.
+    revalidatePath('/')
+    revalidatePath('/about')
 
     return { success: true, property }
   } catch (error: unknown) {
@@ -201,6 +204,9 @@ export async function updateProperty(id: string, formData: FormData) {
     revalidatePath(`/properties/${id}`)
     revalidatePath('/seller/dashboard')
     revalidatePath('/admin/properties')
+    // Home and About show live counts of homes for sale, sold and countries.
+    revalidatePath('/')
+    revalidatePath('/about')
 
     return { success: true, property }
   } catch (error: unknown) {
@@ -248,6 +254,9 @@ export async function deleteProperty(id: string) {
     revalidatePath('/properties')
     revalidatePath('/seller/dashboard')
     revalidatePath('/admin/properties')
+    // Home and About show live counts of homes for sale, sold and countries.
+    revalidatePath('/')
+    revalidatePath('/about')
 
     return { success: true }
   } catch (error: unknown) {
@@ -294,6 +303,9 @@ export async function approveProperty(id: string) {
     // await sendListingApprovalEmail(...)
 
     revalidatePath('/admin/properties')
+    // Home and About show live counts of homes for sale, sold and countries.
+    revalidatePath('/')
+    revalidatePath('/about')
     revalidatePath(`/properties/${id}`)
 
     return { success: true, property }
@@ -340,6 +352,9 @@ export async function rejectProperty(id: string, reason: string) {
     // await sendListingApprovalEmail(...)
 
     revalidatePath('/admin/properties')
+    // Home and About show live counts of homes for sale, sold and countries.
+    revalidatePath('/')
+    revalidatePath('/about')
 
     return { success: true, property }
   } catch (error: unknown) {

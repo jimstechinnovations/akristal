@@ -4,7 +4,7 @@ import { LegalHeader, Prose } from '@/components/ui/prose'
 
 export const metadata: Metadata = pageMetadata({
   title: 'Privacy policy',
-  description: 'How The Akristal Group collects, uses and protects your personal information.',
+  description: 'How The Akristal Group (TAG) collects, uses and protects your personal information.',
   path: '/privacy',
 })
 
@@ -22,7 +22,7 @@ export default function Page() {
                 1. Introduction
               </h2>
               <p>
-                The Akristal Group (“” “” or “”) is committed to protecting your
+                The Akristal Group (TAG) (“” “” or “”) is committed to protecting your
                 privacy. This Privacy Policy explains how we collect, use, disclose, and safeguard
                 your information when you use the Akristal real estate platform.
               </p>

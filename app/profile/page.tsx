@@ -5,6 +5,7 @@ import { Button } from '@/components/ui/button'
 import { User, Mail, Phone, Shield, Building2, UserCheck, Heart } from 'lucide-react'
 import Link from 'next/link'
 import type { Database } from '@/types/database'
+import { dashboardHref } from '@/lib/account-links'
 
 type Profile = Database['public']['Tables']['profiles']['Row']
 
@@ -27,6 +28,8 @@ const getRoleLabel = (role: string) => {
       return 'Administrator'
     case 'agent':
       return 'Agent'
+    case 'broker':
+      return 'Broker company'
     case 'seller':
       return 'Seller'
     default:
@@ -76,10 +79,7 @@ export default async function ProfilePage() {
   }
 
   const getDashboardLink = () => {
-    const role = userProfile?.role
-    if (role === 'admin') return '/admin'
-    if (role === 'seller' || role === 'agent') return '/seller/dashboard'
-    return '/buyer/dashboard'
+    return dashboardHref(userProfile?.role ?? 'buyer')
   }
 
   return (

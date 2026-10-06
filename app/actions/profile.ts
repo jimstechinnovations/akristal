@@ -3,6 +3,8 @@
 import { createClient } from '@supabase/supabase-js'
 import { createClient as createServerClient } from '@/lib/supabase/server'
 import type { Database, UserRole } from '@/types/database'
+import { forms } from '@/config/site'
+import { sendEmail } from '@/lib/email'
 
 // Create admin client using service role key (bypasses RLS)
 function createAdminClient() {
@@ -30,7 +32,8 @@ export async function createProfile(
   email: string,
   fullName: string | null,
   phone: string | null,
-  role: Exclude<UserRole, 'admin'>
+  role: Exclude<UserRole, 'admin'>,
+  companyName?: string
 ) {
   try {
     const adminClient = createAdminClient()
@@ -52,6 +55,24 @@ export async function createProfile(
     if (error) {
       console.error('Profile creation error:', error)
       return { error: error.message }
+    }
+
+    // A broker account owns a company page. It stays unpublished until an admin approves it.
+    if (role === 'broker' && companyName?.trim()) {
+      const name = companyName.trim().slice(0, 160)
+      const base = name.toLowerCase().normalize('NFKD').replace(/[^a-z0-9\s-]/g, '').trim().replace(/\s+/g, '-').slice(0, 60)
+      const { error: brokerError } = await (adminClient as unknown as { from: (t: string) => any }) // eslint-disable-line @typescript-eslint/no-explicit-any
+        .from('brokers')
+        .upsert(
+          { owner_id: userId, name, slug: `${base || 'broker'}-${userId.slice(0, 6)}`, contact_name: fullName?.trim() || null, phone: phone?.trim() || null, email: email.trim(), is_published: false },
+          { onConflict: 'owner_id' }
+        )
+      if (brokerError) console.error('Broker company creation error:', brokerError)
+      await sendEmail({
+        to: forms.notifyEmail,
+        subject: `New broker account: ${name}`,
+        html: `<p><strong>${name.replace(/[<>&]/g, '')}</strong> created a broker account (${email.replace(/[<>&]/g, '')}).</p><p>Review and publish the company in Admin → Broker companies.</p>`,
+      }).catch(() => undefined)
     }
 
     return { success: true, data }

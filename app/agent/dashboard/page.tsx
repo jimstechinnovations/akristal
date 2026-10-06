@@ -5,6 +5,7 @@ import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { PropertyCard } from '@/components/property-card'
 import { Plus, FileText } from 'lucide-react'
+import { ContactStats } from '@/components/account/contact-stats'
 import type { Database } from '@/types/database'
 
 type PropertyRow = Database['public']['Tables']['properties']['Row']
@@ -54,6 +55,8 @@ export default async function AgentDashboard() {
             </Link>
           </div>
         </div>
+
+        <ContactStats agentId={user.id} />
 
         <div className="mb-6 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
           <Card className="bg-white dark:bg-surface">

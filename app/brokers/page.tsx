@@ -12,7 +12,7 @@ export const revalidate = 300
 
 export const metadata: Metadata = pageMetadata({
   title: 'Find a broker',
-  description: 'Broker companies registered with The Akristal Group to sell and let homes across Africa and beyond. See where they work and contact them directly.',
+  description: 'Broker companies registered with The Akristal Group (TAG) to sell and let homes across Africa and beyond. See where they work and contact them directly.',
   path: '/brokers',
 })
 

@@ -33,7 +33,7 @@ export default function Page() {
                 2. Description of Service
               </h2>
               <p>
-                The Akristal Group provides an online marketplace platform that connects buyers,
+                The Akristal Group (TAG) provides an online marketplace platform that connects buyers,
                 sellers, and agents for real estate transactions. We facilitate connections but are
                 not a party to any transactions between users.
               </p>
@@ -113,7 +113,7 @@ export default function Page() {
                 6. Payments and Transactions
               </h2>
               <p>
-                All transactions between users are their sole responsibility. The Akristal Group
+                All transactions between users are their sole responsibility. The Akristal Group (TAG)
                 Limited facilitates connections but is not responsible for:
               </p>
               <ul>
@@ -133,7 +133,7 @@ export default function Page() {
                 7. Intellectual Property
               </h2>
               <p>
-                The Platform and its content are owned by The Akristal Group and protected by
+                The Platform and its content are owned by The Akristal Group (TAG) and protected by
                 copyright and other intellectual property laws. You may not reproduce, distribute,
                 or create derivative works without written permission from Akristal.
               </p>
@@ -144,7 +144,7 @@ export default function Page() {
                 8. Limitation of Liability
               </h2>
               <p>
-                To the maximum extent permitted by law, The Akristal Group shall not be liable
+                To the maximum extent permitted by law, The Akristal Group (TAG) shall not be liable
                 for any indirect, incidental, special, consequential, or punitive damages arising
                 from your use of the Platform.
               </p>
@@ -155,7 +155,7 @@ export default function Page() {
                 9. Indemnification
               </h2>
               <p>
-                You agree to indemnify and hold harmless The Akristal Group from any claims,
+                You agree to indemnify and hold harmless The Akristal Group (TAG) from any claims,
                 damages, losses, or expenses arising from your use of the Platform or violation of
                 these Terms.
               </p>

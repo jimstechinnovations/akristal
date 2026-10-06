@@ -4,14 +4,14 @@ import { CURRENCY_CODES } from './currencies'
 // Client-editable: change values here, not inside components.
 
 export const site = {
-  name: 'The Akristal Group',
+  name: 'The Akristal Group (TAG)',
   shortName: 'Akristal',
   legalName: 'The Akristal Group Limited',
   url: process.env.NEXT_PUBLIC_APP_URL && !process.env.NEXT_PUBLIC_APP_URL.includes('localhost')
     ? process.env.NEXT_PUBLIC_APP_URL
     : 'https://akristal.com',
   description:
-    'The Akristal Group builds, sells and furnishes homes across Africa and beyond. Browse Akristal developments, homes listed by Akristal Brokers & Agents, and Pay Small Small plans.',
+    'The Akristal Group (TAG) builds, sells and furnishes homes across Africa and beyond. Browse Akristal developments, homes listed by Akristal Brokers & Agents, and Pay Small Small plans.',
   email: 'info@akristal.com',
   phone: { label: '+250 791 900 316', href: 'tel:+250791900316' },
   // Digits only, international format, no "+" (used for wa.me links).

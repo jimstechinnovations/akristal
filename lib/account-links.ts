@@ -6,6 +6,7 @@ export type AccountLink = { href: string; label: string }
 const ROLE_LABEL: Record<Role, string> = {
   admin: 'Administrator',
   agent: 'Agent',
+  broker: 'Broker company',
   seller: 'Seller',
   buyer: 'Buyer',
 }
@@ -18,6 +19,7 @@ export function dashboardHref(role?: Role | null) {
   if (role === 'admin') return '/admin'
   if (role === 'seller') return '/seller/dashboard'
   if (role === 'agent') return '/agent/dashboard'
+  if (role === 'broker') return '/broker/dashboard'
   if (role === 'buyer') return '/buyer/dashboard'
   return '/dashboard'
 }
@@ -32,6 +34,13 @@ export function accountLinks(role?: Role | null): AccountLink[] {
   }
   if (role === 'agent') {
     links.push({ href: '/agent/properties', label: 'My listings' }, { href: '/seller/properties/new', label: 'New listing' })
+  }
+  if (role === 'broker') {
+    links.push(
+      { href: '/broker/company', label: 'Company page' },
+      { href: '/seller/properties', label: 'My listings' },
+      { href: '/seller/properties/new', label: 'New listing' }
+    )
   }
   if (role === 'admin') {
     links.push(

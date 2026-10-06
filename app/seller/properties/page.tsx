@@ -10,7 +10,7 @@ import type { Database } from '@/types/database'
 type PropertyRow = Database['public']['Tables']['properties']['Row']
 
 export default async function SellerPropertiesPage() {
-  const user = await requireRole(['seller', 'admin'])
+  const user = await requireRole(['seller', 'broker', 'admin'])
   const supabase = await createClient()
 
   const { data: properties } = await supabase

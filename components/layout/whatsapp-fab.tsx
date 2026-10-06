@@ -6,7 +6,7 @@ import { whatsappLink } from '@/lib/whatsapp'
 import { cn } from '@/lib/utils'
 
 // Dashboards and auth screens don't need a floating chat button.
-const HIDDEN_PREFIXES = ['/admin', '/agent/', '/buyer', '/seller', '/messages', '/login', '/register', '/verify-otp']
+const HIDDEN_PREFIXES = ['/admin', '/agent/', '/broker/', '/buyer', '/seller', '/messages', '/login', '/register', '/verify-otp']
 
 export function WhatsAppFab({ number, message, label }: { number?: string; message: string; label: string }) {
   const pathname = usePathname() ?? '/'

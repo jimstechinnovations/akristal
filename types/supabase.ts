@@ -363,6 +363,7 @@ export type Database = {
           is_verified: boolean
           logo_url: string | null
           name: string
+          owner_id: string | null
           phone: string | null
           registration_number: string | null
           slug: string | null
@@ -385,6 +386,7 @@ export type Database = {
           is_verified?: boolean
           logo_url?: string | null
           name: string
+          owner_id?: string | null
           phone?: string | null
           registration_number?: string | null
           slug?: string | null
@@ -407,6 +409,7 @@ export type Database = {
           is_verified?: boolean
           logo_url?: string | null
           name?: string
+          owner_id?: string | null
           phone?: string | null
           registration_number?: string | null
           slug?: string | null
@@ -414,7 +417,22 @@ export type Database = {
           website_url?: string | null
           whatsapp?: string | null
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "brokers_owner_id_fkey"
+            columns: ["owner_id"]
+            isOneToOne: true
+            referencedRelation: "agent_directory"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "brokers_owner_id_fkey"
+            columns: ["owner_id"]
+            isOneToOne: true
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       categories: {
         Row: {
@@ -3119,7 +3137,7 @@ export type Database = {
       property_status: "available" | "sold" | "rented" | "pending" | "suspended"
       property_type: "residential" | "commercial" | "land" | "rental"
       schedule_visibility: "immediate" | "scheduled" | "hidden"
-      user_role: "buyer" | "seller" | "agent" | "admin"
+      user_role: "buyer" | "seller" | "agent" | "admin" | "broker"
     }
     CompositeTypes: {
       geometry_dump: {
@@ -3285,7 +3303,7 @@ export const Constants = {
       property_status: ["available", "sold", "rented", "pending", "suspended"],
       property_type: ["residential", "commercial", "land", "rental"],
       schedule_visibility: ["immediate", "scheduled", "hidden"],
-      user_role: ["buyer", "seller", "agent", "admin"],
+      user_role: ["buyer", "seller", "agent", "admin", "broker"],
     },
   },
 } as const

@@ -10,7 +10,7 @@ export const revalidate = 300
 
 export const metadata: Metadata = pageMetadata({
   title: 'Client reviews',
-  description: 'What buyers, tenants and investors say about The Akristal Group, and how to share your own experience.',
+  description: 'What buyers, tenants and investors say about The Akristal Group (TAG), and how to share your own experience.',
   path: '/reviews',
 })
 

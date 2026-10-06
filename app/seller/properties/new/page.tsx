@@ -2,7 +2,7 @@ import { requireRole } from '@/lib/auth'
 import { PropertyForm } from '@/components/property-form'
 
 export default async function NewPropertyPage() {
-  await requireRole(['seller', 'agent', 'admin'])
+  await requireRole(['seller', 'agent', 'broker', 'admin'])
 
   return (
     <div className="mx-auto max-w-4xl px-4 py-8 sm:px-6 lg:px-8">

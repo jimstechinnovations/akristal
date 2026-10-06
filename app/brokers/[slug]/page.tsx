@@ -4,6 +4,8 @@ import Link from 'next/link'
 import { notFound } from 'next/navigation'
 import { BadgeCheck, ChevronRight, Globe, Mail, MapPin, MessageCircle, Phone } from 'lucide-react'
 import { getBroker } from '@/lib/data/brokers'
+import { getAllListings } from '@/lib/data/listings'
+import { ListingCard } from '@/components/listings/listing-card'
 import { absoluteUrl, breadcrumbJsonLd } from '@/lib/seo'
 import { whatsappLink } from '@/lib/whatsapp'
 import { cn } from '@/lib/utils'
@@ -18,7 +20,7 @@ type PageProps = { params: Promise<{ slug: string }> }
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
   const broker = await getBroker((await params).slug)
   if (!broker) return { title: 'Broker not found', robots: { index: false } }
-  const description = broker.about?.slice(0, 155) ?? `${broker.name} is a broker company registered with The Akristal Group.`
+  const description = broker.about?.slice(0, 155) ?? `${broker.name} is a broker company registered with The Akristal Group (TAG).`
   return {
     title: `${broker.name}, Akristal Broker`,
     description,
@@ -31,6 +33,7 @@ export default async function BrokerPage({ params }: PageProps) {
   const broker = await getBroker((await params).slug)
   if (!broker) notFound()
   const phone = broker.phone?.replace(/[^\d+]/g, '')
+  const listings = broker.ownerId ? (await getAllListings()).filter((l) => l.sellerId === broker.ownerId && l.status === 'available') : []
   const action = 'inline-flex h-11 items-center justify-center gap-2 rounded-sm px-5 text-sm font-medium transition-colors'
 
   return (
@@ -145,6 +148,21 @@ export default async function BrokerPage({ params }: PageProps) {
           </div>
         </div>
       </section>
+
+      {listings.length > 0 && (
+        <section aria-labelledby="homes-title" className="page-x-wide border-t border-line py-12">
+          <h2 id="homes-title" className="font-display text-display-s font-medium">
+            Homes listed by {broker.name}
+          </h2>
+          <ul className="mt-8 grid gap-x-6 gap-y-12 sm:grid-cols-2 lg:grid-cols-3">
+            {listings.map((l) => (
+              <li key={l.id}>
+                <ListingCard listing={l} />
+              </li>
+            ))}
+          </ul>
+        </section>
+      )}
 
       {broker.about && (
         <section aria-labelledby="about-title" className="page-x-wide border-t border-line py-12">

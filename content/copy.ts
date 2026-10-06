@@ -192,7 +192,10 @@ export const COPY_PAGES: CopyPage[] = [
     paths: ['/join/broker'],
     fields: [
       text('hero.title', 'Heading', 'Register your broker company with Akristal'),
-      text('hero.intro', 'Introduction', 'Broker companies work under The Akristal Group: your team sells and lets homes with Akristal, and your company is listed among Akristal Brokers & Agents.'),
+      text('hero.intro', 'Introduction', 'Broker companies work under The Akristal Group (TAG): your team sells and lets homes with Akristal, and your company is listed among Akristal Brokers & Agents.'),
+      text('account.title', 'Account box: heading', 'Create a broker account'),
+      text('account.text', 'Account box: text', 'Sign up as a broker company to manage your company page, post listings and see how many people contact you. Prefer to talk first? Send the form below.'),
+      text('account.cta', 'Account box: button', 'Create a broker account'),
       steps('benefits', 'What brokers get', [
         { title: 'Sell Akristal Developments', text: 'Offer your clients homes from Akristal Developments, from off-plan to finished.' },
         { title: 'A page for your company', text: 'Your logo, the areas you cover and contact buttons on the Akristal Brokers page.' },
@@ -206,7 +209,7 @@ export const COPY_PAGES: CopyPage[] = [
         { title: 'Sign the broker agreement', text: 'It sets out commission, listing standards and how leads are shared.' },
         { title: 'Go live', text: 'Your company page goes live and you can start listing homes.' },
       ]),
-      text('apply.title', 'Form: heading', 'Company details'),
+      text('apply.title', 'Form: heading', 'Or send your details first'),
       text('apply.intro', 'Form: introduction', 'It takes about five minutes. The Akristal team replies to every registration.'),
     ],
   },

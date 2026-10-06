@@ -3,11 +3,12 @@ import Link from 'next/link'
 import { pageMetadata } from '@/lib/seo'
 import { getCopy } from '@/lib/data/copy'
 import { ApplicationForm } from '@/components/join/application-form'
+import { buttonClasses } from '@/components/ui/button'
 
 export const metadata: Metadata = pageMetadata({
   title: 'Register a broker company',
   description:
-    'Broker companies can register with The Akristal Group to sell Akristal Developments, list their clients’ homes and appear on the Akristal Brokers page.',
+    'Broker companies can register with The Akristal Group (TAG) to sell Akristal Developments, list their clients’ homes and appear on the Akristal Brokers page.',
   path: '/join/broker',
 })
 
@@ -31,6 +32,23 @@ export default async function BrokerJoinPage() {
           {copy.t('hero.intro')}
         </p>
       </header>
+
+      <div className="page-x -mt-4 pb-12">
+        <div className="flex flex-col gap-4 rounded-md border border-line bg-page-alt p-6 sm:flex-row sm:items-center sm:justify-between">
+          <div>
+            <p className="text-lg font-semibold">{copy.t('account.title')}</p>
+            <p className="mt-1 max-w-xl text-[0.9375rem] text-muted">{copy.t('account.text')}</p>
+          </div>
+          <div className="flex flex-wrap gap-3">
+            <Link href="/register?role=broker" className={buttonClasses()}>
+              {copy.t('account.cta')}
+            </Link>
+            <Link href="/login" className={buttonClasses({ variant: 'outline' })}>
+              Log in
+            </Link>
+          </div>
+        </div>
+      </div>
 
       <section aria-labelledby="benefits-title" className="page-x pb-16">
         <h2 id="benefits-title" className="sr-only">

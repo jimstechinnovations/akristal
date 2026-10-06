@@ -465,7 +465,7 @@ export const resources: Resource[] = [
       },
       { name: 'cover_image_url', label: 'Cover image', type: 'image' },
       { name: 'category', label: 'Topic', type: 'text', half: true, placeholder: 'e.g. Buying, Finance, Interiors' },
-      { name: 'author_name', label: 'Author', type: 'text', half: true, placeholder: 'The Akristal Group' },
+      { name: 'author_name', label: 'Author', type: 'text', half: true, placeholder: 'The Akristal Group (TAG)' },
       { name: 'published_at', label: 'Publish date', type: 'date', half: true, help: 'A future date keeps it hidden until then.' },
       { name: 'is_published', label: 'Published', type: 'boolean' },
     ],

@@ -9,7 +9,7 @@ export const revalidate = 600
 
 export const metadata: Metadata = pageMetadata({
   title: 'Insights',
-  description: 'Guides on buying off-plan, Pay Small Small, mortgages, viewings and furnishing a home in Africa, from The Akristal Group.',
+  description: 'Guides on buying off-plan, Pay Small Small, mortgages, viewings and furnishing a home in Africa, from The Akristal Group (TAG).',
   path: '/insights',
 })
 

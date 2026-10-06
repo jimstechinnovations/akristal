@@ -19,6 +19,8 @@ export type Broker = {
   areas: string[]
   registrationNumber: string | null
   isVerified: boolean
+  /** The broker's account; their listings are the ones it posted */
+  ownerId: string | null
 }
 
 /** Published broker companies (RLS hides unpublished ones, including the admin's example record). */
@@ -41,6 +43,7 @@ export const getBrokers = cache(async (): Promise<Broker[]> => {
     areas: b.areas ?? [],
     registrationNumber: b.registration_number,
     isVerified: b.is_verified,
+    ownerId: b.owner_id,
   }))
 })
 

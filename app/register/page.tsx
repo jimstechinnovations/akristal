@@ -13,6 +13,7 @@ import { getErrorMessage } from '@/lib/utils'
 import { Suspense } from 'react'
 import { createProfile } from '@/app/actions/profile'
 import { Eye, EyeOff } from 'lucide-react'
+import { dashboardHref, type Role } from '@/lib/account-links'
 
 function RegisterPageInner() {
   const router = useRouter()
@@ -23,7 +24,9 @@ function RegisterPageInner() {
     confirmPassword: '',
     fullName: '',
     phone: '',
-    role: 'buyer' as Exclude<UserRole, 'admin'>,
+    // /register?role=broker (from Register a broker company) starts on the broker option.
+    role: (searchParams.get('role') === 'broker' ? 'broker' : searchParams.get('role') === 'agent' ? 'agent' : 'buyer') as Exclude<UserRole, 'admin'>,
+    companyName: '',
   })
   const [showPassword, setShowPassword] = useState(false)
   const [showConfirmPassword, setShowConfirmPassword] = useState(false)
@@ -51,16 +54,8 @@ function RegisterPageInner() {
             .eq('id', user.id)
             .single()
           
-          const userRole = (profile as { role?: string } | null)?.role
-          if (userRole === 'admin') {
-            router.replace('/admin')
-          } else if (userRole === 'agent') {
-            router.replace('/agent/dashboard')
-          } else if (userRole === 'seller') {
-            router.replace('/seller/dashboard')
-          } else {
-            router.replace('/buyer/dashboard')
-          }
+          const userRole = (profile as { role?: Role } | null)?.role
+          router.replace(dashboardHref(userRole ?? 'buyer'))
         } else if (user && !user.email_confirmed_at) {
           // User logged in but not confirmed - redirect to verify
           router.replace(`/verify-otp?email=${encodeURIComponent(user.email || '')}`)
@@ -79,6 +74,11 @@ function RegisterPageInner() {
 
     if (formData.password !== formData.confirmPassword) {
       toast.error('Passwords do not match')
+      return
+    }
+
+    if (formData.role === 'broker' && !formData.companyName.trim()) {
+      toast.error('Enter the name of your broker company')
       return
     }
 
@@ -116,7 +116,8 @@ function RegisterPageInner() {
           formData.email.trim(),
           formData.fullName.trim() || null,
           formData.phone.trim() || null,
-          formData.role
+          formData.role,
+          formData.role === 'broker' ? formData.companyName.trim() : undefined
         )
 
         if (profileResult.error) {
@@ -226,8 +227,28 @@ function RegisterPageInner() {
                 <option value="buyer">Buy Properties</option>
                 <option value="seller">Sell Properties</option>
                 <option value="agent">Work as Agent</option>
+                <option value="broker">Register a broker company</option>
               </select>
             </div>
+            {formData.role === 'broker' && (
+              <div>
+                <label htmlFor="companyName" className="block text-sm font-medium mb-1 text-gray-900 dark:text-white">
+                  Company name
+                </label>
+                <Input
+                  id="companyName"
+                  type="text"
+                  autoComplete="organization"
+                  placeholder="e.g. Sade Properties Ltd"
+                  value={formData.companyName}
+                  onChange={(e) => setFormData({ ...formData, companyName: e.target.value })}
+                  required
+                />
+                <p className="mt-1 text-xs text-gray-500 dark:text-gray-400">
+                  Your company page is created now and goes live on the Brokers page once the Akristal team approves it.
+                </p>
+              </div>
+            )}
             <div>
               <label htmlFor="password" className="block text-sm font-medium mb-1 text-gray-900 dark:text-white">
                 Password

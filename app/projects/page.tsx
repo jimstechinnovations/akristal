@@ -17,7 +17,7 @@ import { HillsSkyline } from '@/components/illustrations/hills-skyline'
 export const metadata: Metadata = pageMetadata({
   title: 'Akristal Developments',
   description:
-    'Homes and neighbourhoods built by The Akristal Group: Le Centurium City in Rwamagana, Pearl View Residence in Kanzenze and more. Buy off-plan or finished, directly from the developer.',
+    'Homes and neighbourhoods built by The Akristal Group (TAG): Le Centurium City in Rwamagana, Pearl View Residence in Kanzenze and more. Purchase from the off-plan stage to the finished home via Akristal.',
   path: '/projects',
 })
 
